@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ocs.busi.mapper.InvoiceOperatingMapper">
+
+    <resultMap id="BaseResultMap" type="com.ocs.busi.domain.entity.InvoiceOperating">
+        <id property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="invoicingPeriod" column="invoicing_period" jdbcType="VARCHAR"/>
+        <result property="flowId" column="flow_id" jdbcType="VARCHAR"/>
+        <result property="orderId" column="order_id" jdbcType="VARCHAR"/>
+        <result property="invoiceCreateTime" column="invoice_create_time" jdbcType="DATE"/>
+        <result property="invoicingTime" column="invoicing_time" jdbcType="DATE"/>
+        <result property="redInvoice" column="red_invoice" jdbcType="VARCHAR"/>
+        <result property="invoiceType" column="invoice_type" jdbcType="VARCHAR"/>
+        <result property="invoiceCode" column="invoice_code" jdbcType="VARCHAR"/>
+        <result property="invoiceId" column="invoice_id" jdbcType="VARCHAR"/>
+        <result property="buyerName" column="buyer_name" jdbcType="VARCHAR"/>
+        <result property="buyerTaxId" column="buyer_tax_id" jdbcType="VARCHAR"/>
+        <result property="buyerPhone" column="buyer_phone" jdbcType="VARCHAR"/>
+        <result property="buyerEmail" column="buyer_email" jdbcType="VARCHAR"/>
+        <result property="buyerBankInfo" column="buyer_bank_info" jdbcType="VARCHAR"/>
+        <result property="buyerAddressInfo" column="buyer_address_info" jdbcType="VARCHAR"/>
+        <result property="productName" column="product_name" jdbcType="VARCHAR"/>
+        <result property="productCode" column="product_code" jdbcType="VARCHAR"/>
+        <result property="specifications" column="specifications" jdbcType="VARCHAR"/>
+        <result property="unit" column="unit" jdbcType="VARCHAR"/>
+        <result property="quantity" column="quantity" jdbcType="VARCHAR"/>
+        <result property="unitPriceIncludingTax" column="unit_price_including_tax" jdbcType="VARCHAR"/>
+        <result property="taxRate" column="tax_rate" jdbcType="VARCHAR"/>
+        <result property="priceIncludingTax" column="price_including_tax" jdbcType="VARCHAR"/>
+        <result property="priceExcludingTax" column="price_excluding_tax" jdbcType="VARCHAR"/>
+        <result property="taxPrice" column="tax_price" jdbcType="VARCHAR"/>
+        <result property="totalPriceIncludingTax" column="total_price_including_tax" jdbcType="VARCHAR"/>
+        <result property="totalPriceExcludingTax" column="total_price_excluding_tax" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="billingStaff" column="billing_staff" jdbcType="VARCHAR"/>
+        <result property="payee" column="payee" jdbcType="VARCHAR"/>
+        <result property="reviewer" column="reviewer" jdbcType="VARCHAR"/>
+        <result property="store" column="store" jdbcType="VARCHAR"/>
+        <result property="invoicingMethod" column="invoicing_method" jdbcType="VARCHAR"/>
+        <result property="pdfPath" column="pdf_path" jdbcType="VARCHAR"/>
+        <result property="invoiceState" column="invoice_state" jdbcType="VARCHAR"/>
+        <result property="specialInvoice" column="special_invoice" jdbcType="VARCHAR"/>
+        <result property="clearFlag" column="clear_flag" jdbcType="VARCHAR"/>
+        <result property="extCode" column="ext_code" jdbcType="VARCHAR"/>
+        <result property="machineCode" column="machine_code" jdbcType="VARCHAR"/>
+        <result property="terminalCode" column="terminal_code" jdbcType="VARCHAR"/>
+        <result property="checkCode" column="check_code" jdbcType="VARCHAR"/>
+        <result property="unitPriceExcludingTax" column="unit_price_excluding_tax" jdbcType="VARCHAR"/>
+        <result property="invalidInfo" column="invalid_info" jdbcType="VARCHAR"/>
+        <result property="receiverPhone" column="receiver_phone" jdbcType="VARCHAR"/>
+        <result property="receiverEmail" column="receiver_email" jdbcType="VARCHAR"/>
+        <result property="carInfo" column="car_info" jdbcType="VARCHAR"/>
+        <result property="auctionName" column="auction_name" jdbcType="VARCHAR"/>
+        <result property="auctionAddress" column="auction_address" jdbcType="VARCHAR"/>
+        <result property="auctionTaxNo" column="auction_tax_no" jdbcType="VARCHAR"/>
+        <result property="auctionPhone" column="auction_phone" jdbcType="VARCHAR"/>
+        <result property="bankInfo" column="bank_info" jdbcType="VARCHAR"/>
+        <result property="dataSplit" column="data_split" jdbcType="INTEGER"/>
+        <result property="version" column="version" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="findByFlowId" resultMap="BaseResultMap">
+        select id, flow_id
+        from invoice_operating
+        where flow_id = #{flowId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="groupByInvoicingPeriod" resultType="java.lang.String">
+        select invoicing_period
+        from invoice_operating
+        group by invoicing_period
+        order by invoicing_period
+    </select>
+
+    <select id="findFlowIdIn" resultMap="BaseResultMap">
+        select id, flow_id
+        from invoice_operating
+        where flow_id in (${flowIds})
+    </select>
+
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ocs.busi.mapper.ApplyCheckMapper">
+
+    <resultMap id="BaseResultMap" type="com.ocs.busi.domain.entity.ApplyCheck">
+            <id property="id" column="id" jdbcType="VARCHAR"/>
+            <result property="checkCode" column="check_code" jdbcType="VARCHAR"/>
+            <result property="checkedClient" column="checked_client" jdbcType="VARCHAR"/>
+            <result property="agreementClient" column="agreement_client" jdbcType="VARCHAR"/>
+            <result property="applyOrgAddress" column="apply_org_address" jdbcType="DATE"/>
+            <result property="contactName" column="contact_name" jdbcType="VARCHAR"/>
+            <result property="contactPhone" column="contact_phone" jdbcType="VARCHAR"/>
+            <result property="applyDate" column="apply_date" jdbcType="DATE"/>
+            <result property="checkDate" column="check_date" jdbcType="DATE"/>
+            <result property="status" column="status" jdbcType="VARCHAR"/>
+            <result property="dispatchUserId" column="dispatch_user_id" jdbcType="BIGINT"/>
+            <result property="dispatchDeptId" column="dispatch_dept_id" jdbcType="BIGINT"/>
+            <result property="checkUserId" column="check_user_id" jdbcType="BIGINT"/>
+            <result property="payStatus" column="pay_status" jdbcType="VARCHAR"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+            <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,check_code,checked_client,
+        agreement_client,apply_org_address,contact_name,
+        contact_phone,apply_date,check_date,
+        status,dispatch_user_id,dispatch_dept_id,
+        check_user_id,pay_status,create_by,
+        update_by,create_time,update_time
+    </sql>
+</mapper>

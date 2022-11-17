@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ocs.busi.mapper.BankFlowMapper">
+
+    <resultMap id="BaseResultMap" type="com.ocs.busi.domain.entity.BankFlow">
+        <id property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="bankSiteCode" column="bank_site_code" jdbcType="VARCHAR"/>
+        <result property="selfAccount" column="self_account" jdbcType="VARCHAR"/>
+        <result property="adversaryAccount" column="adversary_account" jdbcType="VARCHAR"/>
+        <result property="tradeTime" column="trade_time" jdbcType="DATE"/>
+        <result property="tradeType" column="trade_type" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="BIGINT"/>
+        <result property="adversaryBankCode" column="adversary_bank_code" jdbcType="VARCHAR"/>
+        <result property="summary" column="summary" jdbcType="VARCHAR"/>
+        <result property="comment" column="comment" jdbcType="VARCHAR"/>
+        <result property="adversaryOrgName" column="adversary_org_name" jdbcType="VARCHAR"/>
+        <result property="balance" column="balance" jdbcType="VARCHAR"/>
+        <result property="otherInfo" column="other_info" jdbcType="VARCHAR"/>
+        <result property="reconciliationFlag" column="reconciliation_flag" jdbcType="VARCHAR"/>
+        <result property="reconciliationModel" column="reconciliation_model" jdbcType="VARCHAR"/>
+        <result property="associationId" column="association_id" jdbcType="VARCHAR"/>
+        <result property="dataSplit" column="data_split" jdbcType="INTEGER"/>
+        <result property="del" column="del" jdbcType="VARCHAR"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="DATE"/>
+        <result property="updateTime" column="update_time" jdbcType="DATE"/>
+    </resultMap>
+
+
+    <select id="findByDateIn" resultType="com.ocs.busi.domain.entity.BankFlow">
+        select id from bank_flow where create_time between #{startDate} and #{endDate} order by id desc limit 1
+    </select>
+
+    <select id="findByBankSiteCode" resultMap="BaseResultMap">
+        select * from bank_flow where bank_site_code = #{bankSiteCode}
+    </select>
+
+    <select id="findAllInByBankSiteCode" resultMap="BaseResultMap">
+        select bank_site_code from bank_flow where bank_site_code in (${bankSiteCodeStr})
+    </select>
+
+
+</mapper>

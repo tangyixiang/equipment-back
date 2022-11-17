@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ocs.busi.mapper.CompanyContractOrgMapper">
+
+    <resultMap id="BaseResultMap" type="com.ocs.busi.domain.entity.CompanyContractOrg">
+            <id property="contractId" column="contract_id" jdbcType="VARCHAR"/>
+            <result property="buyOrgId" column="buy_org_id" jdbcType="VARCHAR"/>
+            <result property="buyOrgContactName" column="buy_org_contact_name" jdbcType="VARCHAR"/>
+            <result property="buyOrgContactPhone" column="buy_org_contact_phone" jdbcType="VARCHAR"/>
+            <result property="sellOrgId" column="sell_org_id" jdbcType="VARCHAR"/>
+            <result property="sellOrgContactName" column="sell_org_contact_name" jdbcType="VARCHAR"/>
+            <result property="sellOrgContactPhone" column="sell_org_contact_phone" jdbcType="VARCHAR"/>
+            <result property="del" column="del" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+</mapper>

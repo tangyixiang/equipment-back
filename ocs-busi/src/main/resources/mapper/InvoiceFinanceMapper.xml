@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ocs.busi.mapper.InvoiceFinanceMapper">
+
+    <resultMap id="BaseResultMap" type="com.ocs.busi.domain.entity.InvoiceFinance">
+        <id property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="invoicingPeriod" column="invoicing_period" jdbcType="VARCHAR"/>
+        <result property="invoicingDate" column="invoicing_date" jdbcType="VARCHAR"/>
+        <result property="orgName" column="org_name" jdbcType="VARCHAR"/>
+        <result property="invoicingOrgName" column="invoicing_org_name" jdbcType="VARCHAR"/>
+        <result property="invoiceBm" column="invoice_bm" jdbcType="VARCHAR"/>
+        <result property="invoiceName" column="invoice_name" jdbcType="VARCHAR"/>
+        <result property="invoiceCode" column="invoice_code" jdbcType="VARCHAR"/>
+        <result property="invoiceId" column="invoice_id" jdbcType="VARCHAR"/>
+        <result property="payer" column="payer" jdbcType="VARCHAR"/>
+        <result property="socialCreditCode" column="social_credit_code" jdbcType="VARCHAR"/>
+        <result property="printed" column="printed" jdbcType="VARCHAR"/>
+        <result property="redInvoiceFlag" column="red_invoice_flag" jdbcType="VARCHAR"/>
+        <result property="paperInvoiceNo" column="paper_invoice_no" jdbcType="VARCHAR"/>
+        <result property="electronInvoiceNo" column="electron_invoice_no" jdbcType="VARCHAR"/>
+        <result property="checkCode" column="check_code" jdbcType="VARCHAR"/>
+        <result property="creator" column="creator" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="unit" column="unit" jdbcType="VARCHAR"/>
+        <result property="quantity" column="quantity" jdbcType="VARCHAR"/>
+        <result property="standard" column="standard" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+        <result property="dataSplit" column="data_split" jdbcType="INTEGER"/>
+        <result property="version" column="version" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="groupByInvoicingPeriod" resultType="java.lang.String">
+        select invoicing_period
+        from invoice_finance
+        group by invoicing_period
+        order by invoicing_period
+    </select>
+
+    <select id="findByInvoiceId" resultMap="BaseResultMap">
+        select id, invoice_id
+        from invoice_finance
+        where invoice_id = #{invoiceId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="findInvoiceIdIn" resultMap="BaseResultMap">
+        select id, invoice_id
+        from invoice_finance
+        where invoice_id in (${invoiceIds})
+    </select>
+
+</mapper>
