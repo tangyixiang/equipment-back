@@ -43,7 +43,7 @@ jobs:
         cp Dockerfile ocs-admin/target
         cp .dockerignore ocs-admin/target
         cd ocs-admin/target
-        docker build . -t yixiang94/ocs-admin:1.0 && docker push yixiang94/ocs-admin:1.0 && echo "push finish"
+        docker build . -t yixiang94/equipment-back:1.0 && docker push yixiang94/equipment-back:1.0 && echo "push finish"
 
 #    - name: Deploy
 #      uses: garygrossgarten/github-action-scp@release
