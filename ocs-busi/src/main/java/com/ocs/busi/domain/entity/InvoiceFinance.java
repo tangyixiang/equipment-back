@@ -86,25 +86,21 @@ public class InvoiceFinance extends SimpleEntity {
     /**
      * 已打印
      */
-    @NotBlank(message = "已打印不能为空")
     private String printed;
 
     /**
      * 已开红票
      */
-    @NotBlank(message = "已开红票不能为空")
     private String redInvoiceFlag;
 
     /**
      * 相关纸质票号
      */
-    @NotBlank(message = "相关纸质票号不能为空")
     private String paperInvoiceNo;
 
     /**
      * 相关电子票号
      */
-    @NotBlank(message = "相关电子票号不能为空")
     private String electronInvoiceNo;
 
     /**
@@ -158,7 +154,6 @@ public class InvoiceFinance extends SimpleEntity {
     /**
      * 备注
      */
-    @NotBlank(message = "备注不能为空")
     private String remark;
 
     /**
@@ -169,7 +164,7 @@ public class InvoiceFinance extends SimpleEntity {
     /**
      * 分录生成标识
      */
-    private boolean dataSplit;
+    private Boolean dataSplit;
 
     /**
      * 版本

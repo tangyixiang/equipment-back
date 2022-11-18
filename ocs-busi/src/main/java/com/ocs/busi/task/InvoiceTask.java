@@ -89,7 +89,7 @@ public class InvoiceTask {
         SysJobRuntime runtime = TaskContext.get();
         String taskId = TaskIDPrefixConstants.FINANCE_TASK + runtime.getTaskId();
         logger.info("财政性发票,分录任务开始执行,分配的任务ID:{}", taskId);
-        LambdaQueryWrapper<InvoiceFinance> wrapper = new LambdaQueryWrapper<InvoiceFinance>().eq(InvoiceFinance::isDataSplit, false);
+        LambdaQueryWrapper<InvoiceFinance> wrapper = new LambdaQueryWrapper<InvoiceFinance>().eq(InvoiceFinance::getDataSplit, false);
         List<InvoiceFinance> list = invoiceFinanceService.list(wrapper);
 
         return invoiceFinanceHandle.dataSplit(certificateId, list, accountingPeriod, taskId);

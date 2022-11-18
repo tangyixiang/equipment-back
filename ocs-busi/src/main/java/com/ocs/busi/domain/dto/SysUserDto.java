@@ -25,6 +25,11 @@ public class SysUserDto extends BaseEntity {
     private Long userId;
 
     /**
+     * 用户编号
+     */
+    private String userCode;
+
+    /**
      * 部门ID
      */
     private Long deptId;

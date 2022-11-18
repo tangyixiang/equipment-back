@@ -47,7 +47,7 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
             invoice.setId(IdUtil.objectId());
             InvoiceFinance oldData = getBaseMapper().findByInvoiceId(invoice.getInvoiceId());
             // 如果生成凭证,只保留最近3次的记录
-            if (oldData != null && oldData.isDataSplit()) {
+            if (oldData != null && oldData.getDataSplit() == Boolean.TRUE) {
                 // 保持原来的ID
                 invoice.setId(oldData.getId());
                 // 执行了的任务次数
