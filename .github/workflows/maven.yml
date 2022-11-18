@@ -16,7 +16,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -27,18 +26,18 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
-    - name: Buildn
+    - name: Build
       run: mvn -B package --file pom.xml -Dmaven.test.skip=true
 
-    - name: deploy
+    - name: Deploy
       uses: garygrossgarten/github-action-scp@release
       with:
-        local: target/ocs-admin.jar
-        remote: blog.imzjw.cn/actions/github-actions-springboot.jar
+        local: ocs-admin/target/ocs-admin.jar
+        remote: /home/soft/jar/equipment/ocs-admin.jar
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.USER_NAME }}
         password: ${{ secrets.SERVER_PASSWORD }}
-    - name: 在服务器上执行 java -jar，请确保服务器安装了 JDK
+    - name: Run
       if: always()
       uses: fifsky/ssh-action@master
       with:
