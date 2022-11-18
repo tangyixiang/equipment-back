@@ -26,22 +26,38 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
+    # 设置 maven 缓存
+    - name: Cache Maven packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
     - name: Build
       run: mvn -B package --file pom.xml -Dmaven.test.skip=true
+    - name: Docker Image
+      run: |
+        docker version
+        docker login --username=${{ secrets.DOCKER_USERNAME }} --password=${{ secrets.DOCKER_PASSWORD }}
+        cp Dockerfile ocs-admin/target
+        cp .dockerignore ocs-admin/target
+        cd ocs-admin/target
+        docker build . -t yixiang94/ocs-admin:1.0 && docker push yixiang94/ocs-admin:1.0 && echo "push finish"
 
-    - name: Deploy
-      uses: garygrossgarten/github-action-scp@release
-      with:
-        local: ocs-admin/target/ocs-admin.jar
-        remote: /home/soft/jar/equipment/ocs-admin.jar
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.USER_NAME }}
-        password: ${{ secrets.SERVER_PASSWORD }}
-    - name: Run
-      if: always()
-      uses: fifsky/ssh-action@master
-      with:
-        command: sh /home/soft/jar/equipment/server.sh
-        host: ${{ secrets.SERVER_HOST }}
-        user: ${{ secrets.USER_NAME }}
-        pass: ${{ secrets.SERVER_PASSWORD }}
+#    - name: Deploy
+#      uses: garygrossgarten/github-action-scp@release
+#      with:
+#        local: ocs-admin/target/ocs-admin.jar
+#        remote: /home/soft/jar/equipment/ocs-admin.jar
+#        host: ${{ secrets.SERVER_HOST }}
+#        username: ${{ secrets.USER_NAME }}
+#        password: ${{ secrets.SERVER_PASSWORD }}
+#    - name: Run
+#      if: always()
+#      uses: fifsky/ssh-action@master
+#      with:
+#        command: docker pull yixiang94/ocs-admin:1.0
+#        host: ${{ secrets.SERVER_HOST }}
+#        user: ${{ secrets.USER_NAME }}
+#        pass: ${{ secrets.SERVER_PASSWORD }}
