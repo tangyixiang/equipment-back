@@ -26,6 +26,7 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
+
     # 设置 maven 缓存
 #    - name: Cache Maven packages
 #      uses: actions/cache@v3
