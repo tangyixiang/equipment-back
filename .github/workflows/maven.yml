@@ -27,15 +27,16 @@ jobs:
         distribution: 'temurin'
         cache: maven
     # 设置 maven 缓存
-    - name: Cache Maven packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
+#    - name: Cache Maven packages
+#      uses: actions/cache@v3
+#      with:
+#        path: ~/.m2
+#        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+#        restore-keys: ${{ runner.os }}-m2
 
     - name: Build
       run: mvn -B package --file pom.xml -Dmaven.test.skip=true
+
     - name: Docker Image
       run: |
         docker version
