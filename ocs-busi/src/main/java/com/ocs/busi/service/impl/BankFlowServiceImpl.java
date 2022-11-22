@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.dto.BankFlowUploadDto;
 import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.BankFlowSplit;
+import com.ocs.busi.domain.entity.CompanyClientOrg;
 import com.ocs.busi.helper.ExcelCellHelper;
 import com.ocs.busi.helper.SerialNumberHelper;
 import com.ocs.busi.helper.ValidateHelper;
@@ -14,6 +15,7 @@ import com.ocs.busi.mapper.BankFlowMapper;
 import com.ocs.busi.mapper.BankFlowSplitMapper;
 import com.ocs.busi.service.BankFlowService;
 import com.ocs.busi.service.BankFlowSplitService;
+import com.ocs.busi.service.CompanyClientOrgService;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
 import com.ocs.common.utils.DateUtils;
@@ -47,10 +49,15 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
     private BankFlowSplitService bankFlowSplitService;
     @Autowired
     private BankFlowSplitMapper bankFlowSplitMapper;
+    @Autowired
+    private CompanyClientOrgService companyClientOrgService;
 
     @Override
     public Map<String, Object> uploadValidate(InputStream inputStream, BankFlowUploadDto bankFlowUploadDto) {
         List<BankFlow> bankFlowList = convertExcelToFlow(inputStream, bankFlowUploadDto);
+        List<CompanyClientOrg> allCompanyOrg = companyClientOrgService.findAllCompanyOrg();
+
+        Set<String> allCompanyOrgNameSet = allCompanyOrg.stream().map(CompanyClientOrg::getName).collect(Collectors.toSet());
 
         List<String> bankSiteCodeList = new ArrayList<>();
         // 根据BankSiteCode来查询
@@ -58,6 +65,12 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
         List<BankFlow> bankFlows = getBaseMapper().findAllInByBankSiteCode(bankSiteCodeStr);
 
         bankFlows.forEach(flow -> bankSiteCodeList.add(flow.getBankSiteCode()));
+
+        bankFlowList.forEach(flow -> {
+            if (!allCompanyOrgNameSet.contains(flow.getAdversaryOrgName())) {
+                throw new ServiceException("客户基础资料中不存在," + flow.getAdversaryOrgName());
+            }
+        });
 
         Map<String, Object> result = new HashMap<>();
         result.put("validate", bankFlows.size() == 0);

@@ -3,6 +3,7 @@ package com.ocs.busi.service.impl;
 import cn.hutool.poi.excel.sax.Excel07SaxReader;
 import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.entity.CompanyClientOrg;
 import com.ocs.busi.helper.ValidateHelper;
@@ -10,6 +11,7 @@ import com.ocs.busi.mapper.CompanyClientOrgMapper;
 import com.ocs.busi.service.CompanyClientOrgService;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
+import com.ocs.common.utils.sql.QueryUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +51,13 @@ public class CompanyClientOrgServiceImpl extends ServiceImpl<CompanyClientOrgMap
             saveOrUpdate(org);
         });
 
+    }
+
+    @Override
+    public List<CompanyClientOrg> findAllCompanyOrg() {
+        QueryWrapper<CompanyClientOrg> queryWrapper = QueryUtil.dynamicCondition(new CompanyClientOrg(), CommonConstants.QUERY_EQUAL, false);
+        List<CompanyClientOrg> clientOrgList = list(queryWrapper);
+        return clientOrgList;
     }
 
 
