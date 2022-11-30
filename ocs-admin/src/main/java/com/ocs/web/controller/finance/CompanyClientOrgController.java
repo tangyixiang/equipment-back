@@ -13,7 +13,7 @@ import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
 import com.ocs.common.utils.TemplateDownloadUtils;
-import com.ocs.common.utils.sql.QueryUtil;
+import com.ocs.common.helper.QueryHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +53,7 @@ public class CompanyClientOrgController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list(CompanyClientOrg companyClientOrg) {
         startPage("create_time desc");
-        QueryWrapper<CompanyClientOrg> queryWrapper = QueryUtil.dynamicCondition(companyClientOrg, CommonConstants.QUERY_LIKE, false);
+        QueryWrapper<CompanyClientOrg> queryWrapper = QueryHelper.dynamicCondition(companyClientOrg, CommonConstants.QUERY_LIKE, false);
         List<CompanyClientOrg> list = companyClientOrgService.list(queryWrapper);
         return getDataTable(list);
     }

@@ -2,7 +2,6 @@ package com.ocs.busi.task.handle;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.IdUtil;
-import com.ocs.busi.domain.dto.AccountingSubjectDto;
 import com.ocs.busi.domain.entity.AccountingSubject;
 import com.ocs.busi.domain.entity.InvoiceOperating;
 import com.ocs.busi.domain.entity.InvoiceOperatingSplit;
@@ -76,15 +75,8 @@ public class InvoiceOperatingHandle {
             String productName = invoiceOperating.getProductName();
             String[] productNameSplit = productName.split("\\*");
             String itemName = productNameSplit[productNameSplit.length - 1];
-            List<AccountingSubjectDto> accountingSubjectDtoList = accountingSubjectService.findSubjectChild(itemName);
             // 科目编号
-            Map<String, String> nameValueMap = new HashMap<>();
-            for (AccountingSubjectDto accountingSubjectDto : accountingSubjectDtoList) {
-                String parentId = accountingSubjectDto.getSubject().getParentId();
-                AccountingSubject parent = accountingSubjectService.getById(parentId);
-                Optional<AccountingSubjectDto> optional = accountingSubjectDto.getChild().stream().findFirst();
-                optional.ifPresent(value -> nameValueMap.put(parent.getName(), value.getSubject().getName()));
-            }
+            Map<String, String> nameValueMap = accountingSubjectService.findOperatingData(itemName);
 
             InvoiceOperatingSplit bankRecordSplit = bankRecord(increment, invoiceOperating, itemName, taskId);
             InvoiceOperatingSplit fundsRecordSplit = fundsRecord(increment, invoiceOperating, itemName, taskId);

@@ -95,7 +95,7 @@
         <if test="status != null">status,</if>
         <if test="remark != null and remark != ''">remark,</if>
         <if test="createBy != null and createBy != ''">create_by,</if>
-        <if test="group != null and group != ''">group,</if>
+        <if test="group != null and group != ''">`group`,</if>
         create_time
         )values(
         <if test="dictName != null and dictName != ''">#{dictName},</if>

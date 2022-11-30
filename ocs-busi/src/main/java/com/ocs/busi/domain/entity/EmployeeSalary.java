@@ -1,11 +1,6 @@
 package com.ocs.busi.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-
 import com.ocs.common.core.domain.SimpleEntity;
 import lombok.Data;
 
@@ -31,17 +26,28 @@ public class EmployeeSalary extends SimpleEntity {
     private String salaryPeriod;
 
     /**
-     * 职员编号
-     */
-    @TableId
-    @NotBlank(message = "职员编号不能为空")
-    private String employeeCode;
-
-    /**
      * 职员名称
      */
     @NotBlank(message = "职员名称不能为空")
     private String employeeName;
+
+    /**
+     * 部门
+     */
+    @NotBlank(message = "部门不能为空")
+    private String employeeDept;
+
+    /**
+     * 账户
+     */
+    @NotBlank(message = "账户不能为空")
+    private String employeeAccountNo;
+
+    /**
+     * 居民身份证号码
+     */
+    @NotBlank(message = "身份证号码不能为空")
+    private String employeeIdNumber;
 
     /**
      * 岗位工资
@@ -49,11 +55,19 @@ public class EmployeeSalary extends SimpleEntity {
     @NotNull(message = "岗位工资不能为空")
     private Double postSalary;
 
+
+    @NotNull(message = "补岗位工资不能为空")
+    private Double additionPostSalary;
+
     /**
      * 薪级工资
      */
     @NotNull(message = "薪级工资不能为空")
     private Double rankSalary;
+
+
+    @NotNull(message = "补薪级工资不能为空")
+    private Double additionRankSalary;
 
     /**
      * 基础性绩效工资
@@ -62,15 +76,10 @@ public class EmployeeSalary extends SimpleEntity {
     private Double performanceSalary;
 
     /**
-     * 住房物业服务补贴
+     * 基础性绩效工资
      */
-    @NotNull(message = "住房物业服务补贴不能为空")
-    private Double housingSalary;
-
-    /**
-     * 奖励性绩效
-     */
-    private Double bonusSalary;
+    @NotNull(message = "补基础性绩效工资不能为空")
+    private Double additionPerformanceSalary;
 
     /**
      * 预留增项1
@@ -98,19 +107,29 @@ public class EmployeeSalary extends SimpleEntity {
     private Double extraIncreaseSalary5;
 
     /**
-     * 预发 百分比
+     * 合计
      */
-    private String paymentRatio;
+    @NotNull(message = "合计不能为空")
+    private Double salaryTotal;
+
 
     /**
-     * 差额
+     * 激励性绩效
      */
-    private Double unPaymentSalary;
+    @NotNull(message = "激励性绩效不能为空")
+    private Double bonusSalary;
+
+    /**
+     * 住房物业服务补贴
+     */
+    @NotNull(message = "住房物业服务补贴不能为空")
+    private Double housingSalary;
+
 
     /**
      * 应发工资
      */
-    @NotNull(message = "应发工资不能为空")
+    @NotNull(message = "应发合计不能为空")
     private Double salaryPayable;
 
     /**
@@ -138,24 +157,17 @@ public class EmployeeSalary extends SimpleEntity {
     private Double housingAccumulationFunds;
 
     /**
-     * 职业年金
-     */
-    private Double occupationalAnnuity;
-
-    /**
-     * 职业年金清算差额
-     */
-    private Double occupationalAnnuityDifferent;
-
-    /**
      * 工会费
      */
+    @NotNull(message = "工会会费不能为空")
     private Double unionFees;
 
     /**
-     * 个人所得税
+     * 职业年金
      */
-    private Double individualIncomeTax;
+    @NotNull(message = "职业年金不能为空")
+    private Double occupationalAnnuity;
+
 
     /**
      * 预留减项1
@@ -187,6 +199,12 @@ public class EmployeeSalary extends SimpleEntity {
      */
     @NotNull(message = "扣款合计不能为空")
     private Double decreaseTotalSalary;
+
+    /**
+     * 个人所得税
+     */
+    @NotNull(message = "个税不能为空")
+    private Double individualIncomeTax;
 
     /**
      * 实发金额

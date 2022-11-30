@@ -20,7 +20,7 @@ public class OfficeApplicationTest {
 
     @Test
     public void dbConvert() {
-        String tableName = "invoice_finance";
+        String tableName = "employee_salary";
         String sql = String.format(SQL, tableName);
         List<Map<String, Object>> maps = SqlRunner.db().selectList(sql);
         List<Map<String,Object>> list = new ArrayList<>();

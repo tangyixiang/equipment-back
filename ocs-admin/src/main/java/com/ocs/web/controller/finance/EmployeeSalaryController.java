@@ -9,7 +9,7 @@ import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
 import com.ocs.common.utils.TemplateDownloadUtils;
-import com.ocs.common.utils.sql.QueryUtil;
+import com.ocs.common.helper.QueryHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +46,7 @@ public class EmployeeSalaryController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list(EmployeeSalary employeeSalary) {
         startPage("create_time desc");
-        QueryWrapper<EmployeeSalary> queryWrapper = QueryUtil.dynamicCondition(employeeSalary, CommonConstants.QUERY_LIKE);
+        QueryWrapper<EmployeeSalary> queryWrapper = QueryHelper.dynamicCondition(employeeSalary, CommonConstants.QUERY_LIKE);
         List<EmployeeSalary> list = employeeSalaryService.list(queryWrapper);
         return getDataTable(list);
     }

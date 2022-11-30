@@ -13,7 +13,7 @@ import java.util.Map;
 */
 public interface InvoiceFinanceService extends IService<InvoiceFinance> {
 
-    void importInvoice(InputStream inputStream, String month);
+    void importInvoice(InputStream inputStream, String period);
 
     List<String> monthPeriod(String month);
 

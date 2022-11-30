@@ -1,20 +1,19 @@
 package com.ocs.busi.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ocs.busi.domain.dto.AccountingSubjectDto;
 import com.ocs.busi.domain.entity.AccountingSubject;
 import com.ocs.busi.mapper.AccountingSubjectMapper;
 import com.ocs.busi.service.AccountingSubjectService;
 import com.ocs.common.constant.CommonConstants;
-import com.ocs.common.utils.StringUtils;
-import com.ocs.common.utils.sql.QueryUtil;
+import com.ocs.common.core.domain.entity.SysDictData;
+import com.ocs.common.exception.ServiceException;
+import com.ocs.system.service.ISysDictDataService;
+import com.ocs.system.service.ISysDictTypeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * @author tangyx
@@ -25,43 +24,55 @@ import java.util.stream.Collectors;
 public class AccountingSubjectServiceImpl extends ServiceImpl<AccountingSubjectMapper, AccountingSubject>
         implements AccountingSubjectService {
 
+    @Autowired
+    private ISysDictDataService dictDataService;
+    @Autowired
+    private ISysDictTypeService dictTypeService;
 
     @Override
-    public List<AccountingSubjectDto> getAccountSubjectTree() {
-        QueryWrapper<AccountingSubject> wrapper = QueryUtil.dynamicCondition(new AccountingSubject(), CommonConstants.QUERY_EQUAL, false);
-        return getSubjectDtoList(wrapper);
+    public AccountingSubject findFinanceItemValue(String itemName) {
+        SysDictData sysDictData = new SysDictData();
+        sysDictData.setDictLabel(itemName);
+        List<SysDictData> sysDictDataList = dictDataService.selectDictDataList(sysDictData);
+        SysDictData dictData = sysDictDataList.stream().filter(data -> dictTypeService.selectDictTypeById(data.getDictCode()).getGroup().equals(CommonConstants.DICT_FINANCE_GROUP))
+                .findFirst().get();
+
+        LambdaQueryWrapper<AccountingSubject> wrapper = new LambdaQueryWrapper<AccountingSubject>().eq(AccountingSubject::getItemId, dictData.getDictValue());
+        AccountingSubject subject = getOne(wrapper);
+        return subject;
     }
 
     @Override
-    public List<AccountingSubjectDto> findSubjectChild(String name) {
-        QueryWrapper<AccountingSubject> wrapper = QueryUtil.dynamicCondition(new AccountingSubject(), CommonConstants.QUERY_EQUAL, false);
-        wrapper.eq("name",name);
-        return getSubjectDtoList(wrapper);
+    public Map<String, String> findOperatingData(String itemName) {
+        SysDictData sysDictData = new SysDictData();
+        sysDictData.setDictLabel(itemName);
+        List<SysDictData> sysDictDataList = dictDataService.selectDictDataList(sysDictData);
+        SysDictData dictData = sysDictDataList.stream().filter(data -> dictTypeService.selectDictTypeById(data.getDictCode()).getGroup().equals(CommonConstants.DICT_FINANCE_GROUP))
+                .findFirst().get();
+        LambdaQueryWrapper<AccountingSubject> wrapper = new LambdaQueryWrapper<AccountingSubject>().eq(AccountingSubject::getItemId, dictData.getDictValue());
+
+        List<AccountingSubject> accountingSubjectList = list(wrapper);
+
+        HashMap<String, String> map = new HashMap<>();
+        accountingSubjectList.forEach(subject -> {
+            SysDictData mappingDictData = findDictData(subject.getMappingId());
+            map.put(mappingDictData.getDictLabel(), subject.getValue());
+        });
+
+        return map;
     }
 
-    private List<AccountingSubjectDto> getSubjectDtoList(QueryWrapper<AccountingSubject> wrapper) {
-        List<AccountingSubject> allSubject = list(wrapper);
-        List<AccountingSubject> topSubjectList = allSubject.stream().filter(subject -> subject.getParentId().equals("0")).collect(Collectors.toList());
-        if (topSubjectList.size() == 0) {
-            return buildTree(topSubjectList, allSubject);
-        } else {
-            return Collections.emptyList();
-        }
-    }
 
-
-    private List<AccountingSubjectDto> buildTree(List<AccountingSubject> topSubjectList, List<AccountingSubject> allSubject) {
-        List<AccountingSubjectDto> tree = new ArrayList<>();
-        for (AccountingSubject accountingSubject : topSubjectList) {
-            AccountingSubjectDto treeNode = new AccountingSubjectDto();
-            treeNode.setSubject(accountingSubject);
-            if (StringUtils.isNotEmpty(accountingSubject.getParentId())) {
-                List<AccountingSubject> subjectList = allSubject.stream().filter(subject -> subject.getParentId().equals(accountingSubject.getId())).collect(Collectors.toList());
-                treeNode.setChild(buildTree(subjectList, allSubject));
-            }
-            tree.add(treeNode);
+    private SysDictData findDictData(String dictValue) {
+        SysDictData sysDictData = new SysDictData();
+        sysDictData.setDictValue(dictValue);
+        List<SysDictData> sysDictDataList = dictDataService.selectDictDataList(sysDictData);
+        SysDictData dictData = sysDictDataList.stream().filter(data -> dictTypeService.selectDictTypeById(data.getDictCode()).getGroup().equals(CommonConstants.DICT_FINANCE_GROUP))
+                .findFirst().get();
+        if (dictData == null) {
+            throw new ServiceException("未找到值:" + dictValue + "的字典");
         }
-        return tree;
+        return dictData;
     }
 }
 

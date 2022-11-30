@@ -1,7 +1,5 @@
 package com.ocs.web.controller.system;
 
-import com.ocs.busi.domain.dto.SysUserDto;
-import com.ocs.busi.domain.entity.SysUserExtension;
 import com.ocs.busi.service.SysUserExtensionService;
 import com.ocs.common.annotation.Log;
 import com.ocs.common.constant.UserConstants;
@@ -18,7 +16,6 @@ import com.ocs.system.service.ISysPostService;
 import com.ocs.system.service.ISysRoleService;
 import com.ocs.system.service.ISysUserService;
 import org.apache.commons.lang3.ArrayUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,12 +98,6 @@ public class SysUserController extends BaseController {
             ajax.put("roleIds", sysUser.getRoles().stream().map(SysRole::getRoleId).collect(Collectors.toList()));
         }
 
-        SysUserExtension sysUserExtension = sysUserExtensionService.getById(userId);
-        if (sysUserExtension != null) {
-            ajax.put("hireType", sysUserExtension.getHireType());
-            ajax.put("certificate", sysUserExtension.getCertificate());
-            ajax.put("dimensions", sysUserExtension.getDimensions());
-        }
         return ajax;
     }
 
@@ -117,9 +108,7 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @Transactional
     @PostMapping
-    public Result add(@Validated @RequestBody SysUserDto sysUserDto) {
-        SysUser user = new SysUser();
-        BeanUtils.copyProperties(sysUserDto, user);
+    public Result add(@Validated @RequestBody SysUser user) {
         if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName()))) {
             return Result.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
         } else if (StringUtils.isNotEmpty(user.getPhonenumber())
@@ -133,11 +122,6 @@ public class SysUserController extends BaseController {
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
         int rows = userService.insertUser(user);
 
-        SysUserExtension sysUserExtension = new SysUserExtension();
-        sysUserExtension.setUseId(user.getUserId());
-        BeanUtils.copyProperties(sysUserDto, sysUserExtension);
-        sysUserExtensionService.save(sysUserExtension);
-
         return toAjax(rows);
     }
 
@@ -147,9 +131,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public Result edit(@Validated @RequestBody SysUserDto sysUserDto) {
-        SysUser user = new SysUser();
-        BeanUtils.copyProperties(sysUserDto, user);
+    public Result edit(@Validated @RequestBody SysUser user) {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
         if (StringUtils.isNotEmpty(user.getPhonenumber())
@@ -161,11 +143,6 @@ public class SysUserController extends BaseController {
         }
         user.setUpdateBy(getUsername());
         int updateUser = userService.updateUser(user);
-
-        SysUserExtension sysUserExtension = new SysUserExtension();
-        sysUserExtension.setUseId(user.getUserId());
-        BeanUtils.copyProperties(sysUserDto, sysUserExtension);
-        sysUserExtensionService.saveOrUpdate(sysUserExtension);
 
         return toAjax(updateUser);
     }

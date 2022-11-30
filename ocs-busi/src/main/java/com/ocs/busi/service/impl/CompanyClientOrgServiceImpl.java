@@ -11,7 +11,7 @@ import com.ocs.busi.mapper.CompanyClientOrgMapper;
 import com.ocs.busi.service.CompanyClientOrgService;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
-import com.ocs.common.utils.sql.QueryUtil;
+import com.ocs.common.helper.QueryHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class CompanyClientOrgServiceImpl extends ServiceImpl<CompanyClientOrgMap
 
     @Override
     public List<CompanyClientOrg> findAllCompanyOrg() {
-        QueryWrapper<CompanyClientOrg> queryWrapper = QueryUtil.dynamicCondition(new CompanyClientOrg(), CommonConstants.QUERY_EQUAL, false);
+        QueryWrapper<CompanyClientOrg> queryWrapper = QueryHelper.dynamicCondition(new CompanyClientOrg(), CommonConstants.QUERY_EQUAL, false);
         List<CompanyClientOrg> clientOrgList = list(queryWrapper);
         return clientOrgList;
     }

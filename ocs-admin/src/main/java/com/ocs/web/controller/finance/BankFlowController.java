@@ -9,7 +9,7 @@ import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
 import com.ocs.common.utils.TemplateDownloadUtils;
-import com.ocs.common.utils.sql.QueryUtil;
+import com.ocs.common.helper.QueryHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,7 +57,7 @@ public class BankFlowController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list(BankFlow bankFlow) {
         startPage("create_time desc");
-        QueryWrapper<BankFlow> queryWrapper = QueryUtil.dynamicCondition(bankFlow, CommonConstants.QUERY_LIKE, false);
+        QueryWrapper<BankFlow> queryWrapper = QueryHelper.dynamicCondition(bankFlow, CommonConstants.QUERY_LIKE, false);
         List<BankFlow> list = bankFlowService.list(queryWrapper);
         return getDataTable(list);
     }

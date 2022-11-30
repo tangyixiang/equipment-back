@@ -1,4 +1,4 @@
-package com.ocs.common.utils.sql;
+package com.ocs.common.helper;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -10,7 +10,7 @@ import org.springframework.cglib.beans.BeanMap;
  * @author tangyixiang
  * @Date 2022/10/13
  */
-public class QueryUtil {
+public class QueryHelper {
 
     /**
      * 动态生成查询条件(删除条件)

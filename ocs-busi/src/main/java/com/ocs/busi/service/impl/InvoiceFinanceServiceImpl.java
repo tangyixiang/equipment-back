@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.entity.InvoiceFinance;
 import com.ocs.busi.domain.entity.InvoiceFinanceSplit;
+import com.ocs.busi.helper.InvoiceHelper;
 import com.ocs.busi.helper.ValidateHelper;
 import com.ocs.busi.mapper.InvoiceFinanceMapper;
 import com.ocs.busi.service.InvoiceFinanceService;
@@ -37,11 +38,15 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
 
     @Autowired
     private InvoiceFinanceSplitService invoiceFinanceSplitService;
+    @Autowired
+    private InvoiceHelper invoiceHelper;
 
     @Override
     @Transactional
-    public synchronized void importInvoice(InputStream inputStream, String month) {
-        List<InvoiceFinance> invoiceFinanceList = convertExcelToInvoice(inputStream, month);
+    public synchronized void importInvoice(InputStream inputStream, String period) {
+        List<InvoiceFinance> invoiceFinanceList = convertExcelToInvoice(inputStream, period);
+        // 数据校验
+        invoiceHelper.validateFinance(invoiceFinanceList);
 
         invoiceFinanceList.forEach(invoice -> {
             invoice.setId(IdUtil.objectId());
@@ -67,6 +72,11 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
             }
             saveOrUpdate(invoice);
         });
+
+        // 删除这个期间
+        remove(new LambdaQueryWrapper<InvoiceFinance>().eq(InvoiceFinance::getInvoicingPeriod, period));
+
+        saveBatch(invoiceFinanceList);
 
     }
 
@@ -146,7 +156,7 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
         };
     }
 
-    public String convertString(Object value){
+    public String convertString(Object value) {
         return value == null ? null : String.valueOf(value);
     }
 

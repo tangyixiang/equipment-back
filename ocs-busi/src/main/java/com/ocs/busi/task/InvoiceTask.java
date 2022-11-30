@@ -47,20 +47,20 @@ public class InvoiceTask {
      *
      * @param accountingPeriod  会计日期
      */
-    public void splitTask(String accountingPeriod) {
+    public void splitTask(Integer accountingPeriod) {
         TaskContext.get().setTaskType(CommonConstants.TASK_SPLIT);
         logger.info("发票分录任务开始");
         SysDictData dictData = new SysDictData();
         dictData.setDictType("invoice_accounting_period");
         List<SysDictData> sysDictDataList = dictDataService.selectDictDataList(dictData);
 
-        Optional<String> periodOptional = sysDictDataList.stream().filter(data -> data.getDictLabel().equals(accountingPeriod)).map(data -> data.getDictValue()).findFirst();
+        Optional<String> periodOptional = sysDictDataList.stream().filter(data -> data.getDictLabel().equals(accountingPeriod + "")).map(data -> data.getDictValue()).findFirst();
         if (!periodOptional.isPresent()) {
             throw new ServiceException("请配置会计期间,期间值" + accountingPeriod + ",不存在");
         }
 
-        Integer certificateId = splitOperatingInvoice(accountingPeriod, Integer.parseInt(periodOptional.get()));
-        splitFinanceInvoice(accountingPeriod, certificateId);
+        Integer certificateId = splitOperatingInvoice(accountingPeriod + "", Integer.parseInt(periodOptional.get()));
+        splitFinanceInvoice(accountingPeriod + "", certificateId);
         logger.info("发票分录任务完成");
     }
 

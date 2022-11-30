@@ -1,7 +1,7 @@
 package com.ocs.busi.task.handle;
 
 import cn.hutool.core.util.IdUtil;
-import com.ocs.busi.domain.dto.AccountingSubjectDto;
+import com.ocs.busi.domain.entity.AccountingSubject;
 import com.ocs.busi.domain.entity.InvoiceFinance;
 import com.ocs.busi.domain.entity.InvoiceFinanceSplit;
 import com.ocs.busi.service.AccountingSubjectService;
@@ -72,19 +72,16 @@ public class InvoiceFinanceHandle {
 
         for (InvoiceFinance invoiceFinance : invoiceFinanceList) {
             int increment = atomicInteger.getAndIncrement();
-
             String itemName = invoiceFinance.getItemName();
-            List<AccountingSubjectDto> accountingSubjectDtoList = accountingSubjectService.findSubjectChild(itemName);
 
-            Optional<AccountingSubjectDto> accountingSubjectDto = accountingSubjectDtoList.stream().findFirst();
-            if (!accountingSubjectDto.isPresent()) {
+            AccountingSubject financeItemValue = accountingSubjectService.findFinanceItemValue(itemName);
+
+            if (financeItemValue == null) {
                 logger.error("未找到科目编码");
             }
-            AccountingSubjectDto subjectDto = accountingSubjectDto.get().getChild().stream().findFirst().get();
 
             InvoiceFinanceSplit bankRecordSplit = bankRecord(increment, invoiceFinance, taskId);
-            InvoiceFinanceSplit financeRecordSplit = financeRecord(increment, invoiceFinance, taskId, subjectDto.getSubject().getName());
-
+            InvoiceFinanceSplit financeRecordSplit = financeRecord(increment, invoiceFinance, taskId, financeItemValue.getValue());
 
             invoiceFinance.setDataSplit(true);
             //CZFPENTRY202211V001

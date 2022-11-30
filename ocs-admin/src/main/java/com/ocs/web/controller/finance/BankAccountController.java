@@ -9,7 +9,7 @@ import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
-import com.ocs.common.utils.sql.QueryUtil;
+import com.ocs.common.helper.QueryHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +32,7 @@ public class BankAccountController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list() {
         startPage("create_time desc");
-        QueryWrapper<BankAccount> queryWrapper = QueryUtil.dynamicCondition(new BankAccount(), CommonConstants.QUERY_EQUAL, false);
+        QueryWrapper<BankAccount> queryWrapper = QueryHelper.dynamicCondition(new BankAccount(), CommonConstants.QUERY_EQUAL, false);
         List<BankAccount> list = bankAccountService.list(queryWrapper);
         return getDataTable(list);
     }

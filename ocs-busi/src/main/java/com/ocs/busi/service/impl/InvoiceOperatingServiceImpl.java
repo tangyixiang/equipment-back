@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.entity.InvoiceOperating;
 import com.ocs.busi.domain.entity.InvoiceOperatingSplit;
 import com.ocs.busi.helper.ExcelCellHelper;
+import com.ocs.busi.helper.InvoiceHelper;
 import com.ocs.busi.helper.ValidateHelper;
 import com.ocs.busi.mapper.InvoiceOperatingMapper;
 import com.ocs.busi.service.InvoiceOperatingService;
@@ -38,11 +39,15 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
 
     @Autowired
     private InvoiceOperatingSplitService invoiceOperatingSplitService;
+    @Autowired
+    private InvoiceHelper invoiceHelper;
 
     @Override
     @Transactional
     public synchronized void importInvoice(InputStream inputStream, String period) {
         List<InvoiceOperating> invoiceOperatingList = convertExcelToInvoice(inputStream, period);
+        // 校验数据
+        invoiceHelper.validateOperate(invoiceOperatingList);
 
         invoiceOperatingList.forEach(invoice -> {
             invoice.setId(IdUtil.objectId());
@@ -64,8 +69,11 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
                     }
                 }
             }
-            saveOrUpdate(invoice);
         });
+        // 删除这个期间
+        remove(new LambdaQueryWrapper<InvoiceOperating>().eq(InvoiceOperating::getInvoicingPeriod, period));
+        // 再导入
+        saveBatch(invoiceOperatingList);
     }
 
     private List<InvoiceOperating> convertExcelToInvoice(InputStream inputStream, String period) {

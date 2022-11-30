@@ -50,4 +50,9 @@ public class CommonConstants {
      */
     public static final String DICT_BUSI_GROUP = "busi";
 
+    /**
+     * 字典分组-业务组
+     */
+    public static final String DICT_FINANCE_GROUP = "finance";
+
 }

@@ -10,8 +10,7 @@ import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
 import com.ocs.common.exception.ServiceException;
-import com.ocs.common.utils.sql.QueryUtil;
-import io.swagger.annotations.ApiOperation;
+import com.ocs.common.helper.QueryHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +35,7 @@ public class CompanyCarController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list(CompanyCar companyCar) {
         startPage("create_time desc");
-        QueryWrapper<CompanyCar> companyCarQueryWrapper = QueryUtil.dynamicCondition(companyCar, CommonConstants.QUERY_LIKE, false);
+        QueryWrapper<CompanyCar> companyCarQueryWrapper = QueryHelper.dynamicCondition(companyCar, CommonConstants.QUERY_LIKE, false);
         List<CompanyCar> list = companyCarService.list(companyCarQueryWrapper);
         return getDataTable(list);
     }
@@ -49,7 +48,6 @@ public class CompanyCarController extends BaseController {
      * @return
      */
     @PostMapping("/add")
-    @ApiOperation(value = "新增车辆管理", notes = "新增车辆管理")
     public Result add(@RequestBody @Validated CompanyCar companyCar) {
         validateCar(companyCar);
         companyCar.setId(IdUtil.objectId());
@@ -68,7 +66,6 @@ public class CompanyCarController extends BaseController {
      * @return
      */
     @PostMapping("/update")
-    @ApiOperation(value = "更新车辆管理", notes = "更新车辆管理")
     public Result update(@RequestBody @Validated CompanyCar companyCar) {
         validateCar(companyCar);
         boolean update = companyCarService.updateById(companyCar);
@@ -85,7 +82,6 @@ public class CompanyCarController extends BaseController {
      * @return
      */
     @DeleteMapping("/del/{ids}")
-    @ApiOperation(value = "删除车辆管理", notes = "删除车辆管理")
     @Transactional
     public Result delete(@PathVariable String[] ids) {
         for (String id : ids) {

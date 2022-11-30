@@ -11,7 +11,7 @@ import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
-import com.ocs.common.utils.sql.QueryUtil;
+import com.ocs.common.helper.QueryHelper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class CompanyContractController extends BaseController {
         startPage("create_time desc");
         CompanyContract contract = new CompanyContract();
         BeanUtils.copyProperties(companyContractDto, contract);
-        QueryWrapper<CompanyContract> queryWrapper = QueryUtil.dynamicCondition(contract, CommonConstants.QUERY_LIKE, false);
+        QueryWrapper<CompanyContract> queryWrapper = QueryHelper.dynamicCondition(contract, CommonConstants.QUERY_LIKE, false);
         if (ObjectUtils.isNotEmpty(companyContractDto.getContractSignDateEnd())) {
             queryWrapper.between("start_date", companyContractDto.getContractSignDateStart(), companyContractDto.getContractSignDateEnd());
         }

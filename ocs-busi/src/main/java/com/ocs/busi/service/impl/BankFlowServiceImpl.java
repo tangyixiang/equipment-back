@@ -55,10 +55,10 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
     @Override
     public Map<String, Object> uploadValidate(InputStream inputStream, BankFlowUploadDto bankFlowUploadDto) {
         List<BankFlow> bankFlowList = convertExcelToFlow(inputStream, bankFlowUploadDto);
+        // 所有的客户信息
         List<CompanyClientOrg> allCompanyOrg = companyClientOrgService.findAllCompanyOrg();
-
+        logger.info("客户数量:{}", allCompanyOrg.size());
         Set<String> allCompanyOrgNameSet = allCompanyOrg.stream().map(CompanyClientOrg::getName).collect(Collectors.toSet());
-
         List<String> bankSiteCodeList = new ArrayList<>();
         // 根据BankSiteCode来查询
         String bankSiteCodeStr = bankFlowList.stream().map(flow -> flow.getBankSiteCode()).collect(Collectors.joining(","));
@@ -99,9 +99,9 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
                 if (bankFlowSplitList.size() > 0) {
                     bankFlowSplitList.forEach(split -> split.setDel(CommonConstants.STATUS_DEL));
                     bankFlowSplitService.updateBatchById(bankFlowSplitList);
-                    //TODO 根据拆分信息取消对账单
+                    // TODO 根据拆分信息取消对账单
                 }
-                //TODO 取消对账单
+                // TODO 取消对账单
 
             }
 
