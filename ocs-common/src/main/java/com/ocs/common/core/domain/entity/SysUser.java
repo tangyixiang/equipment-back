@@ -1,17 +1,19 @@
 package com.ocs.common.core.domain.entity;
 
-import java.util.Date;
-import java.util.List;
-import javax.validation.constraints.*;
-
-import com.ocs.common.xss.Xss;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ocs.common.annotation.Excel;
 import com.ocs.common.annotation.Excel.ColumnType;
 import com.ocs.common.annotation.Excel.Type;
 import com.ocs.common.annotation.Excels;
 import com.ocs.common.core.domain.BaseEntity;
+import com.ocs.common.xss.Xss;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 用户对象 sys_user
@@ -25,11 +27,6 @@ public class SysUser extends BaseEntity {
      */
     @Excel(name = "用户序号", cellType = ColumnType.NUMERIC, prompt = "用户编号")
     private Long userId;
-
-    /**
-     * 用户编号
-     */
-    private String userCode;
 
     /**
      * 部门ID
@@ -83,6 +80,7 @@ public class SysUser extends BaseEntity {
     /**
      * 密码
      */
+    @NotBlank(message = "密码不能为空")
     private String password;
 
     /**
@@ -299,14 +297,6 @@ public class SysUser extends BaseEntity {
 
     public void setRoleId(Long roleId) {
         this.roleId = roleId;
-    }
-
-    public String getUserCode() {
-        return userCode;
-    }
-
-    public void setUserCode(String userCode) {
-        this.userCode = userCode;
     }
 
     @Override
