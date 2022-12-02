@@ -22,8 +22,6 @@ import com.ocs.framework.security.handle.LogoutSuccessHandlerImpl;
 
 /**
  * spring security配置
- *
- *
  */
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -65,9 +63,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * 解决 无法直接注入 AuthenticationManager
-     *
-     * @return
-     * @throws Exception
      */
     @Bean
     @Override
@@ -106,7 +101,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 过滤请求
                 .authorizeRequests()
                 // 对于登录login 注册register 验证码captchaImage 允许匿名访问
-                .antMatchers("/login", "/register", "/captchaImage").anonymous()
+                .antMatchers("/login", "/register", "/captchaImage", "/front/column").anonymous()
                 // 静态资源，可匿名访问
                 .antMatchers(HttpMethod.GET, "/", "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**").permitAll()
                 .antMatchers("/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/*/api-docs", "/druid/**").permitAll()

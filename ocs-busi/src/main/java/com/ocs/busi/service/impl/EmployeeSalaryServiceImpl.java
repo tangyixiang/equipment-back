@@ -27,11 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * @author tangyx
- * @description 针对表【employee_salary(员工工资)】的数据库操作Service实现
- * @createDate 2022-11-07 11:58:55
- */
+
 @Service
 public class EmployeeSalaryServiceImpl extends ServiceImpl<EmployeeSalaryMapper, EmployeeSalary> implements EmployeeSalaryService {
 
@@ -91,7 +87,7 @@ public class EmployeeSalaryServiceImpl extends ServiceImpl<EmployeeSalaryMapper,
                 return;
             }
 
-            if (period.equals(rowlist.get(0) + "") || StringUtils.isEmpty(period)) {
+            if (period.equals(rowlist.get(1) + "") || StringUtils.isEmpty(period)) {
                 EmployeeSalary employeeSalary = new EmployeeSalary();
 
                 employeeSalary.setSalaryPeriod(rowlist.get(1) + "");
@@ -142,9 +138,6 @@ public class EmployeeSalaryServiceImpl extends ServiceImpl<EmployeeSalaryMapper,
         return StringUtils.isEmpty(value) || value.equals("null") ? null : Double.parseDouble(value);
     }
 
-    public String convertString(Object value) {
-        return value == null ? null : String.valueOf(value);
-    }
 }
 
 
