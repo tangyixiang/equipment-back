@@ -1,9 +1,5 @@
 package com.ocs.framework.manager.factory;
 
-import java.util.TimerTask;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.ocs.common.constant.Constants;
 import com.ocs.common.utils.LogUtils;
 import com.ocs.common.utils.ServletUtils;
@@ -16,11 +12,13 @@ import com.ocs.system.domain.SysOperLog;
 import com.ocs.system.service.ISysLogininforService;
 import com.ocs.system.service.ISysOperLogService;
 import eu.bitwalker.useragentutils.UserAgent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.TimerTask;
 
 /**
  * 异步工厂（产生任务用）
- *
- * 
  */
 public class AsyncFactory {
     private static final Logger sys_user_logger = LoggerFactory.getLogger("sys-user");

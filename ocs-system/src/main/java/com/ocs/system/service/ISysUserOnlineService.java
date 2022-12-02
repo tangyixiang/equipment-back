@@ -5,8 +5,6 @@ import com.ocs.system.domain.SysUserOnline;
 
 /**
  * 在线用户 服务层
- *
- *
  */
 public interface ISysUserOnlineService {
     /**

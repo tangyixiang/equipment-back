@@ -2,8 +2,6 @@ package com.ocs.common.constant;
 
 /**
  * 返回状态码
- *
- * 
  */
 public class HttpStatus {
     /**

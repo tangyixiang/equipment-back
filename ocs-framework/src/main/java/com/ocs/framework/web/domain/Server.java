@@ -1,17 +1,8 @@
 package com.ocs.framework.web.domain;
 
-import java.net.UnknownHostException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-
 import com.ocs.common.utils.Arith;
 import com.ocs.common.utils.ip.IpUtils;
-import com.ocs.framework.web.domain.server.Cpu;
-import com.ocs.framework.web.domain.server.Jvm;
-import com.ocs.framework.web.domain.server.Mem;
-import com.ocs.framework.web.domain.server.Sys;
-import com.ocs.framework.web.domain.server.SysFile;
+import com.ocs.framework.web.domain.server.*;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.CentralProcessor.TickType;
@@ -22,10 +13,13 @@ import oshi.software.os.OSFileStore;
 import oshi.software.os.OperatingSystem;
 import oshi.util.Util;
 
+import java.net.UnknownHostException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+
 /**
  * 服务器相关信息
- *
- * 
  */
 public class Server {
     private static final int OSHI_WAIT_SECOND = 1000;

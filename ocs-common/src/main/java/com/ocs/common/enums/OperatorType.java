@@ -2,8 +2,6 @@ package com.ocs.common.enums;
 
 /**
  * 操作人类别
- *
- *
  */
 public enum OperatorType {
     /**

@@ -2,8 +2,6 @@ package com.ocs.common.enums;
 
 /**
  * 用户状态
- *
- * 
  */
 public enum UserStatus {
     OK("0", "正常"), DISABLE("1", "停用"), DELETED("2", "删除");

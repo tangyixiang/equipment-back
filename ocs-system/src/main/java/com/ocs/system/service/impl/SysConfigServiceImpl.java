@@ -1,13 +1,5 @@
 package com.ocs.system.service.impl;
 
-import java.util.Collection;
-import java.util.List;
-import javax.annotation.PostConstruct;
-
-import com.ocs.system.mapper.SysConfigMapper;
-import com.ocs.system.service.ISysConfigService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.ocs.common.annotation.DataSource;
 import com.ocs.common.constant.CacheConstants;
 import com.ocs.common.constant.UserConstants;
@@ -17,11 +9,17 @@ import com.ocs.common.enums.DataSourceType;
 import com.ocs.common.exception.ServiceException;
 import com.ocs.common.utils.StringUtils;
 import com.ocs.system.domain.SysConfig;
+import com.ocs.system.mapper.SysConfigMapper;
+import com.ocs.system.service.ISysConfigService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 参数配置 服务层实现
- *
- * 
  */
 @Service
 public class SysConfigServiceImpl implements ISysConfigService {

@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * swagger 接口
- *
- * 
  */
 @Controller
 @RequestMapping("/tool/swagger")

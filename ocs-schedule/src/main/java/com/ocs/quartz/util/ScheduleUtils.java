@@ -1,27 +1,16 @@
 package com.ocs.quartz.util;
 
-import com.ocs.quartz.domain.SysJob;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.CronTrigger;
-import org.quartz.Job;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.TriggerBuilder;
-import org.quartz.TriggerKey;
 import com.ocs.common.constant.Constants;
 import com.ocs.common.constant.ScheduleConstants;
 import com.ocs.common.exception.job.TaskException;
 import com.ocs.common.exception.job.TaskException.Code;
 import com.ocs.common.utils.StringUtils;
 import com.ocs.common.utils.spring.SpringUtils;
+import com.ocs.quartz.domain.SysJob;
+import org.quartz.*;
 
 /**
  * 定时任务工具类
- *
- * 
  */
 public class ScheduleUtils {
     /**

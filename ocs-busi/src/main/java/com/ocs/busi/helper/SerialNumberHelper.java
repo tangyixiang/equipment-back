@@ -16,7 +16,7 @@ public class SerialNumberHelper {
     private AtomicInteger initialValue = new AtomicInteger();
 
     public SerialNumberHelper(String currentValue, String pattern) {
-        if (StringUtils.isNotEmpty(currentValue)){
+        if (StringUtils.isNotEmpty(currentValue)) {
             String[] array = currentValue.split(pattern);
             this.initialValue = new AtomicInteger(Integer.parseInt(array[array.length - 1]));
         }

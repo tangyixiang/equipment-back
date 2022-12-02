@@ -1,13 +1,11 @@
 package com.ocs.system.mapper;
 
-import java.util.List;
-
 import com.ocs.system.domain.SysUserPost;
+
+import java.util.List;
 
 /**
  * 用户与岗位关联表 数据层
- *
- *
  */
 public interface SysUserPostMapper {
     /**

@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 首页
- *
- * 
  */
 @RestController
 public class SysIndexController {

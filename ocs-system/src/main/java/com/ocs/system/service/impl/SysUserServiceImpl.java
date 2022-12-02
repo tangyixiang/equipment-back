@@ -1,18 +1,5 @@
 package com.ocs.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.validation.Validator;
-
-import com.ocs.system.service.ISysConfigService;
-import com.ocs.system.service.ISysUserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import com.ocs.common.annotation.DataScope;
 import com.ocs.common.constant.UserConstants;
 import com.ocs.common.core.domain.entity.SysRole;
@@ -25,16 +12,23 @@ import com.ocs.common.utils.spring.SpringUtils;
 import com.ocs.system.domain.SysPost;
 import com.ocs.system.domain.SysUserPost;
 import com.ocs.system.domain.SysUserRole;
-import com.ocs.system.mapper.SysPostMapper;
-import com.ocs.system.mapper.SysRoleMapper;
-import com.ocs.system.mapper.SysUserMapper;
-import com.ocs.system.mapper.SysUserPostMapper;
-import com.ocs.system.mapper.SysUserRoleMapper;
+import com.ocs.system.mapper.*;
+import com.ocs.system.service.ISysConfigService;
+import com.ocs.system.service.ISysUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import javax.validation.Validator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 用户 业务层处理
- *
- * 
  */
 @Service
 public class SysUserServiceImpl implements ISysUserService {

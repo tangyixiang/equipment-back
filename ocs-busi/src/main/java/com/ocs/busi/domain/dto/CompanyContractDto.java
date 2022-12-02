@@ -3,7 +3,6 @@ package com.ocs.busi.domain.dto;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  * @author tangyixiang

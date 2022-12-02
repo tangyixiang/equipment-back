@@ -17,8 +17,16 @@
     </resultMap>
 
     <sql id="selectConfigVo">
-        select config_id, config_name, config_key, config_value, config_type, create_by, create_time, update_by,
-        update_time, remark
+        select config_id,
+               config_name,
+               config_key,
+               config_value,
+               config_type,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               remark
         from sys_config
     </sql>
 
@@ -100,7 +108,9 @@
     </update>
 
     <delete id="deleteConfigById" parameterType="Long">
-        delete from sys_config where config_id = #{configId}
+        delete
+        from sys_config
+        where config_id = #{configId}
     </delete>
 
     <delete id="deleteConfigByIds" parameterType="Long">

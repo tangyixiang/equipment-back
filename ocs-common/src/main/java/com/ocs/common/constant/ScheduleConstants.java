@@ -2,8 +2,6 @@ package com.ocs.common.constant;
 
 /**
  * 任务调度通用常量
- *
- * 
  */
 public class ScheduleConstants {
     public static final String TASK_CLASS_NAME = "TASK_CLASS_NAME";

@@ -1,14 +1,5 @@
 package com.ocs.framework.web.service;
 
-import javax.annotation.Resource;
-
-import com.ocs.framework.manager.factory.AsyncFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
 import com.ocs.common.constant.CacheConstants;
 import com.ocs.common.constant.Constants;
 import com.ocs.common.core.domain.entity.SysUser;
@@ -24,13 +15,20 @@ import com.ocs.common.utils.ServletUtils;
 import com.ocs.common.utils.StringUtils;
 import com.ocs.common.utils.ip.IpUtils;
 import com.ocs.framework.manager.AsyncManager;
+import com.ocs.framework.manager.factory.AsyncFactory;
 import com.ocs.system.service.ISysConfigService;
 import com.ocs.system.service.ISysUserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * 登录校验方法
- *
- *
  */
 @Component
 public class SysLoginService {

@@ -2,8 +2,6 @@ package com.ocs.common.utils.sign;
 
 /**
  * Base64工具类
- *
- * 
  */
 public final class Base64 {
     static private final int BASELENGTH = 128;

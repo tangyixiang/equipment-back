@@ -8,11 +8,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
-* @author tangyx
-* @description 针对表【company_employee(职员信息表)】的数据库操作Mapper
-* @createDate 2022-11-29 12:12:56
-* @Entity com.ocs.busi.domain.entity.CompanyEmployee
-*/
+ * @author tangyx
+ * @description 针对表【company_employee(职员信息表)】的数据库操作Mapper
+ * @createDate 2022-11-29 12:12:56
+ * @Entity com.ocs.busi.domain.entity.CompanyEmployee
+ */
 @Repository
 public interface CompanyEmployeeMapper extends BaseMapper<CompanyEmployee> {
 

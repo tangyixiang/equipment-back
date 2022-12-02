@@ -1,15 +1,13 @@
 package com.ocs.system.service.impl;
 
-import com.ocs.system.service.ISysUserOnlineService;
-import org.springframework.stereotype.Service;
 import com.ocs.common.core.domain.model.LoginUser;
 import com.ocs.common.utils.StringUtils;
 import com.ocs.system.domain.SysUserOnline;
+import com.ocs.system.service.ISysUserOnlineService;
+import org.springframework.stereotype.Service;
 
 /**
  * 在线用户 服务层处理
- *
- *
  */
 @Service
 public class SysUserOnlineServiceImpl implements ISysUserOnlineService {

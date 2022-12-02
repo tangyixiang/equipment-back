@@ -18,12 +18,12 @@ public class FrontController {
 
         String sql = String.format(SQL, tableName);
         List<Map<String, Object>> maps = SqlRunner.db().selectList(sql);
-        List<Map<String,Object>> list = new ArrayList<>();
+        List<Map<String, Object>> list = new ArrayList<>();
         maps.forEach(map -> {
             Set<String> strings = map.keySet();
             TreeMap<String, Object> hashMap = new TreeMap<>();
             for (String key : strings) {
-                hashMap.put(key, NamingCase.toCamelCase((String)map.get(key)));
+                hashMap.put(key, NamingCase.toCamelCase((String) map.get(key)));
             }
             hashMap.put("valueType", "text");
             list.add(hashMap);

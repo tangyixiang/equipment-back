@@ -1,14 +1,12 @@
 package com.ocs.common.enums;
 
+import org.springframework.lang.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.lang.Nullable;
-
 /**
  * 请求方式
- *
- *
  */
 public enum HttpMethod {
     GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE;

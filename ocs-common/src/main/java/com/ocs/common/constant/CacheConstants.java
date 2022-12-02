@@ -2,8 +2,6 @@ package com.ocs.common.constant;
 
 /**
  * 缓存的key 常量
- *
- *
  */
 public class CacheConstants {
     /**

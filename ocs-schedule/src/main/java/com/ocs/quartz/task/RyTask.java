@@ -1,12 +1,10 @@
 package com.ocs.quartz.task;
 
-import org.springframework.stereotype.Component;
 import com.ocs.common.utils.StringUtils;
+import org.springframework.stereotype.Component;
 
 /**
  * 定时任务调度测试
- *
- *
  */
 @Component("ryTask")
 public class RyTask {

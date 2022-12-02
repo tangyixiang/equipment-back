@@ -5,19 +5,21 @@
 <mapper namespace="com.ocs.busi.mapper.BankFlowSplitMapper">
 
     <resultMap id="BaseResultMap" type="com.ocs.busi.domain.entity.BankFlowSplit">
-            <result property="id" column="id" jdbcType="VARCHAR"/>
-            <result property="bankFlowId" column="bank_flow_id" jdbcType="VARCHAR"/>
-            <result property="price" column="price" jdbcType="DOUBLE"/>
-            <result property="associationId" column="association_id" jdbcType="VARCHAR"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
-            <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="bankFlowId" column="bank_flow_id" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="DOUBLE"/>
+        <result property="associationId" column="association_id" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
     </resultMap>
 
 
-
     <select id="findByBankFlowId" resultMap="BaseResultMap">
-        select * from bank_flow_split where bank_flow_id = #{bankFlowId} and del = '2'
+        select *
+        from bank_flow_split
+        where bank_flow_id = #{bankFlowId}
+          and del = '2'
     </select>
 </mapper>

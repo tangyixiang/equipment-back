@@ -5,27 +5,27 @@
 <mapper namespace="com.ocs.busi.mapper.StaffTripMapper">
 
     <resultMap id="BaseResultMap" type="com.ocs.busi.domain.entity.StaffTrip">
-            <id property="id" column="id" jdbcType="VARCHAR"/>
-            <result property="checkCode" column="check_code" jdbcType="VARCHAR"/>
-            <result property="deptId" column="dept_id" jdbcType="BIGINT"/>
-            <result property="roleId" column="role_id" jdbcType="BIGINT"/>
-            <result property="startDate" column="start_date" jdbcType="DATE"/>
-            <result property="endDate" column="end_date" jdbcType="DATE"/>
-            <result property="tripDays" column="trip_days" jdbcType="VARCHAR"/>
-            <result property="tripType" column="trip_type" jdbcType="VARCHAR"/>
-            <result property="tripMethod" column="trip_method" jdbcType="VARCHAR"/>
-            <result property="partner" column="partner" jdbcType="VARCHAR"/>
-            <result property="adressDesc" column="adress_desc" jdbcType="VARCHAR"/>
-            <result property="outReason" column="out_reason" jdbcType="VARCHAR"/>
-            <result property="picuters" column="picuters" jdbcType="VARCHAR"/>
-            <result property="useStartDate" column="use_start_date" jdbcType="DATE"/>
-            <result property="useEndDate" column="use_end_date" jdbcType="DATE"/>
-            <result property="useTripDays" column="use_trip_days" jdbcType="VARCHAR"/>
-            <result property="carDispatchId" column="car_dispatch_id" jdbcType="VARCHAR"/>
-            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
-            <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <id property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="checkCode" column="check_code" jdbcType="VARCHAR"/>
+        <result property="deptId" column="dept_id" jdbcType="BIGINT"/>
+        <result property="roleId" column="role_id" jdbcType="BIGINT"/>
+        <result property="startDate" column="start_date" jdbcType="DATE"/>
+        <result property="endDate" column="end_date" jdbcType="DATE"/>
+        <result property="tripDays" column="trip_days" jdbcType="VARCHAR"/>
+        <result property="tripType" column="trip_type" jdbcType="VARCHAR"/>
+        <result property="tripMethod" column="trip_method" jdbcType="VARCHAR"/>
+        <result property="partner" column="partner" jdbcType="VARCHAR"/>
+        <result property="adressDesc" column="adress_desc" jdbcType="VARCHAR"/>
+        <result property="outReason" column="out_reason" jdbcType="VARCHAR"/>
+        <result property="picuters" column="picuters" jdbcType="VARCHAR"/>
+        <result property="useStartDate" column="use_start_date" jdbcType="DATE"/>
+        <result property="useEndDate" column="use_end_date" jdbcType="DATE"/>
+        <result property="useTripDays" column="use_trip_days" jdbcType="VARCHAR"/>
+        <result property="carDispatchId" column="car_dispatch_id" jdbcType="VARCHAR"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
 

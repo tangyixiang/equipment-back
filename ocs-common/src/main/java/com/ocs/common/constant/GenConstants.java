@@ -2,8 +2,6 @@ package com.ocs.common.constant;
 
 /**
  * 代码生成通用常量
- *
- *
  */
 public class GenConstants {
     /**

@@ -25,7 +25,7 @@ public class StaffTripController {
 
         staffTripService.save(staffTrip);
         if (staffTrip.getStatus().equals(FlowStatusConstants.SUBMIT)) {
-            //TODO 发起流程
+            // TODO 发起流程
 
         }
 
@@ -48,8 +48,8 @@ public class StaffTripController {
     }
 
     @PostMapping("/approve")
-    public Result approve(){
-        //TODO 审批通过
+    public Result approve() {
+        // TODO 审批通过
         return Result.success();
     }
 

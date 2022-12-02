@@ -1,17 +1,15 @@
 package com.ocs.common.core.domain.model;
 
-import java.util.Collection;
-import java.util.Set;
-
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.ocs.common.core.domain.entity.SysUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.alibaba.fastjson2.annotation.JSONField;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * 登录用户身份权限
- *
- * 
  */
 public class LoginUser implements UserDetails {
     private static final long serialVersionUID = 1L;

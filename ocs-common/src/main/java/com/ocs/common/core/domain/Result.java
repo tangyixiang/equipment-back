@@ -1,14 +1,12 @@
 package com.ocs.common.core.domain;
 
-import java.util.HashMap;
-
 import com.ocs.common.constant.HttpStatus;
 import com.ocs.common.utils.StringUtils;
 
+import java.util.HashMap;
+
 /**
  * 操作消息提醒
- *
- *
  */
 public class Result extends HashMap<String, Object> {
     private static final long serialVersionUID = 1L;

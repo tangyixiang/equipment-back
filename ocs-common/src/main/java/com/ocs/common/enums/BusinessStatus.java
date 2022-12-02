@@ -2,8 +2,6 @@ package com.ocs.common.enums;
 
 /**
  * 操作状态
- *
- *
  */
 public enum BusinessStatus {
     /**

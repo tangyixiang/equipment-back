@@ -2,8 +2,6 @@ package com.ocs.common.utils.poi;
 
 /**
  * Excel数据格式处理适配器
- *
- * 
  */
 public interface ExcelHandlerAdapter {
     /**

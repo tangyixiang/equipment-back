@@ -1,18 +1,16 @@
 package com.ocs.quartz.util;
 
+import com.ocs.common.utils.StringUtils;
+import com.ocs.common.utils.spring.SpringUtils;
+import com.ocs.quartz.domain.SysJob;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.ocs.quartz.domain.SysJob;
-import com.ocs.common.utils.StringUtils;
-import com.ocs.common.utils.spring.SpringUtils;
-
 /**
  * 任务执行工具
- *
- *
  */
 public class JobInvokeUtil {
     /**

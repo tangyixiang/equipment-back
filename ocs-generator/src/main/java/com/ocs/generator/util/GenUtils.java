@@ -1,18 +1,16 @@
 package com.ocs.generator.util;
 
-import java.util.Arrays;
-
-import org.apache.commons.lang3.RegExUtils;
 import com.ocs.common.constant.GenConstants;
 import com.ocs.common.utils.StringUtils;
 import com.ocs.generator.config.GenConfig;
 import com.ocs.generator.domain.GenTable;
 import com.ocs.generator.domain.GenTableColumn;
+import org.apache.commons.lang3.RegExUtils;
+
+import java.util.Arrays;
 
 /**
  * 代码生成器 工具类
- *
- *
  */
 public class GenUtils {
     /**

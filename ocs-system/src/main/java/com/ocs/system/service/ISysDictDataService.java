@@ -1,13 +1,11 @@
 package com.ocs.system.service;
 
-import java.util.List;
-
 import com.ocs.common.core.domain.entity.SysDictData;
+
+import java.util.List;
 
 /**
  * 字典 业务层
- *
- * 
  */
 public interface ISysDictDataService {
     /**

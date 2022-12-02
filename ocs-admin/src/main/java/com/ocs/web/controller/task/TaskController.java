@@ -18,7 +18,6 @@ import com.ocs.quartz.domain.SysJob;
 import com.ocs.quartz.domain.SysJobLog;
 import com.ocs.quartz.service.ISysJobLogService;
 import com.ocs.quartz.service.ISysJobService;
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;

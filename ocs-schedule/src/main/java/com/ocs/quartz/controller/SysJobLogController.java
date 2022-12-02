@@ -1,29 +1,22 @@
 package com.ocs.quartz.controller;
 
-import java.util.List;
-import javax.servlet.http.HttpServletResponse;
-
-import com.ocs.quartz.domain.SysJobLog;
-import com.ocs.quartz.service.ISysJobLogService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import com.ocs.common.annotation.Log;
 import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
 import com.ocs.common.enums.BusinessType;
 import com.ocs.common.utils.poi.ExcelUtil;
+import com.ocs.quartz.domain.SysJobLog;
+import com.ocs.quartz.service.ISysJobLogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 调度日志操作处理
- *
- *
  */
 @RestController
 @RequestMapping("/monitor/jobLog")

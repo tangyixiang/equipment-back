@@ -1,19 +1,5 @@
 package com.ocs.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import com.ocs.system.mapper.SysRoleDeptMapper;
-import com.ocs.system.mapper.SysRoleMapper;
-import com.ocs.system.mapper.SysRoleMenuMapper;
-import com.ocs.system.mapper.SysUserRoleMapper;
-import com.ocs.system.service.ISysRoleService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import com.ocs.common.annotation.DataScope;
 import com.ocs.common.constant.UserConstants;
 import com.ocs.common.core.domain.entity.SysRole;
@@ -25,11 +11,19 @@ import com.ocs.common.utils.spring.SpringUtils;
 import com.ocs.system.domain.SysRoleDept;
 import com.ocs.system.domain.SysRoleMenu;
 import com.ocs.system.domain.SysUserRole;
+import com.ocs.system.mapper.SysRoleDeptMapper;
+import com.ocs.system.mapper.SysRoleMapper;
+import com.ocs.system.mapper.SysRoleMenuMapper;
+import com.ocs.system.mapper.SysUserRoleMapper;
+import com.ocs.system.service.ISysRoleService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 /**
  * 角色 业务层处理
- *
- * 
  */
 @Service
 public class SysRoleServiceImpl implements ISysRoleService {

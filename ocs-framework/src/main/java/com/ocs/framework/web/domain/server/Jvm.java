@@ -1,14 +1,12 @@
 package com.ocs.framework.web.domain.server;
 
-import java.lang.management.ManagementFactory;
-
 import com.ocs.common.utils.Arith;
 import com.ocs.common.utils.DateUtils;
 
+import java.lang.management.ManagementFactory;
+
 /**
  * JVM相关信息
- *
- *
  */
 public class Jvm {
     /**

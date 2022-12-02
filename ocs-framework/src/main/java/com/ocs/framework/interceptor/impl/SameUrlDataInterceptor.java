@@ -1,14 +1,5 @@
 package com.ocs.framework.interceptor.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import javax.servlet.http.HttpServletRequest;
-
-import com.ocs.framework.interceptor.RepeatSubmitInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import com.alibaba.fastjson2.JSON;
 import com.ocs.common.annotation.RepeatSubmit;
 import com.ocs.common.constant.CacheConstants;
@@ -16,12 +7,19 @@ import com.ocs.common.core.redis.RedisCache;
 import com.ocs.common.filter.RepeatedlyRequestWrapper;
 import com.ocs.common.utils.StringUtils;
 import com.ocs.common.utils.http.HttpHelper;
+import com.ocs.framework.interceptor.RepeatSubmitInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 判断请求url和数据是否和上一次相同，
  * 如果和上次相同，则是重复提交表单。 有效时间为10秒内。
- *
- * 
  */
 @Component
 public class SameUrlDataInterceptor extends RepeatSubmitInterceptor {

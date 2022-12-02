@@ -2,8 +2,6 @@ package com.ocs.common.enums;
 
 /**
  * 数据源
- *
- *
  */
 public enum DataSourceType {
     /**

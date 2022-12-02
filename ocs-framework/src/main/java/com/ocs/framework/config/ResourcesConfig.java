@@ -1,5 +1,7 @@
 package com.ocs.framework.config;
 
+import com.ocs.common.config.OCSConfig;
+import com.ocs.common.constant.Constants;
 import com.ocs.framework.interceptor.RepeatSubmitInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,13 +12,9 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import com.ocs.common.config.OCSConfig;
-import com.ocs.common.constant.Constants;
 
 /**
  * 通用配置
- *
- *
  */
 @Configuration
 public class ResourcesConfig implements WebMvcConfigurer {

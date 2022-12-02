@@ -24,8 +24,6 @@ import java.util.List;
 
 /**
  * 通用请求处理
- *
- *
  */
 @RestController
 @RequestMapping("/common")

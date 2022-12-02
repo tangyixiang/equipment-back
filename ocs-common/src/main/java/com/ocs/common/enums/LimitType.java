@@ -2,8 +2,6 @@ package com.ocs.common.enums;
 
 /**
  * 限流类型
- *
- *
  */
 
 public enum LimitType {

@@ -1,13 +1,11 @@
 package com.ocs.generator.service;
 
-import java.util.List;
-
 import com.ocs.generator.domain.GenTableColumn;
+
+import java.util.List;
 
 /**
  * 业务字段 服务层
- *
- *
  */
 public interface IGenTableColumnService {
     /**

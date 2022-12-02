@@ -2,8 +2,6 @@ package com.ocs.framework.web.domain.server;
 
 /**
  * 系统文件相关信息
- *
- * 
  */
 public class SysFile {
     /**

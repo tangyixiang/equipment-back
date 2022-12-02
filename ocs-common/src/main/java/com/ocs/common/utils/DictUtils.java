@@ -1,18 +1,16 @@
 package com.ocs.common.utils;
 
-import java.util.Collection;
-import java.util.List;
-
 import com.alibaba.fastjson2.JSONArray;
 import com.ocs.common.constant.CacheConstants;
 import com.ocs.common.core.domain.entity.SysDictData;
 import com.ocs.common.core.redis.RedisCache;
 import com.ocs.common.utils.spring.SpringUtils;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * 字典工具类
- *
- *
  */
 public class DictUtils {
     /**

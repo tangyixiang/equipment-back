@@ -2,8 +2,6 @@ package com.ocs.common.constant;
 
 /**
  * 用户常量信息
- *
- * 
  */
 public class UserConstants {
     /**

@@ -1,21 +1,18 @@
 package com.ocs.busi.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.Date;
-
 import com.ocs.common.core.domain.SimpleEntity;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 /**
  * 员工外出表
+ *
  * @TableName staff_trip
  */
-@TableName(value ="staff_trip")
+@TableName(value = "staff_trip")
 @Data
 public class StaffTrip extends SimpleEntity {
     /**

@@ -2,8 +2,6 @@ package com.ocs.common.exception.job;
 
 /**
  * 计划策略异常
- *
- *
  */
 public class TaskException extends Exception {
     private static final long serialVersionUID = 1L;

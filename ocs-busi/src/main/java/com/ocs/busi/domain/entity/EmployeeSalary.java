@@ -9,10 +9,11 @@ import javax.validation.constraints.NotNull;
 
 /**
  * 员工工资
+ *
  * @TableName employee_salary
  */
 @Data
-@TableName(value ="employee_salary")
+@TableName(value = "employee_salary")
 public class EmployeeSalary extends SimpleEntity {
     /**
      * id

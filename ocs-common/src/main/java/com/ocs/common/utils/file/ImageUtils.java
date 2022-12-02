@@ -1,5 +1,12 @@
 package com.ocs.common.utils.file;
 
+import com.ocs.common.config.OCSConfig;
+import com.ocs.common.constant.Constants;
+import com.ocs.common.utils.StringUtils;
+import org.apache.poi.util.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -7,17 +14,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
 
-import com.ocs.common.config.OCSConfig;
-import com.ocs.common.constant.Constants;
-import org.apache.poi.util.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.ocs.common.utils.StringUtils;
-
 /**
  * 图片处理工具类
- *
- * 
  */
 public class ImageUtils {
     private static final Logger log = LoggerFactory.getLogger(ImageUtils.class);

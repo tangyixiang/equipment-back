@@ -1,12 +1,17 @@
 package com.ocs.framework.aspectj;
 
-import java.util.Collection;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.alibaba.fastjson2.JSON;
+import com.ocs.common.annotation.Log;
+import com.ocs.common.core.domain.model.LoginUser;
+import com.ocs.common.enums.BusinessStatus;
+import com.ocs.common.enums.HttpMethod;
+import com.ocs.common.utils.SecurityUtils;
+import com.ocs.common.utils.ServletUtils;
+import com.ocs.common.utils.StringUtils;
+import com.ocs.common.utils.ip.IpUtils;
 import com.ocs.framework.manager.AsyncManager;
 import com.ocs.framework.manager.factory.AsyncFactory;
+import com.ocs.system.domain.SysOperLog;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -17,21 +22,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
-import com.alibaba.fastjson2.JSON;
-import com.ocs.common.annotation.Log;
-import com.ocs.common.core.domain.model.LoginUser;
-import com.ocs.common.enums.BusinessStatus;
-import com.ocs.common.enums.HttpMethod;
-import com.ocs.common.utils.ServletUtils;
-import com.ocs.common.utils.StringUtils;
-import com.ocs.common.utils.ip.IpUtils;
-import com.ocs.common.utils.SecurityUtils;
-import com.ocs.system.domain.SysOperLog;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * 操作日志记录处理
- *
- *
  */
 @Aspect
 @Component

@@ -1,21 +1,19 @@
 package com.ocs.system.service.impl;
 
-import java.util.List;
-
+import com.ocs.common.constant.UserConstants;
+import com.ocs.common.exception.ServiceException;
+import com.ocs.common.utils.StringUtils;
+import com.ocs.system.domain.SysPost;
 import com.ocs.system.mapper.SysPostMapper;
 import com.ocs.system.mapper.SysUserPostMapper;
 import com.ocs.system.service.ISysPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ocs.common.constant.UserConstants;
-import com.ocs.common.exception.ServiceException;
-import com.ocs.common.utils.StringUtils;
-import com.ocs.system.domain.SysPost;
+
+import java.util.List;
 
 /**
  * 岗位信息 服务层处理
- *
- *
  */
 @Service
 public class SysPostServiceImpl implements ISysPostService {

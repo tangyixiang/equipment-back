@@ -1,15 +1,13 @@
 package com.ocs.system.service;
 
-import java.util.List;
-import java.util.Set;
-
 import com.ocs.common.core.domain.entity.SysRole;
 import com.ocs.system.domain.SysUserRole;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * 角色业务层
- *
- *
  */
 public interface ISysRoleService {
     /**

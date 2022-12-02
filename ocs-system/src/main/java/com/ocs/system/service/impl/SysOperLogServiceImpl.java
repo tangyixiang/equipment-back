@@ -1,17 +1,15 @@
 package com.ocs.system.service.impl;
 
-import java.util.List;
-
+import com.ocs.system.domain.SysOperLog;
 import com.ocs.system.mapper.SysOperLogMapper;
 import com.ocs.system.service.ISysOperLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ocs.system.domain.SysOperLog;
+
+import java.util.List;
 
 /**
  * 操作日志 服务层处理
- *
- *
  */
 @Service
 public class SysOperLogServiceImpl implements ISysOperLogService {

@@ -4,8 +4,6 @@ import io.jsonwebtoken.Claims;
 
 /**
  * 通用常量信息
- *
- *
  */
 public class Constants {
     /**

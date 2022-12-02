@@ -1,7 +1,7 @@
 package com.ocs.busi.mapper;
 
-import com.ocs.busi.domain.entity.CompanyClientOrg;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ocs.busi.domain.entity.CompanyClientOrg;
 import org.springframework.stereotype.Repository;
 
 @Repository

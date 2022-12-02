@@ -2,17 +2,16 @@ package com.ocs.busi.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDate;
-import java.util.Date;
-
 import com.ocs.common.core.domain.SimpleEntity;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 /**
- *
  * 用户申检派单实体
  */
-@TableName(value ="apply_check")
+@TableName(value = "apply_check")
 @Data
 public class ApplyCheck extends SimpleEntity {
     /**

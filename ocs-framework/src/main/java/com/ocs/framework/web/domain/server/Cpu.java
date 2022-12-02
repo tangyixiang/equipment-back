@@ -4,8 +4,6 @@ import com.ocs.common.utils.Arith;
 
 /**
  * CPU相关信息
- *
- *
  */
 public class Cpu {
     /**

@@ -1,18 +1,16 @@
 package com.ocs.common.core.domain.entity;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ocs.common.annotation.Excel;
 import com.ocs.common.annotation.Excel.ColumnType;
 import com.ocs.common.core.domain.BaseEntity;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * 角色表 sys_role
- *
- * 
  */
 public class SysRole extends BaseEntity {
     private static final long serialVersionUID = 1L;

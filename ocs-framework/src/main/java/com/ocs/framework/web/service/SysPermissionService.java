@@ -1,18 +1,16 @@
 package com.ocs.framework.web.service;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import com.ocs.common.core.domain.entity.SysUser;
 import com.ocs.system.service.ISysMenuService;
 import com.ocs.system.service.ISysRoleService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 用户权限处理
- *
- *
  */
 @Component
 public class SysPermissionService {

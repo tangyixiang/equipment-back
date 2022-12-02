@@ -31,15 +31,22 @@
 
 
     <select id="findByDateIn" resultType="com.ocs.busi.domain.entity.BankFlow">
-        select id from bank_flow where create_time between #{startDate} and #{endDate} order by id desc limit 1
+        select id
+        from bank_flow
+        where create_time between #{startDate} and #{endDate}
+        order by id desc limit 1
     </select>
 
     <select id="findByBankSiteCode" resultMap="BaseResultMap">
-        select * from bank_flow where bank_site_code = #{bankSiteCode}
+        select *
+        from bank_flow
+        where bank_site_code = #{bankSiteCode}
     </select>
 
     <select id="findAllInByBankSiteCode" resultMap="BaseResultMap">
-        select bank_site_code from bank_flow where bank_site_code in (${bankSiteCodeStr})
+        select bank_site_code
+        from bank_flow
+        where bank_site_code in (${bankSiteCodeStr})
     </select>
 
 

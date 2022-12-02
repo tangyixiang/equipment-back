@@ -1,14 +1,12 @@
 package com.ocs.generator.util;
 
-import java.util.Properties;
-
-import org.apache.velocity.app.Velocity;
 import com.ocs.common.constant.Constants;
+import org.apache.velocity.app.Velocity;
+
+import java.util.Properties;
 
 /**
  * VelocityEngine工厂
- *
- * 
  */
 public class VelocityInitializer {
     /**

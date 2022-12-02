@@ -1,17 +1,15 @@
 package com.ocs.generator.service;
 
-import java.util.List;
-
+import com.ocs.common.core.text.Convert;
 import com.ocs.generator.domain.GenTableColumn;
 import com.ocs.generator.mapper.GenTableColumnMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ocs.common.core.text.Convert;
+
+import java.util.List;
 
 /**
  * 业务字段 服务层实现
- *
- * 
  */
 @Service
 public class GenTableColumnServiceImpl implements IGenTableColumnService {

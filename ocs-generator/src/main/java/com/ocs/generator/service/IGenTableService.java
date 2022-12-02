@@ -1,14 +1,12 @@
 package com.ocs.generator.service;
 
+import com.ocs.generator.domain.GenTable;
+
 import java.util.List;
 import java.util.Map;
 
-import com.ocs.generator.domain.GenTable;
-
 /**
  * 业务 服务层
- *
- * 
  */
 public interface IGenTableService {
     /**

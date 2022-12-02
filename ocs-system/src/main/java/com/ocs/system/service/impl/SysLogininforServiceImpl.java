@@ -1,17 +1,15 @@
 package com.ocs.system.service.impl;
 
-import java.util.List;
-
+import com.ocs.system.domain.SysLogininfor;
 import com.ocs.system.mapper.SysLogininforMapper;
 import com.ocs.system.service.ISysLogininforService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ocs.system.domain.SysLogininfor;
+
+import java.util.List;
 
 /**
  * 系统访问日志情况信息 服务层处理
- *
- *
  */
 @Service
 public class SysLogininforServiceImpl implements ISysLogininforService {

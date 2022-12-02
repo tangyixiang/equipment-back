@@ -1,25 +1,23 @@
 package com.ocs.common.utils.file;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Objects;
-
 import com.ocs.common.config.OCSConfig;
 import com.ocs.common.constant.Constants;
-import com.ocs.common.utils.uuid.Seq;
-import org.apache.commons.io.FilenameUtils;
-import org.springframework.web.multipart.MultipartFile;
 import com.ocs.common.exception.file.FileNameLengthLimitExceededException;
 import com.ocs.common.exception.file.FileSizeLimitExceededException;
 import com.ocs.common.exception.file.InvalidExtensionException;
 import com.ocs.common.utils.DateUtils;
 import com.ocs.common.utils.StringUtils;
+import com.ocs.common.utils.uuid.Seq;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Objects;
 
 /**
  * 文件上传工具类
- *
- * 
  */
 public class FileUploadUtils {
     /**

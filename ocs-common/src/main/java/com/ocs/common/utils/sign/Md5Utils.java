@@ -1,15 +1,13 @@
 package com.ocs.common.utils.sign;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
 /**
  * Md5加密方法
- *
- * 
  */
 public class Md5Utils {
     private static final Logger log = LoggerFactory.getLogger(Md5Utils.class);

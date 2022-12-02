@@ -1,17 +1,15 @@
 package com.ocs.common.core.domain;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ocs.common.core.domain.entity.SysDept;
 import com.ocs.common.core.domain.entity.SysMenu;
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Treeselect树结构实体类
- *
- * 
  */
 public class TreeSelect implements Serializable {
     private static final long serialVersionUID = 1L;

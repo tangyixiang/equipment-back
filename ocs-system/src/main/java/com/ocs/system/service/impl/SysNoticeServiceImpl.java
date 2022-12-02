@@ -1,17 +1,15 @@
 package com.ocs.system.service.impl;
 
-import java.util.List;
-
+import com.ocs.system.domain.SysNotice;
 import com.ocs.system.mapper.SysNoticeMapper;
 import com.ocs.system.service.ISysNoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ocs.system.domain.SysNotice;
+
+import java.util.List;
 
 /**
  * 公告 服务层实现
- *
- *
  */
 @Service
 public class SysNoticeServiceImpl implements ISysNoticeService {

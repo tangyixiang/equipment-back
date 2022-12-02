@@ -1,14 +1,12 @@
 package com.ocs.system.mapper;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
 import com.ocs.common.core.domain.entity.SysMenu;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 菜单表 数据层
- *
- *
  */
 public interface SysMenuMapper {
     /**

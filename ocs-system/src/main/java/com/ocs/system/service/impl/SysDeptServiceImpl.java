@@ -1,15 +1,5 @@
 package com.ocs.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.ocs.system.mapper.SysDeptMapper;
-import com.ocs.system.mapper.SysRoleMapper;
-import com.ocs.system.service.ISysDeptService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.ocs.common.annotation.DataScope;
 import com.ocs.common.constant.UserConstants;
 import com.ocs.common.core.domain.TreeSelect;
@@ -21,11 +11,19 @@ import com.ocs.common.exception.ServiceException;
 import com.ocs.common.utils.SecurityUtils;
 import com.ocs.common.utils.StringUtils;
 import com.ocs.common.utils.spring.SpringUtils;
+import com.ocs.system.mapper.SysDeptMapper;
+import com.ocs.system.mapper.SysRoleMapper;
+import com.ocs.system.service.ISysDeptService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 部门管理 服务实现
- *
- *
  */
 @Service
 public class SysDeptServiceImpl implements ISysDeptService {

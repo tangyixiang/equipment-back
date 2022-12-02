@@ -1,8 +1,5 @@
 package com.ocs.framework.web.service;
 
-import com.ocs.framework.manager.factory.AsyncFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import com.ocs.common.constant.CacheConstants;
 import com.ocs.common.constant.Constants;
 import com.ocs.common.constant.UserConstants;
@@ -15,13 +12,14 @@ import com.ocs.common.utils.MessageUtils;
 import com.ocs.common.utils.SecurityUtils;
 import com.ocs.common.utils.StringUtils;
 import com.ocs.framework.manager.AsyncManager;
+import com.ocs.framework.manager.factory.AsyncFactory;
 import com.ocs.system.service.ISysConfigService;
 import com.ocs.system.service.ISysUserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * 注册校验方法
- *
- *
  */
 @Component
 public class SysRegisterService {

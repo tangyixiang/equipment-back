@@ -12,8 +12,8 @@ import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
-import com.ocs.common.utils.TemplateDownloadUtils;
 import com.ocs.common.helper.QueryHelper;
+import com.ocs.common.utils.TemplateDownloadUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -83,7 +83,7 @@ public class CompanyClientOrgController extends BaseController {
 
 
     @GetMapping("/financeItem")
-    public Result getClientFinanceItem(String clientOrgId){
+    public Result getClientFinanceItem(String clientOrgId) {
         List<ClientFinanceInfoItem> list = clientFinanceInfoItemService.list(new LambdaQueryWrapper<ClientFinanceInfoItem>()
                 .eq(ClientFinanceInfoItem::getClientOrgId, clientOrgId).orderByDesc(ClientFinanceInfoItem::getCreateTime));
         return Result.success(list);

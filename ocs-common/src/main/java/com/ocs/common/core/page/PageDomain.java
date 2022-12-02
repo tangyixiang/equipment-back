@@ -4,8 +4,6 @@ import com.ocs.common.utils.StringUtils;
 
 /**
  * 分页数据
- *
- * 
  */
 public class PageDomain {
     /**

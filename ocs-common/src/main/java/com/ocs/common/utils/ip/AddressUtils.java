@@ -1,18 +1,16 @@
 package com.ocs.common.utils.ip;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.ocs.common.config.OCSConfig;
 import com.ocs.common.constant.Constants;
 import com.ocs.common.utils.StringUtils;
 import com.ocs.common.utils.http.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 
 /**
  * 获取地址类
- *
- * 
  */
 public class AddressUtils {
     private static final Logger log = LoggerFactory.getLogger(AddressUtils.class);

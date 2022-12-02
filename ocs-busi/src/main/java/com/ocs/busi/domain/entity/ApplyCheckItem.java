@@ -1,19 +1,13 @@
 package com.ocs.busi.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-
-import com.ocs.common.core.domain.SimpleEntity;
 import lombok.Data;
 
 /**
- *
  * @TableName apply_check_item
  */
-@TableName(value ="apply_check_item")
+@TableName(value = "apply_check_item")
 @Data
 public class ApplyCheckItem {
     /**

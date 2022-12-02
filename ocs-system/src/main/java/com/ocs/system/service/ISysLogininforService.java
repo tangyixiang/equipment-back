@@ -1,13 +1,11 @@
 package com.ocs.system.service;
 
-import java.util.List;
-
 import com.ocs.system.domain.SysLogininfor;
+
+import java.util.List;
 
 /**
  * 系统访问日志情况信息 服务层
- *
- *
  */
 public interface ISysLogininforService {
     /**

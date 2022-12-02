@@ -1,22 +1,17 @@
 package com.ocs.busi.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ocs.common.core.domain.SimpleEntity;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
-import java.util.Date;
 
 /**
- *
  * 公司客户
  */
 @Data
-@TableName(value ="company_client_org")
+@TableName(value = "company_client_org")
 public class CompanyClientOrg extends SimpleEntity {
     /**
      * id

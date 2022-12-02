@@ -2,7 +2,6 @@ package com.ocs.busi.task.handle;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.IdUtil;
-import com.ocs.busi.domain.entity.AccountingSubject;
 import com.ocs.busi.domain.entity.InvoiceOperating;
 import com.ocs.busi.domain.entity.InvoiceOperatingSplit;
 import com.ocs.busi.service.AccountingSubjectService;
@@ -19,7 +18,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -85,7 +87,7 @@ public class InvoiceOperatingHandle {
             InvoiceOperatingSplit budgetRecordSplit = budgetRecord(increment, invoiceOperating, itemName, taskId, nameValueMap.get("经营预算收入科目映射关系"));
 
             invoiceOperating.setDataSplit(true);
-            //JYFPENTRY202211V001
+            // JYFPENTRY202211V001
             invoiceOperating.setVersion("JYFPENTRY" + accountingPeriod + StringUtils.leftPad(periodNum + "", 3, "0"));
 
             logger.info("经营发票:{},开始保存分录拆分数据", invoiceOperating.getId());

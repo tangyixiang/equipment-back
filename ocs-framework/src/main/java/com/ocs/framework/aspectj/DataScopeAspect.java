@@ -1,21 +1,19 @@
 package com.ocs.framework.aspectj;
 
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.springframework.stereotype.Component;
 import com.ocs.common.annotation.DataScope;
 import com.ocs.common.core.domain.BaseEntity;
 import com.ocs.common.core.domain.entity.SysRole;
 import com.ocs.common.core.domain.entity.SysUser;
 import com.ocs.common.core.domain.model.LoginUser;
-import com.ocs.common.utils.StringUtils;
 import com.ocs.common.utils.SecurityUtils;
+import com.ocs.common.utils.StringUtils;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.stereotype.Component;
 
 /**
  * 数据过滤处理
- *
- *
  */
 @Aspect
 @Component

@@ -1,21 +1,15 @@
 package com.ocs.common.utils;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.Date;
-
-import org.apache.commons.lang3.time.DateFormatUtils;
 
 /**
  * 时间工具类
- *
- *
  */
 public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     public static String YYYY = "yyyy";
@@ -164,8 +158,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
     /**
      * 格式化日期,格式为yyyy-MM-dd
-     * @param date  日期
-     * @return      字符串,日期为yyyy-MM-dd
+     *
+     * @param date 日期
+     * @return 字符串, 日期为yyyy-MM-dd
      */
     public static String formatDate(Date date) {
         return DateFormatUtils.format(date, YYYY_MM_DD);
@@ -173,8 +168,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
     /**
      * 格式化日期,格式为yyyy-MM-dd HH:mm:ss
-     * @param date  日期
-     * @return      字符串格式为yyyy-MM-dd HH:mm:ss
+     *
+     * @param date 日期
+     * @return 字符串格式为yyyy-MM-dd HH:mm:ss
      */
     public static String formatDateTime(Date date) {
         return DateFormatUtils.format(date, YYYY_MM_DD_HH_MM_SS);

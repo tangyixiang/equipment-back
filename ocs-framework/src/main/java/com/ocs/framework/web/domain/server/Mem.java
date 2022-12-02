@@ -4,8 +4,6 @@ import com.ocs.common.utils.Arith;
 
 /**
  * 內存相关信息
- *
- *
  */
 public class Mem {
     /**

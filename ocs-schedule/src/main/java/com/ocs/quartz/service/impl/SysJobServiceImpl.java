@@ -1,11 +1,12 @@
 package com.ocs.quartz.service.impl;
 
-import java.util.List;
-import javax.annotation.PostConstruct;
-
+import com.ocs.common.constant.ScheduleConstants;
+import com.ocs.common.exception.job.TaskException;
 import com.ocs.quartz.domain.SysJob;
 import com.ocs.quartz.mapper.SysJobMapper;
 import com.ocs.quartz.service.ISysJobService;
+import com.ocs.quartz.util.CronUtils;
+import com.ocs.quartz.util.ScheduleUtils;
 import org.quartz.JobDataMap;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
@@ -13,15 +14,12 @@ import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.ocs.common.constant.ScheduleConstants;
-import com.ocs.common.exception.job.TaskException;
-import com.ocs.quartz.util.CronUtils;
-import com.ocs.quartz.util.ScheduleUtils;
+
+import javax.annotation.PostConstruct;
+import java.util.List;
 
 /**
  * 定时任务调度信息 服务层
- *
- *
  */
 @Service
 public class SysJobServiceImpl implements ISysJobService {

@@ -1,9 +1,11 @@
 package com.ocs.framework.aspectj;
 
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
-
+import com.ocs.common.annotation.RateLimiter;
+import com.ocs.common.enums.LimitType;
+import com.ocs.common.exception.ServiceException;
+import com.ocs.common.utils.ServletUtils;
+import com.ocs.common.utils.StringUtils;
+import com.ocs.common.utils.ip.IpUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -14,17 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
-import com.ocs.common.annotation.RateLimiter;
-import com.ocs.common.enums.LimitType;
-import com.ocs.common.exception.ServiceException;
-import com.ocs.common.utils.ServletUtils;
-import com.ocs.common.utils.StringUtils;
-import com.ocs.common.utils.ip.IpUtils;
+
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 限流处理
- *
- *
  */
 @Aspect
 @Component

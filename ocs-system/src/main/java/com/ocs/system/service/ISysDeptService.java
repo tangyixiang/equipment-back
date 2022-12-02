@@ -1,14 +1,12 @@
 package com.ocs.system.service;
 
-import java.util.List;
-
 import com.ocs.common.core.domain.TreeSelect;
 import com.ocs.common.core.domain.entity.SysDept;
 
+import java.util.List;
+
 /**
  * 部门管理 服务层
- *
- *
  */
 public interface ISysDeptService {
     /**

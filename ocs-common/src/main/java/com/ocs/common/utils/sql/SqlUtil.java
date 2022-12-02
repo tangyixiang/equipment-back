@@ -5,8 +5,6 @@ import com.ocs.common.utils.StringUtils;
 
 /**
  * sql操作工具类
- *
- * 
  */
 public class SqlUtil {
     /**

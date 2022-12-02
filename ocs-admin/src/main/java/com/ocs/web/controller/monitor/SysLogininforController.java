@@ -17,8 +17,6 @@ import java.util.List;
 
 /**
  * 系统访问记录
- *
- *
  */
 @RestController
 @RequestMapping("/monitor/logininfor")

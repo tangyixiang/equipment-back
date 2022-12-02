@@ -23,8 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 验证码操作处理
- *
- *
  */
 @RestController
 public class CaptchaController {

@@ -23,8 +23,18 @@
     </resultMap>
 
     <sql id="selectDeptVo">
-        select d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.phone, d.email, d.status,
-        d.del_flag, d.create_by, d.create_time
+        select d.dept_id,
+               d.parent_id,
+               d.ancestors,
+               d.dept_name,
+               d.order_num,
+               d.leader,
+               d.phone,
+               d.email,
+               d.status,
+               d.del_flag,
+               d.create_by,
+               d.create_time
         from sys_dept d
     </sql>
 
@@ -66,20 +76,31 @@
     </select>
 
     <select id="checkDeptExistUser" parameterType="Long" resultType="int">
-        select count(1) from sys_user where dept_id = #{deptId} and del_flag = '0'
+        select count(1)
+        from sys_user
+        where dept_id = #{deptId}
+          and del_flag = '0'
     </select>
 
     <select id="hasChildByDeptId" parameterType="Long" resultType="int">
-        select count(1) from sys_dept
-        where del_flag = '0' and parent_id = #{deptId} limit 1
+        select count(1)
+        from sys_dept
+        where del_flag = '0'
+          and parent_id = #{deptId} limit 1
     </select>
 
     <select id="selectChildrenDeptById" parameterType="Long" resultMap="SysDeptResult">
-        select * from sys_dept where find_in_set(#{deptId}, ancestors)
+        select *
+        from sys_dept
+        where find_in_set(#{deptId}, ancestors)
     </select>
 
     <select id="selectNormalChildrenDeptById" parameterType="Long" resultType="int">
-        select count(*) from sys_dept where status = 0 and del_flag = '0' and find_in_set(#{deptId}, ancestors)
+        select count(*)
+        from sys_dept
+        where status = 0
+          and del_flag = '0'
+          and find_in_set(#{deptId}, ancestors)
     </select>
 
     <select id="checkDeptNameUnique" resultMap="SysDeptResult">
@@ -153,7 +174,9 @@
     </update>
 
     <delete id="deleteDeptById" parameterType="Long">
-        update sys_dept set del_flag = '2' where dept_id = #{deptId}
+        update sys_dept
+        set del_flag = '2'
+        where dept_id = #{deptId}
     </delete>
 
 </mapper>

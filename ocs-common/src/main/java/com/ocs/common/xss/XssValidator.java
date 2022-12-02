@@ -9,8 +9,6 @@ import java.util.regex.Pattern;
 
 /**
  * 自定义xss校验注解实现
- *
- *
  */
 public class XssValidator implements ConstraintValidator<Xss, String> {
     private static final String HTML_PATTERN = "<(\\S*?)[^>]*>.*?|<.*? />";

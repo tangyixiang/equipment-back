@@ -13,7 +13,7 @@ public class CrudHelper<T> {
 
     public void deleteByIds(String[] ids, IService<T> service) {
         for (String id : ids) {
-            UpdateWrapper <T> updateWrapper = new UpdateWrapper<T>();
+            UpdateWrapper<T> updateWrapper = new UpdateWrapper<T>();
             updateWrapper.eq("id", id);
             updateWrapper.set("del", CommonConstants.STATUS_DEL);
             service.update(null, updateWrapper);

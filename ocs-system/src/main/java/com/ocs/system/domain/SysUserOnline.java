@@ -2,8 +2,6 @@ package com.ocs.system.domain;
 
 /**
  * 当前在线会话
- *
- * 
  */
 public class SysUserOnline {
     /**

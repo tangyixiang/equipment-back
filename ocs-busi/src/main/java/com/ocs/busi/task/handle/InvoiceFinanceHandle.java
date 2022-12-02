@@ -45,7 +45,7 @@ public class InvoiceFinanceHandle {
      * 发票拆分
      *
      * @param startCertificateId 起始凭照号ID
-     * @param invoiceFinanceList  发票数据
+     * @param invoiceFinanceList 发票数据
      * @param accountingPeriod   会计期间
      * @param taskId             任务ID
      * @return
@@ -84,7 +84,7 @@ public class InvoiceFinanceHandle {
             InvoiceFinanceSplit financeRecordSplit = financeRecord(increment, invoiceFinance, taskId, financeItemValue.getValue());
 
             invoiceFinance.setDataSplit(true);
-            //CZFPENTRY202211V001
+            // CZFPENTRY202211V001
             invoiceFinance.setVersion("CZFPENTRY" + accountingPeriod + StringUtils.leftPad(periodNum + "", 3, "0"));
 
             logger.info("财政发票:{},开始保存分录拆分数据", invoiceFinance.getId());

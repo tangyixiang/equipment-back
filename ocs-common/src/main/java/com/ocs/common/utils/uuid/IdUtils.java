@@ -2,8 +2,6 @@ package com.ocs.common.utils.uuid;
 
 /**
  * ID生成器工具类
- *
- * 
  */
 public class IdUtils {
     /**

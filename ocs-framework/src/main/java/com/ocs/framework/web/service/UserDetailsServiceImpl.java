@@ -1,5 +1,11 @@
 package com.ocs.framework.web.service;
 
+import com.ocs.common.core.domain.entity.SysUser;
+import com.ocs.common.core.domain.model.LoginUser;
+import com.ocs.common.enums.UserStatus;
+import com.ocs.common.exception.ServiceException;
+import com.ocs.common.utils.StringUtils;
+import com.ocs.system.service.ISysUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,17 +13,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import com.ocs.common.core.domain.entity.SysUser;
-import com.ocs.common.core.domain.model.LoginUser;
-import com.ocs.common.enums.UserStatus;
-import com.ocs.common.exception.ServiceException;
-import com.ocs.common.utils.StringUtils;
-import com.ocs.system.service.ISysUserService;
 
 /**
  * 用户验证处理
- *
- *
  */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

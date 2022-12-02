@@ -5,8 +5,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * 读取项目相关配置
- *
- *
  */
 @Component
 @ConfigurationProperties(prefix = "ocs")

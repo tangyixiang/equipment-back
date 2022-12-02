@@ -5,20 +5,21 @@
 <mapper namespace="com.ocs.busi.mapper.ApplyCheckItemMapper">
 
     <resultMap id="BaseResultMap" type="com.ocs.busi.domain.entity.ApplyCheckItem">
-            <id property="id" column="id" jdbcType="VARCHAR"/>
-            <result property="applyCheckId" column="apply_check_id" jdbcType="VARCHAR"/>
-            <result property="checkItemName" column="check_item_name" jdbcType="VARCHAR"/>
-            <result property="deviceCode" column="device_code" jdbcType="VARCHAR"/>
-            <result property="deviceName" column="device_name" jdbcType="VARCHAR"/>
-            <result property="checkNum" column="check_num" jdbcType="INTEGER"/>
-            <result property="clientType" column="client_type" jdbcType="VARCHAR"/>
-            <result property="checkItemId" column="check_item_id" jdbcType="VARCHAR"/>
-            <result property="price" column="price" jdbcType="VARCHAR"/>
-            <result property="del" column="del" jdbcType="VARCHAR"/>
+        <id property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="applyCheckId" column="apply_check_id" jdbcType="VARCHAR"/>
+        <result property="checkItemName" column="check_item_name" jdbcType="VARCHAR"/>
+        <result property="deviceCode" column="device_code" jdbcType="VARCHAR"/>
+        <result property="deviceName" column="device_name" jdbcType="VARCHAR"/>
+        <result property="checkNum" column="check_num" jdbcType="INTEGER"/>
+        <result property="clientType" column="client_type" jdbcType="VARCHAR"/>
+        <result property="checkItemId" column="check_item_id" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="VARCHAR"/>
+        <result property="del" column="del" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,apply_check_id,check_item_name,
+        id
+        ,apply_check_id,check_item_name,
         device_code,device_name,check_num,
         client_type,check_item_id,price,
         del

@@ -1,13 +1,11 @@
 package com.ocs.system.mapper;
 
-import java.util.List;
-
 import com.ocs.system.domain.SysNotice;
+
+import java.util.List;
 
 /**
  * 通知公告表 数据层
- *
- * 
  */
 public interface SysNoticeMapper {
     /**

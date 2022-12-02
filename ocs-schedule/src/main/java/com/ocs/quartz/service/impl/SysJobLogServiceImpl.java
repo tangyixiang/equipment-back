@@ -1,17 +1,15 @@
 package com.ocs.quartz.service.impl;
 
-import java.util.List;
-
 import com.ocs.quartz.domain.SysJobLog;
 import com.ocs.quartz.mapper.SysJobLogMapper;
+import com.ocs.quartz.service.ISysJobLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ocs.quartz.service.ISysJobLogService;
+
+import java.util.List;
 
 /**
  * 定时任务调度日志信息 服务层
- *
- *
  */
 @Service
 public class SysJobLogServiceImpl implements ISysJobLogService {

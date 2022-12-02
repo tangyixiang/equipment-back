@@ -1,7 +1,5 @@
 package com.ocs.common.task;
 
-import com.ocs.common.task.SysJobRuntime;
-
 /**
  * 系统任务执行上线文
  *

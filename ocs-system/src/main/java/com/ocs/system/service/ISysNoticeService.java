@@ -1,13 +1,11 @@
 package com.ocs.system.service;
 
-import java.util.List;
-
 import com.ocs.system.domain.SysNotice;
+
+import java.util.List;
 
 /**
  * 公告 服务层
- *
- *
  */
 public interface ISysNoticeService {
     /**

@@ -4,8 +4,6 @@ import com.ocs.common.utils.StringUtils;
 
 /**
  * 缓存信息
- *
- * 
  */
 public class SysCache {
     /**

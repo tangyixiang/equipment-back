@@ -21,8 +21,6 @@ import java.util.List;
 
 /**
  * 数据字典信息
- *
- *
  */
 @RestController
 @RequestMapping("/system/dict/data")

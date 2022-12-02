@@ -1,15 +1,13 @@
 package com.ocs.common.utils.ip;
 
+import com.ocs.common.utils.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import javax.servlet.http.HttpServletRequest;
-
-import com.ocs.common.utils.StringUtils;
 
 /**
  * 获取IP方法
- *
- *
  */
 public class IpUtils {
     /**

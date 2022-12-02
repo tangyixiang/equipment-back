@@ -45,7 +45,7 @@ public class InvoiceTask {
     /**
      * 分录
      *
-     * @param accountingPeriod  会计日期
+     * @param accountingPeriod 会计日期
      */
     public void splitTask(Integer accountingPeriod) {
         TaskContext.get().setTaskType(CommonConstants.TASK_SPLIT);

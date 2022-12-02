@@ -2,8 +2,6 @@ package com.ocs.common.exception;
 
 /**
  * 全局异常
- *
- *
  */
 public class GlobalException extends RuntimeException {
 

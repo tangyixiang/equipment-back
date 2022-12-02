@@ -15,7 +15,7 @@ import java.net.URLEncoder;
  */
 public class TemplateDownloadUtils {
 
-    public static void downloadByFileName(String fileName, HttpServletResponse response){
+    public static void downloadByFileName(String fileName, HttpServletResponse response) {
         ClassPathResource classPathResource = new ClassPathResource("template/" + fileName);
         // 初始化流
         InputStream inputStream = null;

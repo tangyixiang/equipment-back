@@ -1,14 +1,12 @@
 package com.ocs.common.core.text;
 
+import com.ocs.common.utils.StringUtils;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import com.ocs.common.utils.StringUtils;
-
 /**
  * 字符集工具类
- *
- *
  */
 public class CharsetKit {
     /**

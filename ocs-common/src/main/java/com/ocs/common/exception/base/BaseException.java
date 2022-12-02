@@ -5,8 +5,6 @@ import com.ocs.common.utils.StringUtils;
 
 /**
  * 基础异常
- *
- * 
  */
 public class BaseException extends RuntimeException {
     private static final long serialVersionUID = 1L;

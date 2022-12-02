@@ -1,18 +1,16 @@
 package com.ocs.generator.domain;
 
-import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-
-import org.apache.commons.lang3.ArrayUtils;
 import com.ocs.common.constant.GenConstants;
 import com.ocs.common.core.domain.BaseEntity;
 import com.ocs.common.utils.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 /**
  * 业务表 gen_table
- *
- *
  */
 public class GenTable extends BaseEntity {
     private static final long serialVersionUID = 1L;

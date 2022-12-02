@@ -1,16 +1,14 @@
 package com.ocs.system.domain;
 
-import java.util.Date;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ocs.common.annotation.Excel;
 import com.ocs.common.annotation.Excel.ColumnType;
 import com.ocs.common.core.domain.BaseEntity;
 
+import java.util.Date;
+
 /**
  * 系统访问记录表 sys_logininfor
- *
- * 
  */
 public class SysLogininfor extends BaseEntity {
     private static final long serialVersionUID = 1L;

@@ -1,18 +1,16 @@
 package com.ocs.framework.web.service;
 
-import java.util.Set;
-
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import com.ocs.common.core.domain.entity.SysRole;
 import com.ocs.common.core.domain.model.LoginUser;
 import com.ocs.common.utils.SecurityUtils;
 import com.ocs.common.utils.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.Set;
 
 /**
  * RuoYi首创 自定义权限实现，ss取自SpringSecurity首字母
- *
- * 
  */
 @Service("ss")
 public class PermissionService {

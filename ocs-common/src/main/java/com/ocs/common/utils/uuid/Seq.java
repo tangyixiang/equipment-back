@@ -1,12 +1,12 @@
 package com.ocs.common.utils.uuid;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.ocs.common.utils.DateUtils;
 import com.ocs.common.utils.StringUtils;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
- *  序列生成类
+ * 序列生成类
  */
 public class Seq {
     // 通用序列类型

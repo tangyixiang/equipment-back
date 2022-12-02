@@ -1,15 +1,13 @@
 package com.ocs.quartz.service;
 
-import java.util.List;
-
+import com.ocs.common.exception.job.TaskException;
 import com.ocs.quartz.domain.SysJob;
 import org.quartz.SchedulerException;
-import com.ocs.common.exception.job.TaskException;
+
+import java.util.List;
 
 /**
  * 定时任务调度信息信息 服务层
- *
- * 
  */
 public interface ISysJobService {
     /**

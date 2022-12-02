@@ -1,26 +1,19 @@
 package com.ocs.busi.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
-
 import com.ocs.common.core.domain.SimpleEntity;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 /**
- *
  * @TableName bank_flow
  */
 @Data
-@TableName(value ="bank_flow")
+@TableName(value = "bank_flow")
 public class BankFlow extends SimpleEntity {
     /**
      * 流水ID

@@ -1,13 +1,11 @@
 package com.ocs.common.core.domain;
 
-import java.io.Serializable;
-
 import com.ocs.common.constant.HttpStatus;
+
+import java.io.Serializable;
 
 /**
  * 响应信息主体
- *
- * 
  */
 public class R<T> implements Serializable {
     private static final long serialVersionUID = 1L;

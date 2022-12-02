@@ -41,7 +41,7 @@ public class JacksonConfig {
     }
 
 
-    public void initMybatisTypeHandler(ObjectMapper objectMapper){
+    public void initMybatisTypeHandler(ObjectMapper objectMapper) {
         JacksonTypeHandler.setObjectMapper(objectMapper);
     }
 

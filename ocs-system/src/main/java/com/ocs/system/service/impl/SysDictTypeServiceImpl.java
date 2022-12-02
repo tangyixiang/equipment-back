@@ -1,28 +1,26 @@
 package com.ocs.system.service.impl;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-
-import com.ocs.system.mapper.SysDictDataMapper;
-import com.ocs.system.mapper.SysDictTypeMapper;
-import com.ocs.system.service.ISysDictTypeService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import com.ocs.common.constant.UserConstants;
 import com.ocs.common.core.domain.entity.SysDictData;
 import com.ocs.common.core.domain.entity.SysDictType;
 import com.ocs.common.exception.ServiceException;
 import com.ocs.common.utils.DictUtils;
 import com.ocs.common.utils.StringUtils;
+import com.ocs.system.mapper.SysDictDataMapper;
+import com.ocs.system.mapper.SysDictTypeMapper;
+import com.ocs.system.service.ISysDictTypeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.PostConstruct;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 字典 业务层处理
- *
- * 
  */
 @Service
 public class SysDictTypeServiceImpl implements ISysDictTypeService {

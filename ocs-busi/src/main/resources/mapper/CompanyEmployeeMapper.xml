@@ -22,7 +22,9 @@
     </resultMap>
 
     <select id="findByNickName" resultMap="BaseResultMap">
-        select * from company_employee where nick_name = #{nickName}
+        select *
+        from company_employee
+        where nick_name = #{nickName}
     </select>
 
 
