@@ -2,12 +2,14 @@ package com.ocs.system.mapper;
 
 import com.ocs.common.core.domain.entity.SysDept;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * 部门管理 数据层
  */
+@Repository
 public interface SysDeptMapper {
     /**
      * 查询部门管理数据

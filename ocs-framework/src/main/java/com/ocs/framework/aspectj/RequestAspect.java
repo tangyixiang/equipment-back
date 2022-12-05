@@ -110,7 +110,7 @@ public class RequestAspect {
     }
 
     private String paramOfPost(HttpServletRequest request) {
-        return ServletUtil.getBody(request);
+        return request.getRequestURL().toString().contains("/upload") ? "" : ServletUtil.getBody(request);
     }
 
     public Object[] getRequestBodyParams(ProceedingJoinPoint proceedingJoinPoint) {

@@ -14,7 +14,7 @@ import com.ocs.busi.mapper.EmployeeSalaryMapper;
 import com.ocs.busi.service.EmployeeSalaryService;
 import com.ocs.common.core.domain.entity.SysDept;
 import com.ocs.common.exception.ServiceException;
-import com.ocs.system.service.ISysDeptService;
+import com.ocs.system.mapper.SysDeptMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +35,10 @@ public class EmployeeSalaryServiceImpl extends ServiceImpl<EmployeeSalaryMapper,
 
     @Autowired
     private CompanyEmployeeMapper companyEmployeeMapper;
+
     @Autowired
-    private ISysDeptService sysDeptService;
+    private SysDeptMapper sysDeptMapper;
+
 
     @Override
     @Transactional
@@ -60,7 +62,7 @@ public class EmployeeSalaryServiceImpl extends ServiceImpl<EmployeeSalaryMapper,
             }
             SysDept sysDept = new SysDept();
             sysDept.setDeptName(employeeSalary.getEmployeeDept());
-            List<SysDept> depts = sysDeptService.selectDeptList(sysDept);
+            List<SysDept> depts = sysDeptMapper.selectDeptList(sysDept);
             if (depts.size() == 0) {
                 throw new ServiceException("部门:" + employeeSalary.getEmployeeDept() + ", 不存在");
             }
