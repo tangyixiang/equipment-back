@@ -4,9 +4,12 @@ package com.ocs;
 import cn.hutool.core.text.NamingCase;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
+import com.ocs.web.controller.task.TaskController;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.*;
 
 /**
@@ -38,6 +41,16 @@ public class OfficeApplicationTest {
         System.out.println(JSON.toJSONString(list));
         System.out.println("=============");
 
+    }
+
+    @Test
+    void getParameterName() throws Exception {
+        Class cls = TaskController.class;
+        Method method = cls.getMethod("test", String.class, Integer.class);
+        Parameter[] parameters = method.getParameters();
+        for (Parameter parameter : parameters) {
+            System.out.println(parameter.getName());
+        }
     }
 
 }

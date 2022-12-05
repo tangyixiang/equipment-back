@@ -3,10 +3,14 @@ package com.ocs.framework.aspectj;
 
 import cn.hutool.extra.servlet.ServletUtil;
 import com.alibaba.fastjson2.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ocs.common.annotation.SimpleRequestBody;
+import com.ocs.common.exception.ServiceException;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +20,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Map;
 
 /**
@@ -23,7 +29,7 @@ import java.util.Map;
  */
 @Aspect
 @Component
-public class ConsoleLogAspect {
+public class RequestAspect {
 
     private Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -60,7 +66,18 @@ public class ConsoleLogAspect {
     @Around("toLog()")
     public Object doAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         long start = System.currentTimeMillis();
-        Object result = proceedingJoinPoint.proceed();
+
+        MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();
+        Method method = signature.getMethod();
+        SimpleRequestBody annotation = method.getAnnotation(SimpleRequestBody.class);
+        Object result = null;
+        if (annotation != null) {
+            Object[] requestBodyParams = getRequestBodyParams(proceedingJoinPoint);
+            result = requestBodyParams != null ? proceedingJoinPoint.proceed(requestBodyParams) : proceedingJoinPoint.proceed();
+        } else {
+            result = proceedingJoinPoint.proceed();
+        }
+
         long millis = System.currentTimeMillis() - start;
         logger.info("共花费:{}毫秒", millis);
         if (millis > 300) {
@@ -94,6 +111,34 @@ public class ConsoleLogAspect {
 
     private String paramOfPost(HttpServletRequest request) {
         return ServletUtil.getBody(request);
+    }
+
+    public Object[] getRequestBodyParams(ProceedingJoinPoint proceedingJoinPoint) {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+        if (request.getMethod().equals("POST")) {
+            String paramStr = paramOfPost(request);
+            try {
+                Map<String, Object> map = objectMapper.readValue(paramStr, Map.class);
+                // 获取方法，此处可将signature强转为MethodSignature
+                MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();
+                Method method = signature.getMethod();
+                Parameter[] parameters = method.getParameters();
+                Object[] data = new Object[parameters.length];
+                for (int i = 0; i < parameters.length; i++) {
+                    String name = parameters[i].getName();
+                    data[i] = map.get(name);
+                    if (data[i] == null) {
+                        logger.error("请求参数:{}", objectMapper.writeValueAsString(map));
+                        throw new ServiceException("参数名:" + name + ",缺少参数值");
+                    }
+                }
+                return data;
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
     }
 
 }
