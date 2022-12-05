@@ -42,6 +42,9 @@
             <if test="dictType != null and dictType != ''">
                 AND dict_type = #{dictType}
             </if>
+            <if test="dictValue != null and dictValue != ''">
+                AND dict_value = #{dictValue}
+            </if>
             <if test="dictLabel != null and dictLabel != ''">
                 AND dict_label like concat('%', #{dictLabel}, '%')
             </if>

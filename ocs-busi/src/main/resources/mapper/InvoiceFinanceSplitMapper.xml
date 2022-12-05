@@ -28,12 +28,12 @@
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <select id="findPeriodNumMax" resultMap="BaseResultMap">
+    <select id="findPeriodNumMax" resultType="java.lang.Integer">
         select period_num
         from invoice_finance_split
         where accounting_period = #{period}
         group by period_num
-        order by period_num desc
+        order by period_num desc limit 1
     </select>
 
 </mapper>

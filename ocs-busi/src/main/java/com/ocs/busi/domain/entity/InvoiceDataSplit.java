@@ -16,7 +16,7 @@ public class InvoiceDataSplit {
      */
     @Excel(name = "分录类别")
     @TableField(exist = false)
-    protected String splitType = "经营类";
+    protected String splitType;
 
     /**
      * 日期

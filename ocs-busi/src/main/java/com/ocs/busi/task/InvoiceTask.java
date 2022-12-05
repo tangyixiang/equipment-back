@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +48,7 @@ public class InvoiceTask {
      *
      * @param accountingPeriod 会计日期
      */
+    @Transactional
     public void splitTask(Integer accountingPeriod) {
         TaskContext.get().setTaskType(CommonConstants.TASK_SPLIT);
         logger.info("发票分录任务开始");

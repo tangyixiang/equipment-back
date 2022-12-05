@@ -36,7 +36,7 @@ public class AccountingSubjectServiceImpl extends ServiceImpl<AccountingSubjectM
         SysDictData sysDictData = new SysDictData();
         sysDictData.setDictLabel(itemName);
         List<SysDictData> sysDictDataList = dictDataService.selectDictDataList(sysDictData);
-        SysDictData dictData = sysDictDataList.stream().filter(data -> dictTypeService.selectDictTypeById(data.getDictCode()).getGroup().equals(CommonConstants.DICT_FINANCE_GROUP))
+        SysDictData dictData = sysDictDataList.stream().filter(data -> dictTypeService.selectDictTypeByType(data.getDictType()).getGroup().equals(CommonConstants.DICT_FINANCE_GROUP))
                 .findFirst().get();
 
         LambdaQueryWrapper<AccountingSubject> wrapper = new LambdaQueryWrapper<AccountingSubject>().eq(AccountingSubject::getItemId, dictData.getDictValue());
@@ -49,7 +49,7 @@ public class AccountingSubjectServiceImpl extends ServiceImpl<AccountingSubjectM
         SysDictData sysDictData = new SysDictData();
         sysDictData.setDictLabel(itemName);
         List<SysDictData> sysDictDataList = dictDataService.selectDictDataList(sysDictData);
-        SysDictData dictData = sysDictDataList.stream().filter(data -> dictTypeService.selectDictTypeById(data.getDictCode()).getGroup().equals(CommonConstants.DICT_FINANCE_GROUP))
+        SysDictData dictData = sysDictDataList.stream().filter(data -> dictTypeService.selectDictTypeByType(data.getDictType()).getGroup().equals(CommonConstants.DICT_FINANCE_GROUP))
                 .findFirst().get();
         LambdaQueryWrapper<AccountingSubject> wrapper = new LambdaQueryWrapper<AccountingSubject>().eq(AccountingSubject::getItemId, dictData.getDictValue());
 
@@ -68,8 +68,9 @@ public class AccountingSubjectServiceImpl extends ServiceImpl<AccountingSubjectM
     private SysDictData findDictData(String dictValue) {
         SysDictData sysDictData = new SysDictData();
         sysDictData.setDictValue(dictValue);
+        // 可能存在相同的value
         List<SysDictData> sysDictDataList = dictDataService.selectDictDataList(sysDictData);
-        SysDictData dictData = sysDictDataList.stream().filter(data -> dictTypeService.selectDictTypeById(data.getDictCode()).getGroup().equals(CommonConstants.DICT_FINANCE_GROUP))
+        SysDictData dictData = sysDictDataList.stream().filter(data -> dictTypeService.selectDictTypeByType(data.getDictType()).getGroup().equals(CommonConstants.DICT_FINANCE_GROUP))
                 .findFirst().get();
         if (dictData == null) {
             throw new ServiceException("未找到值:" + dictValue + "的字典");

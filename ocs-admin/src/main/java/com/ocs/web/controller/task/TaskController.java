@@ -8,6 +8,7 @@ import com.ocs.busi.domain.entity.InvoiceFinanceSplit;
 import com.ocs.busi.domain.entity.InvoiceOperatingSplit;
 import com.ocs.busi.service.InvoiceFinanceSplitService;
 import com.ocs.busi.service.InvoiceOperatingSplitService;
+import com.ocs.common.constant.TaskIDPrefixConstants;
 import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
@@ -68,21 +69,23 @@ public class TaskController extends BaseController {
         SysJobLog sysJobLog = sysJobLogService.selectJobLogById(jobLogId);
         String taskId = sysJobLog.getTaskId();
         if (StringUtils.isNotEmpty(taskId)) {
-            LambdaQueryWrapper<InvoiceOperatingSplit> wrapper1 = new LambdaQueryWrapper<InvoiceOperatingSplit>().eq(InvoiceOperatingSplit::getTaskId, taskId);
+            LambdaQueryWrapper<InvoiceOperatingSplit> wrapper1 = new LambdaQueryWrapper<InvoiceOperatingSplit>().eq(InvoiceOperatingSplit::getTaskId, TaskIDPrefixConstants.OPERATE_TASK + taskId);
             List<InvoiceOperatingSplit> invoiceOperatingSplits = invoiceOperatingSplitService.list(wrapper1);
 
-            LambdaQueryWrapper<InvoiceFinanceSplit> wrapper2 = new LambdaQueryWrapper<InvoiceFinanceSplit>().eq(InvoiceFinanceSplit::getTaskId, taskId);
+            LambdaQueryWrapper<InvoiceFinanceSplit> wrapper2 = new LambdaQueryWrapper<InvoiceFinanceSplit>().eq(InvoiceFinanceSplit::getTaskId, TaskIDPrefixConstants.FINANCE_TASK + taskId);
             List<InvoiceFinanceSplit> invoiceFinanceSplits = invoiceFinanceSplitService.list(wrapper2);
 
             List<InvoiceDataSplit> list = new ArrayList<>();
             invoiceOperatingSplits.forEach(op -> {
                 InvoiceDataSplit data = new InvoiceDataSplit();
                 BeanUtils.copyProperties(op, data);
+                data.setSplitType("经营类");
                 list.add(data);
             });
             invoiceFinanceSplits.forEach(finance -> {
                 InvoiceDataSplit data = new InvoiceDataSplit();
                 BeanUtils.copyProperties(finance, data);
+                data.setSplitType("财政类");
                 list.add(data);
             });
 
