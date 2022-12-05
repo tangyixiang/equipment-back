@@ -93,7 +93,10 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public List<SysMenu> selectMenuTreeByUserId(Long userId) {
         List<SysMenu> menus = null;
-        if (SecurityUtils.isAdmin(userId)) {
+        List<SysRole> sysRoles = roleMapper.selectRolePermissionByUserId(userId);
+        // 超级管理员角色
+        boolean isAdminRole = sysRoles.stream().map(sysRole -> sysRole.getRoleId()).filter(id -> id == 1L).findAny().isPresent();
+        if (SecurityUtils.isAdmin(userId) || isAdminRole) {
             menus = menuMapper.selectMenuTreeAll();
         } else {
             menus = menuMapper.selectMenuTreeByUserId(userId);

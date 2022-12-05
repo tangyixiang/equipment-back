@@ -8,8 +8,6 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.ocs.common.core.domain.SimpleEntity;
 import lombok.Data;
 
-import java.io.Serializable;
-
 /**
  * 职员信息表
  *
@@ -17,7 +15,7 @@ import java.io.Serializable;
  */
 @TableName(value = "company_employee")
 @Data
-public class CompanyEmployee extends SimpleEntity implements Serializable {
+public class CompanyEmployee extends SimpleEntity {
     /**
      * 用户ID
      */
@@ -54,6 +52,16 @@ public class CompanyEmployee extends SimpleEntity implements Serializable {
      * 手机号码
      */
     private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 性别
+     */
+    private String sex;
 
     /**
      * 职员状态（0正常 1停用）

@@ -7,6 +7,7 @@ import com.ocs.busi.domain.entity.InvoiceFinance;
 import com.ocs.busi.domain.entity.InvoiceOperating;
 import com.ocs.busi.mapper.CompanyEmployeeMapper;
 import com.ocs.busi.service.CompanyClientOrgService;
+import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,7 +35,8 @@ public class InvoiceHelper {
             String payee = invoiceOperating.getPayee();
             String reviewer = invoiceOperating.getReviewer();
 
-            List<CompanyClientOrg> clientOrgList = clientOrgService.list(new LambdaQueryWrapper<CompanyClientOrg>().eq(CompanyClientOrg::getName, buyerName));
+            List<CompanyClientOrg> clientOrgList = clientOrgService.list(new LambdaQueryWrapper<CompanyClientOrg>().eq(CompanyClientOrg::getName, buyerName)
+                    .eq(CompanyClientOrg::getDel, CommonConstants.STATUS_NORMAL));
             if (clientOrgList.size() == 0) {
                 throw new ServiceException("购方名称:" + buyerName + ",不存在");
             }
@@ -58,7 +60,8 @@ public class InvoiceHelper {
             String socialCreditCode = invoiceFinance.getSocialCreditCode();
             String creator = invoiceFinance.getCreator();
 
-            List<CompanyClientOrg> clientOrgList = clientOrgService.list(new LambdaQueryWrapper<CompanyClientOrg>().eq(CompanyClientOrg::getName, payer));
+            List<CompanyClientOrg> clientOrgList = clientOrgService.list(new LambdaQueryWrapper<CompanyClientOrg>().eq(CompanyClientOrg::getName, payer)
+                    .eq(CompanyClientOrg::getDel, CommonConstants.STATUS_NORMAL));
             if (clientOrgList.size() == 0) {
                 throw new ServiceException("缴款人:" + payer + ",不存在");
             }

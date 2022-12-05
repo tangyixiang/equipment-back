@@ -76,7 +76,7 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
         // 删除这个期间
         remove(new LambdaQueryWrapper<InvoiceFinance>().eq(InvoiceFinance::getInvoicingPeriod, period));
 
-        saveBatch(invoiceFinanceList);
+        saveOrUpdateBatch(invoiceFinanceList);
 
     }
 

@@ -124,7 +124,7 @@ public class EmployeeSalaryServiceImpl extends ServiceImpl<EmployeeSalaryMapper,
                 employeeSalary.setDecreaseTotalSalary(covertDouble(rowlist.get(32) + ""));
                 employeeSalary.setIndividualIncomeTax(covertDouble(rowlist.get(33) + ""));
                 employeeSalary.setActualAmount(covertDouble(rowlist.get(34) + ""));
-                employeeSalary.setRemark(rowlist.get(35) + "");
+                employeeSalary.setRemark(rowlist.get(35) == null ? null : rowlist.get(35) + "");
 
                 ValidateHelper.validData(employeeSalary);
 

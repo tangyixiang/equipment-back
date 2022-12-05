@@ -1,5 +1,7 @@
 package com.ocs.busi.domain.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.ocs.busi.domain.entity.SysUserExtension;
 import com.ocs.common.core.domain.entity.SysDept;
 import lombok.Data;
@@ -17,6 +19,7 @@ public class CompanyEmployeeDto {
     /**
      * 用户ID
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     /**
@@ -45,6 +48,21 @@ public class CompanyEmployeeDto {
      * 密码
      */
     private String password;
+
+    /**
+     * 手机号码
+     */
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 性别
+     */
+    private String sex;
 
     /**
      * 职员状态（0正常 1停用）

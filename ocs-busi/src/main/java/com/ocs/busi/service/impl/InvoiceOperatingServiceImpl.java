@@ -73,7 +73,7 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
         // 删除这个期间
         remove(new LambdaQueryWrapper<InvoiceOperating>().eq(InvoiceOperating::getInvoicingPeriod, period));
         // 再导入
-        saveBatch(invoiceOperatingList);
+        saveOrUpdateBatch(invoiceOperatingList);
     }
 
     private List<InvoiceOperating> convertExcelToInvoice(InputStream inputStream, String period) {
@@ -96,6 +96,10 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
     @Override
     public Map<String, Object> uploadValidate(InputStream inputStream, String period) {
         List<InvoiceOperating> invoiceOperatingList = convertExcelToInvoice(inputStream, period);
+
+        // 校验数据
+        invoiceHelper.validateOperate(invoiceOperatingList);
+
         String flowIds = invoiceOperatingList.stream().map(invoice -> invoice.getFlowId()).collect(Collectors.joining(","));
         List<InvoiceOperating> invoiceOperatings = getBaseMapper().findFlowIdIn(flowIds);
 

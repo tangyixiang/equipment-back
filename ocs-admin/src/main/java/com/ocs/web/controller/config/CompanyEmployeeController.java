@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -56,17 +57,24 @@ public class CompanyEmployeeController extends BaseController {
         startPage();
         QueryWrapper<CompanyEmployee> wrapper = QueryHelper.dynamicCondition(companyEmployee, CommonConstants.QUERY_LIKE, false);
         List<CompanyEmployee> list = companyEmployeeService.list(wrapper);
-
+        List<CompanyEmployeeDto> dtoList = new ArrayList<>();
         for (CompanyEmployee employee : list) {
+            CompanyEmployeeDto dto = new CompanyEmployeeDto();
+            BeanUtils.copyProperties(employee,dto);
             SysUserExtension sysUserExtension = userExtensionService.getById(employee.getId());
-            employee.setExtensionData(sysUserExtension);
+            if (sysUserExtension != null){
+                dto.setCertificate(sysUserExtension.getCertificate());
+                dto.setDimensions(sysUserExtension.getDimensions());
+            }
+            dtoList.add(dto);
         }
 
-        return getDataTable(list);
+        return getDataTable(dtoList);
     }
 
 
     @PostMapping("/update")
+    @Transactional
     public Result update(@RequestBody @Validated CompanyEmployeeDto companyEmployeeDto) {
 
         CompanyEmployee companyEmployee = new CompanyEmployee();
@@ -77,8 +85,10 @@ public class CompanyEmployeeController extends BaseController {
 
         sysUserExtension.setUseId(companyEmployee.getId());
 
+        // userExtensionService.remove(new LambdaQueryWrapper<SysUserExtension>().eq(SysUserExtension::getUseId, companyEmployee.getId()));
+
         companyEmployeeService.updateById(companyEmployee);
-        userExtensionService.updateById(sysUserExtension);
+        userExtensionService.saveOrUpdate(sysUserExtension);
         return Result.success();
     }
 
