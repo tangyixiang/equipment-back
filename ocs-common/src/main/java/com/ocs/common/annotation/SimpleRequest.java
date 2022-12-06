@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(value = RetentionPolicy.RUNTIME)
-public @interface SimpleRequestBody {
+public @interface SimpleRequest {
 
 }

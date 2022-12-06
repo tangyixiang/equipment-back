@@ -1,6 +1,7 @@
 package com.ocs.framework.config;
 
 import com.ocs.common.filter.RepeatableFilter;
+import com.ocs.common.filter.TraceIdFilter;
 import com.ocs.common.filter.XssFilter;
 import com.ocs.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,6 +49,17 @@ public class FilterConfig {
         registration.addUrlPatterns("/*");
         registration.setName("repeatableFilter");
         registration.setOrder(FilterRegistrationBean.LOWEST_PRECEDENCE);
+        return registration;
+    }
+
+    @Bean
+    public FilterRegistrationBean<TraceIdFilter> traceIdFilterRegistration() {
+        FilterRegistrationBean<TraceIdFilter> registration = new FilterRegistrationBean<>(
+                new TraceIdFilter());
+        registration.setName("traceIdFilter");
+        registration.addUrlPatterns("/*");
+        //优先级
+        registration.setOrder(Integer.MAX_VALUE - 1);
         return registration;
     }
 

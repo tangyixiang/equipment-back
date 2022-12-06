@@ -5,8 +5,11 @@ import cn.hutool.extra.servlet.ServletUtil;
 import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ocs.common.annotation.SimpleRequestBody;
+import com.ocs.common.annotation.SimpleRequest;
+import com.ocs.common.core.domain.entity.SysUser;
+import com.ocs.common.core.domain.model.LoginUser;
 import com.ocs.common.exception.ServiceException;
+import com.ocs.framework.web.service.TokenService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -35,6 +38,8 @@ public class RequestAspect {
 
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private TokenService tokenService;
 
 
     @Pointcut("execution(public * com.ocs.*.controller..*.*(..))")
@@ -60,16 +65,21 @@ public class RequestAspect {
 
         String params = request.getMethod().equals("POST") ? paramOfPost(request) : objectMapper.writeValueAsString(paramOfGet(request));
         logger.info("HTTP请求参数:{}", params);
+        LoginUser loginUser = tokenService.getLoginUser(request);
+        SysUser currentUser = loginUser == null ? null : loginUser.getUser();
+        if (currentUser != null) {
+            logger.info("业务操作人员 : " + currentUser.getUserName());
+            logger.info("业务操作人员名称 : " + currentUser.getNickName());
+        }
 
     }
 
     @Around("toLog()")
     public Object doAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         long start = System.currentTimeMillis();
-
         MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();
         Method method = signature.getMethod();
-        SimpleRequestBody annotation = method.getAnnotation(SimpleRequestBody.class);
+        SimpleRequest annotation = method.getAnnotation(SimpleRequest.class);
         Object result = null;
         if (annotation != null) {
             Object[] requestBodyParams = getRequestBodyParams(proceedingJoinPoint);
