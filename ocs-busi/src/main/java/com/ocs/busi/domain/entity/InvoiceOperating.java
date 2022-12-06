@@ -183,7 +183,7 @@ public class InvoiceOperating extends SimpleEntity {
      * 合计税额
      */
     @NotBlank(message = "合计税额不能为空")
-    private String totalPrice;
+    private String totalTaxPrice;
 
     /**
      * 备注

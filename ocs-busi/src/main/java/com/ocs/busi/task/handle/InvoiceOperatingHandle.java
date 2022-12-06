@@ -81,9 +81,9 @@ public class InvoiceOperatingHandle {
             Map<String, String> nameValueMap = accountingSubjectService.findOperatingData(itemName);
 
             InvoiceOperatingSplit bankRecordSplit = bankRecord(increment, invoiceOperating, itemName, taskId);
-            InvoiceOperatingSplit fundsRecordSplit = fundsRecord(increment, invoiceOperating, itemName, taskId);
             InvoiceOperatingSplit incomeRecordSplit = incomeRecord(increment, invoiceOperating, itemName, taskId, nameValueMap.get("经营核算收入科目映射关系"));
             InvoiceOperatingSplit taxRecordSplit = taxRecord(increment, invoiceOperating, itemName, taskId, nameValueMap.get("经营核算税科目映射关系"));
+            InvoiceOperatingSplit fundsRecordSplit = fundsRecord(increment, invoiceOperating, itemName, taskId);
             InvoiceOperatingSplit budgetRecordSplit = budgetRecord(increment, invoiceOperating, itemName, taskId, nameValueMap.get("经营预算收入科目映射关系"));
 
             invoiceOperating.setDataSplit(true);
@@ -91,7 +91,7 @@ public class InvoiceOperatingHandle {
             invoiceOperating.setVersion("JYFPENTRY" + accountingPeriod + StringUtils.leftPad(periodNum + "", 3, "0"));
 
             logger.info("经营发票:{},开始保存分录拆分数据", invoiceOperating.getId());
-            List<InvoiceOperatingSplit> invoiceOperatingSplitList = Arrays.asList(bankRecordSplit, fundsRecordSplit, incomeRecordSplit, taxRecordSplit, budgetRecordSplit);
+            List<InvoiceOperatingSplit> invoiceOperatingSplitList = Arrays.asList(bankRecordSplit, incomeRecordSplit, taxRecordSplit, fundsRecordSplit, budgetRecordSplit);
             invoiceOperatingSplitList.forEach(split -> {
                 split.setAccountingPeriod(accountingPeriod);
                 split.setPeriodNum(periodNum);
@@ -113,8 +113,8 @@ public class InvoiceOperatingHandle {
         split.setCertificateId(id);
         split.setSubjectCode("100203");
         split.setSummary(invoiceOperating.getBuyerName() + " " + itemName);
-        split.setBorrow("0");
-        split.setLoan(invoiceOperating.getTotalPriceIncludingTax());
+        split.setBorrow(invoiceOperating.getTotalPriceIncludingTax());
+        split.setLoan("0");
         split.setAttachmentNum("0");
         split.setUseFor(invoiceOperating.getBuyerName());
         split.setBudgetProjectCode("");
@@ -138,8 +138,8 @@ public class InvoiceOperatingHandle {
         split.setCertificateId(id);
         split.setSubjectCode("800102");
         split.setSummary(invoiceOperating.getBuyerName() + " " + itemName);
-        split.setBorrow("0");
-        split.setLoan(invoiceOperating.getTotalPriceIncludingTax());
+        split.setBorrow(invoiceOperating.getTotalPriceIncludingTax());
+        split.setLoan("0");
         split.setAttachmentNum("0");
         split.setUseFor(invoiceOperating.getBuyerName());
         split.setBudgetProjectCode("");
@@ -166,7 +166,7 @@ public class InvoiceOperatingHandle {
         split.setSubjectCode(subjectCode);
         split.setSummary(invoiceOperating.getBuyerName() + " " + itemName);
         split.setBorrow("0");
-        split.setLoan(invoiceOperating.getTotalPriceIncludingTax());
+        split.setLoan(invoiceOperating.getTotalPriceExcludingTax());
         split.setAttachmentNum("0");
         split.setUseFor(invoiceOperating.getBuyerName());
         split.setBudgetProjectCode("");
@@ -191,7 +191,7 @@ public class InvoiceOperatingHandle {
         split.setSubjectCode(subjectCode);
         split.setSummary(invoiceOperating.getBuyerName() + " " + itemName);
         split.setBorrow("0");
-        split.setLoan(invoiceOperating.getTotalPrice());
+        split.setLoan(invoiceOperating.getTotalTaxPrice());
         split.setAttachmentNum("0");
         split.setUseFor(invoiceOperating.getBuyerName());
         split.setBudgetProjectCode("");
@@ -199,7 +199,7 @@ public class InvoiceOperatingHandle {
         split.setDeptEconomyCode("");
         split.setContactsCode("");
         split.setDivergenceCode("0");
-        split.setFundsCode("34");
+        split.setFundsCode("");
         split.setTaskId(taskId);
         split.setInvoiceOperatingId(invoiceOperating.getId());
         split.setCreateTime(LocalDateTime.now());

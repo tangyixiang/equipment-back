@@ -153,7 +153,7 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
             invoiceOperating.setTaxPrice(convertString(rowlist.get(23)));
             invoiceOperating.setTotalPriceIncludingTax(convertString(rowlist.get(24)));
             invoiceOperating.setTotalPriceExcludingTax(convertString(rowlist.get(25)));
-            invoiceOperating.setTotalPrice(convertString(rowlist.get(26)));
+            invoiceOperating.setTotalTaxPrice(convertString(rowlist.get(26)));
             invoiceOperating.setRemark(convertString(rowlist.get(27)));
             invoiceOperating.setBillingStaff(convertString(rowlist.get(28)));
             invoiceOperating.setPayee(convertString(rowlist.get(29)));

@@ -33,7 +33,7 @@
         <result property="taxPrice" column="tax_price" jdbcType="VARCHAR"/>
         <result property="totalPriceIncludingTax" column="total_price_including_tax" jdbcType="VARCHAR"/>
         <result property="totalPriceExcludingTax" column="total_price_excluding_tax" jdbcType="VARCHAR"/>
-        <result property="totalPrice" column="total_price" jdbcType="VARCHAR"/>
+        <result property="totalTaxPrice" column="total_tax_price" jdbcType="VARCHAR"/>
         <result property="remark" column="remark" jdbcType="VARCHAR"/>
         <result property="billingStaff" column="billing_staff" jdbcType="VARCHAR"/>
         <result property="payee" column="payee" jdbcType="VARCHAR"/>
