@@ -5,6 +5,7 @@ import com.ocs.common.annotation.Excel.ColumnType;
 import com.ocs.common.annotation.Excel.Type;
 import com.ocs.common.annotation.Excels;
 import com.ocs.common.core.domain.BaseEntity;
+import com.ocs.common.validate.AddValidate;
 import com.ocs.common.xss.Xss;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -80,7 +81,7 @@ public class SysUser extends BaseEntity {
     /**
      * 密码
      */
-    @NotBlank(message = "密码不能为空")
+    @NotBlank(message = "密码不能为空", groups = {AddValidate.class})
     private String password;
 
     /**

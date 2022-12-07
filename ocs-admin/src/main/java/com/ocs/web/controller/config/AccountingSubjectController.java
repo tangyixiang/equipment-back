@@ -2,7 +2,6 @@ package com.ocs.web.controller.config;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ocs.busi.domain.entity.AccountingSubject;
-import com.ocs.busi.helper.CrudHelper;
 import com.ocs.busi.service.AccountingSubjectService;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.core.controller.BaseController;
@@ -14,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -52,7 +52,7 @@ public class AccountingSubjectController extends BaseController {
     @DeleteMapping("/del/{ids}")
     @Transactional
     public Result delete(@PathVariable String[] ids) {
-        new CrudHelper<AccountingSubject>().deleteByIds(ids, accountingSubjectService);
+        accountingSubjectService.removeBatchByIds(Arrays.asList(ids));
         return Result.success();
     }
 

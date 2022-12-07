@@ -12,6 +12,7 @@ import com.ocs.common.enums.BusinessType;
 import com.ocs.common.utils.SecurityUtils;
 import com.ocs.common.utils.StringUtils;
 import com.ocs.common.utils.poi.ExcelUtil;
+import com.ocs.common.validate.AddValidate;
 import com.ocs.system.service.ISysPostService;
 import com.ocs.system.service.ISysRoleService;
 import com.ocs.system.service.ISysUserService;
@@ -108,7 +109,7 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @Transactional
     @PostMapping
-    public Result add(@Validated @RequestBody SysUser user) {
+    public Result add(@Validated({AddValidate.class}) @RequestBody SysUser user) {
         if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName()))) {
             return Result.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
         } else if (StringUtils.isNotEmpty(user.getPhonenumber())
@@ -142,6 +143,9 @@ public class SysUserController extends BaseController {
             return Result.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         user.setUpdateBy(getUsername());
+        if (StringUtils.isNotEmpty(user.getPassword())) {
+            user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        }
         int updateUser = userService.updateUser(user);
 
         return toAjax(updateUser);

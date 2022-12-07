@@ -63,7 +63,7 @@ public class RequestAspect {
         String methodName = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
         logger.info("业务请求方法 : " + methodName);
 
-        String params = request.getMethod().equals("POST") ? paramOfPost(request) : objectMapper.writeValueAsString(paramOfGet(request));
+        String params = request.getMethod().equals("GET") || request.getMethod().equals("DELETE") ? objectMapper.writeValueAsString(paramOfGet(request)) : paramOfPost(request);
         logger.info("HTTP请求参数:{}", params);
         LoginUser loginUser = tokenService.getLoginUser(request);
         SysUser currentUser = loginUser == null ? null : loginUser.getUser();
