@@ -71,7 +71,7 @@ public class InvoiceFinanceHandle {
         final Integer periodNum = periodNumMax == null ? 1 : periodNumMax + 1;
 
         for (InvoiceFinance invoiceFinance : invoiceFinanceList) {
-            int increment = atomicInteger.getAndIncrement();
+            int increment = atomicInteger.incrementAndGet();
             String itemName = invoiceFinance.getItemName();
 
             AccountingSubject financeItemValue = accountingSubjectService.findFinanceItemValue(itemName);
