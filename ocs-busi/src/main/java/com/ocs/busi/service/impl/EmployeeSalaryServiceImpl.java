@@ -62,7 +62,7 @@ public class EmployeeSalaryServiceImpl extends ServiceImpl<EmployeeSalaryMapper,
                 throw new ServiceException("职员:" + employeeSalary.getEmployeeName() + ", 不存在");
             }
 
-            employeeSalary.setEmployeeType(employeeList.stream().findFirst().get().getHireType());
+            employeeSalary.setEmployeeType(employeeList.stream().findFirst().get().getHireType().equals("1") ? "在编" : "聘用");
             SysDept sysDept = new SysDept();
             sysDept.setDeptName(employeeSalary.getEmployeeDept());
             List<SysDept> depts = sysDeptMapper.selectDeptList(sysDept);
