@@ -55,19 +55,22 @@ public class EmployeeSalaryServiceImpl extends ServiceImpl<EmployeeSalaryMapper,
         if (employeeSalaryList.size() == 0) {
             throw new ServiceException("未找到工资区间符合" + period + "期间的数据");
         }
-        employeeSalaryList.parallelStream().forEach(employeeSalary -> {
+
+        for (EmployeeSalary employeeSalary : employeeSalaryList) {
             List<CompanyEmployee> employeeList = companyEmployeeMapper.findByNickName(employeeSalary.getEmployeeName());
             if (employeeList.size() == 0) {
                 throw new ServiceException("职员:" + employeeSalary.getEmployeeName() + ", 不存在");
             }
+
+            employeeSalary.setEmployeeType(employeeList.stream().findFirst().get().getHireType());
             SysDept sysDept = new SysDept();
             sysDept.setDeptName(employeeSalary.getEmployeeDept());
             List<SysDept> depts = sysDeptMapper.selectDeptList(sysDept);
             if (depts.size() == 0) {
                 throw new ServiceException("部门:" + employeeSalary.getEmployeeDept() + ", 不存在");
             }
-        });
-
+            employeeSalary.setEmployeeDeptId(depts.stream().findFirst().get().getDeptId());
+        }
 
         LambdaQueryWrapper<EmployeeSalary> delWrapper = new LambdaQueryWrapper<EmployeeSalary>().eq(EmployeeSalary::getSalaryPeriod, period);
         // 删除旧数据
@@ -92,9 +95,9 @@ public class EmployeeSalaryServiceImpl extends ServiceImpl<EmployeeSalaryMapper,
             if (period.equals(rowlist.get(1) + "") || StringUtils.isEmpty(period)) {
                 EmployeeSalary employeeSalary = new EmployeeSalary();
 
-                employeeSalary.setSalaryPeriod(rowlist.get(1) + "");
-                employeeSalary.setEmployeeName(rowlist.get(2) + "");
-                employeeSalary.setEmployeeDept(rowlist.get(3) + "");
+                employeeSalary.setSalaryPeriod((rowlist.get(1) + "").trim());
+                employeeSalary.setEmployeeName((rowlist.get(2) + "").trim());
+                employeeSalary.setEmployeeDept((rowlist.get(3) + "").trim());
                 employeeSalary.setEmployeeAccountNo(rowlist.get(4) + "");
                 employeeSalary.setEmployeeIdNumber(rowlist.get(5) + "");
                 employeeSalary.setPostSalary(covertDouble(rowlist.get(6) + ""));

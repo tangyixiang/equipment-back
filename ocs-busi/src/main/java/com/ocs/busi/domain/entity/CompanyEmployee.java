@@ -43,10 +43,11 @@ public class CompanyEmployee extends SimpleEntity {
      */
     private Long postId;
 
+
     /**
-     * 职务ID
+     * 职务
      */
-    private Long positionId;
+    private Long positionName;
 
     /**
      * 手机号码

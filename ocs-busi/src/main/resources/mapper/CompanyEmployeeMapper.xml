@@ -10,7 +10,7 @@
         <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
         <result property="deptId" column="dept_id" jdbcType="BIGINT"/>
         <result property="postId" column="post_id" jdbcType="BIGINT"/>
-        <result property="positionId" column="position_id" jdbcType="BIGINT"/>
+        <result property="positionName" column="position_name" jdbcType="VARCHAR"/>
         <result property="phone" column="phone" jdbcType="VARCHAR"/>
         <result property="email" column="email" jdbcType="VARCHAR"/>
         <result property="sex" column="sex" jdbcType="VARCHAR"/>

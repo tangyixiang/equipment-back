@@ -2,6 +2,7 @@ package com.ocs.web.controller.config;
 
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.pagehelper.PageInfo;
 import com.ocs.busi.domain.dto.CompanyEmployeeDto;
 import com.ocs.busi.domain.entity.CompanyEmployee;
 import com.ocs.busi.domain.entity.SysUserExtension;
@@ -60,16 +61,18 @@ public class CompanyEmployeeController extends BaseController {
         List<CompanyEmployeeDto> dtoList = new ArrayList<>();
         for (CompanyEmployee employee : list) {
             CompanyEmployeeDto dto = new CompanyEmployeeDto();
-            BeanUtils.copyProperties(employee,dto);
+            BeanUtils.copyProperties(employee, dto);
             SysUserExtension sysUserExtension = userExtensionService.getById(employee.getId());
-            if (sysUserExtension != null){
+            if (sysUserExtension != null) {
                 dto.setCertificate(sysUserExtension.getCertificate());
                 dto.setDimensions(sysUserExtension.getDimensions());
             }
             dtoList.add(dto);
         }
 
-        return getDataTable(dtoList);
+        TableDataInfo dataTable = getDataTable(dtoList);
+        dataTable.setTotal(new PageInfo(list).getTotal());
+        return dataTable;
     }
 
 

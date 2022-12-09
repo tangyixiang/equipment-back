@@ -82,7 +82,7 @@ public class CompanyEmployeeDto {
     /**
      * 角色ID
      */
-    private Long roleId;
+    private String positionName;
 
     // 人员性质
     private String hireType;

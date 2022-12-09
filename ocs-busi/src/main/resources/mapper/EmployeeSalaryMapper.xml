@@ -5,40 +5,67 @@
 <mapper namespace="com.ocs.busi.mapper.EmployeeSalaryMapper">
 
     <resultMap id="BaseResultMap" type="com.ocs.busi.domain.entity.EmployeeSalary">
-        <id property="id" column="id" jdbcType="VARCHAR"/>
-        <result property="salaryPeriod" column="salary_period" jdbcType="VARCHAR"/>
-        <result property="employeeCode" column="employee_code" jdbcType="VARCHAR"/>
-        <result property="employeeName" column="employee_name" jdbcType="VARCHAR"/>
-        <result property="postSalary" column="post_salary" jdbcType="DOUBLE"/>
-        <result property="rankSalary" column="rank_salary" jdbcType="DOUBLE"/>
-        <result property="performanceSalary" column="performance_salary" jdbcType="DOUBLE"/>
-        <result property="housingSalary" column="housing_salary" jdbcType="DOUBLE"/>
-        <result property="bonusSalary" column="bonus_salary" jdbcType="DOUBLE"/>
-        <result property="extraIncreaseSalary1" column="extra_increase_salary1" jdbcType="DOUBLE"/>
-        <result property="extraIncreaseSalary2" column="extra_increase_salary2" jdbcType="DOUBLE"/>
-        <result property="extraIncreaseSalary3" column="extra_increase_salary3" jdbcType="DOUBLE"/>
-        <result property="extraIncreaseSalary4" column="extra_increase_salary4" jdbcType="DOUBLE"/>
-        <result property="extraIncreaseSalary5" column="extra_increase_salary5" jdbcType="DOUBLE"/>
-        <result property="paymentRatio" column="payment_ratio" jdbcType="VARCHAR"/>
-        <result property="unPaymentSalary" column="un_payment_salary" jdbcType="DOUBLE"/>
-        <result property="salaryPayable" column="salary_payable" jdbcType="DOUBLE"/>
-        <result property="endowmentInsurance" column="endowment_insurance" jdbcType="DOUBLE"/>
-        <result property="medicalInsurance" column="medical_insurance" jdbcType="DOUBLE"/>
-        <result property="unemploymentInsurance" column="unemployment_insurance" jdbcType="DOUBLE"/>
-        <result property="housingAccumulationFunds" column="housing_accumulation_funds" jdbcType="DOUBLE"/>
-        <result property="occupationalAnnuity" column="occupational_annuity" jdbcType="DOUBLE"/>
-        <result property="occupationalAnnuityDifferent" column="occupational_annuity_different" jdbcType="DOUBLE"/>
-        <result property="unionFees" column="union_fees" jdbcType="DOUBLE"/>
-        <result property="individualIncomeTax" column="individual_income_tax" jdbcType="DOUBLE"/>
-        <result property="extraDecreaseSalary1" column="extra_decrease_salary1" jdbcType="DOUBLE"/>
-        <result property="extraDecreaseSalary2" column="extra_decrease_salary2" jdbcType="DOUBLE"/>
-        <result property="extraDecreaseSalary3" column="extra_decrease_salary3" jdbcType="DOUBLE"/>
-        <result property="extraDecreaseSalary4" column="extra_decrease_salary4" jdbcType="DOUBLE"/>
-        <result property="extraDecreaseSalary5" column="extra_decrease_salary5" jdbcType="DOUBLE"/>
-        <result property="decreaseTotalSalary" column="decrease_total_salary" jdbcType="DOUBLE"/>
-        <result property="actualAmount" column="actual_amount" jdbcType="DOUBLE"/>
-        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+            <id property="id" column="id" jdbcType="VARCHAR"/>
+            <result property="salaryPeriod" column="salary_period" jdbcType="VARCHAR"/>
+            <result property="employeeName" column="employee_name" jdbcType="VARCHAR"/>
+            <result property="employeeType" column="employee_type" jdbcType="VARCHAR"/>
+            <result property="employeeDept" column="employee_dept" jdbcType="VARCHAR"/>
+            <result property="employeeDeptId" column="employee_dept_id" jdbcType="BIGINT"/>
+            <result property="employeeAccountNo" column="employee_account_no" jdbcType="VARCHAR"/>
+            <result property="employeeIdNumber" column="employee_id_number" jdbcType="VARCHAR"/>
+            <result property="postSalary" column="post_salary" jdbcType="DOUBLE"/>
+            <result property="additionPostSalary" column="addition_post_salary" jdbcType="DOUBLE"/>
+            <result property="rankSalary" column="rank_salary" jdbcType="DOUBLE"/>
+            <result property="additionRankSalary" column="addition_rank_salary" jdbcType="DOUBLE"/>
+            <result property="performanceSalary" column="performance_salary" jdbcType="DOUBLE"/>
+            <result property="additionPerformanceSalary" column="addition_performance_salary" jdbcType="DOUBLE"/>
+            <result property="extraIncreaseSalary1" column="extra_increase_salary1" jdbcType="DOUBLE"/>
+            <result property="extraIncreaseSalary2" column="extra_increase_salary2" jdbcType="DOUBLE"/>
+            <result property="extraIncreaseSalary3" column="extra_increase_salary3" jdbcType="DOUBLE"/>
+            <result property="extraIncreaseSalary4" column="extra_increase_salary4" jdbcType="DOUBLE"/>
+            <result property="extraIncreaseSalary5" column="extra_increase_salary5" jdbcType="DOUBLE"/>
+            <result property="salaryTotal" column="salary_total" jdbcType="DOUBLE"/>
+            <result property="bonusSalary" column="bonus_salary" jdbcType="DOUBLE"/>
+            <result property="housingSalary" column="housing_salary" jdbcType="DOUBLE"/>
+            <result property="salaryPayable" column="salary_payable" jdbcType="DOUBLE"/>
+            <result property="endowmentInsurance" column="endowment_insurance" jdbcType="DOUBLE"/>
+            <result property="medicalInsurance" column="medical_insurance" jdbcType="DOUBLE"/>
+            <result property="unemploymentInsurance" column="unemployment_insurance" jdbcType="DOUBLE"/>
+            <result property="housingAccumulationFunds" column="housing_accumulation_funds" jdbcType="DOUBLE"/>
+            <result property="unionFees" column="union_fees" jdbcType="DOUBLE"/>
+            <result property="occupationalAnnuity" column="occupational_annuity" jdbcType="DOUBLE"/>
+            <result property="extraDecreaseSalary1" column="extra_decrease_salary1" jdbcType="DOUBLE"/>
+            <result property="extraDecreaseSalary2" column="extra_decrease_salary2" jdbcType="DOUBLE"/>
+            <result property="extraDecreaseSalary3" column="extra_decrease_salary3" jdbcType="DOUBLE"/>
+            <result property="extraDecreaseSalary4" column="extra_decrease_salary4" jdbcType="DOUBLE"/>
+            <result property="extraDecreaseSalary5" column="extra_decrease_salary5" jdbcType="DOUBLE"/>
+            <result property="decreaseTotalSalary" column="decrease_total_salary" jdbcType="DOUBLE"/>
+            <result property="individualIncomeTax" column="individual_income_tax" jdbcType="DOUBLE"/>
+            <result property="actualAmount" column="actual_amount" jdbcType="DOUBLE"/>
+            <result property="remark" column="remark" jdbcType="VARCHAR"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+            <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
+
+    <sql id="Base_Column_List">
+        id,salary_period,employee_name,
+        employee_dept,employee_dept_id,employee_account_no,
+        employee_id_number,post_salary,addition_post_salary,
+        rank_salary,addition_rank_salary,performance_salary,
+        addition_performance_salary,extra_increase_salary1,extra_increase_salary2,
+        extra_increase_salary3,extra_increase_salary4,extra_increase_salary5,
+        salary_total,bonus_salary,housing_salary,
+        salary_payable,endowment_insurance,medical_insurance,
+        unemployment_insurance,housing_accumulation_funds,union_fees,
+        occupational_annuity,extra_decrease_salary1,extra_decrease_salary2,
+        extra_decrease_salary3,extra_decrease_salary4,extra_decrease_salary5,
+        decrease_total_salary,individual_income_tax,actual_amount,
+        remark,create_by,update_by,
+        create_time,update_time
+    </sql>
+
 
 
 </mapper>
