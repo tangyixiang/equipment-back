@@ -1,5 +1,6 @@
 package com.ocs.busi.domain.vo;
 
+import cn.hutool.core.util.IdUtil;
 import lombok.Data;
 
 import java.util.List;
@@ -7,12 +8,13 @@ import java.util.List;
 @Data
 public class EmployeeSalaryReportVo {
 
+    private String id;
+
     private String name;
 
     private String type;
 
     // private EmployeeSalary employeeSalary;
-
 
     private Double postSalary = 0d;
 

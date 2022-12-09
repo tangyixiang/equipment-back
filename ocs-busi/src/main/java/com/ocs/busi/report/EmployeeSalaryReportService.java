@@ -1,5 +1,6 @@
 package com.ocs.busi.report;
 
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ocs.busi.domain.dto.EmployeeSalaryReportDto;
 import com.ocs.busi.domain.entity.EmployeeSalary;
@@ -118,6 +119,7 @@ public class EmployeeSalaryReportService {
 
             if (EmployeeSalaryTotalOptional.isPresent()) {
                 BeanUtils.copyProperties(EmployeeSalaryTotalOptional.get(), vo);
+                vo.setId(IdUtil.fastSimpleUUID());
                 // vo.setEmployeeSalary(EmployeeSalaryTotalOptional.get());
             }
 
