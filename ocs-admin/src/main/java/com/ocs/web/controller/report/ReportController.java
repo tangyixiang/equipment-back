@@ -49,7 +49,7 @@ public class ReportController {
 
         EmployeeSalaryReportVo totalEmployeeSalaryReportVo = null;
 
-        if (statistics.size() > 0) {
+        if (statistics.size() > 1) {
             totalEmployeeSalaryReportVo = summary(statistics).get();
             totalEmployeeSalaryReportVo.setName("合计");
             statistics.add(totalEmployeeSalaryReportVo);
