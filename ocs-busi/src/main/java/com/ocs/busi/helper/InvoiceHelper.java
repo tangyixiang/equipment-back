@@ -72,12 +72,13 @@ public class InvoiceHelper {
         });
     }
 
-    private void validateEmployee(String name) {
+    public void validateEmployee(String name) {
         List<CompanyEmployee> employeeList = companyEmployeeMapper.findByNickName(name);
         if (employeeList.size() == 0) {
             throw new ServiceException("职员:" + name + ", 不存在");
         }
-        employeeList.stream().filter(employee -> employee.getStatus().equals("1")).findAny().orElseThrow(() -> new ServiceException("职员:" + name + ", 被禁用"));
+        // 如果没找到启用的，则报错
+        employeeList.stream().filter(employee -> employee.getStatus().equals("0")).findAny().orElseThrow(() -> new ServiceException("职员:" + name + ", 被禁用"));
     }
 
 
