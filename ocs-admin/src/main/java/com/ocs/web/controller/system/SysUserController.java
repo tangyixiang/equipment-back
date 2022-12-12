@@ -9,6 +9,7 @@ import com.ocs.common.core.domain.entity.SysRole;
 import com.ocs.common.core.domain.entity.SysUser;
 import com.ocs.common.core.page.TableDataInfo;
 import com.ocs.common.enums.BusinessType;
+import com.ocs.common.utils.PasswordUtils;
 import com.ocs.common.utils.SecurityUtils;
 import com.ocs.common.utils.StringUtils;
 import com.ocs.common.utils.poi.ExcelUtil;
@@ -144,7 +145,7 @@ public class SysUserController extends BaseController {
         }
         user.setUpdateBy(getUsername());
         if (StringUtils.isNotEmpty(user.getPassword())) {
-            user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+            user.setPassword(SecurityUtils.encryptPassword(PasswordUtils.decrypt(user.getPassword())));
         }
         int updateUser = userService.updateUser(user);
 
@@ -173,7 +174,7 @@ public class SysUserController extends BaseController {
     public Result resetPwd(@RequestBody SysUser user) {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        user.setPassword(SecurityUtils.encryptPassword(PasswordUtils.decrypt(user.getPassword())));
         user.setUpdateBy(getUsername());
         return toAjax(userService.resetPwd(user));
     }

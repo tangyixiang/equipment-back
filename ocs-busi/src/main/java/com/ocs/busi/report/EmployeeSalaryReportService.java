@@ -85,37 +85,7 @@ public class EmployeeSalaryReportService {
             vo.setType(employeeSalaryGroupModel.getType());
             List<EmployeeSalary> list = employeeSalaryGroupModel.getList();
 
-            Optional<EmployeeSalary> EmployeeSalaryTotalOptional = list.stream().reduce((a, b) -> new EmployeeSalary(
-                    a.getPostSalary() + b.getPostSalary(),
-                    a.getAdditionPostSalary() + b.getAdditionPostSalary(),
-                    a.getRankSalary() + b.getRankSalary(),
-                    a.getAdditionRankSalary() + b.getAdditionRankSalary(),
-                    a.getPerformanceSalary() + b.getPerformanceSalary(),
-                    a.getAdditionPerformanceSalary() + b.getAdditionPerformanceSalary(),
-                    a.getExtraIncreaseSalary1() + b.getExtraIncreaseSalary1(),
-                    a.getExtraIncreaseSalary2() + b.getExtraIncreaseSalary2(),
-                    a.getExtraIncreaseSalary3() + b.getExtraIncreaseSalary3(),
-                    a.getExtraIncreaseSalary4() + b.getExtraIncreaseSalary4(),
-                    a.getExtraIncreaseSalary5() + b.getExtraIncreaseSalary5(),
-                    a.getSalaryTotal() + b.getSalaryTotal(),
-                    a.getBonusSalary() + b.getBonusSalary(),
-                    a.getHousingSalary() + b.getBonusSalary(),
-                    a.getSalaryPayable() + b.getRankSalary(),
-                    a.getEndowmentInsurance() + b.getEndowmentInsurance(),
-                    a.getMedicalInsurance() + b.getMedicalInsurance(),
-                    a.getUnemploymentInsurance() + b.getMedicalInsurance(),
-                    a.getHousingAccumulationFunds() + b.getHousingAccumulationFunds(),
-                    a.getUnionFees() + b.getUnionFees(),
-                    a.getOccupationalAnnuity() + b.getOccupationalAnnuity(),
-                    a.getExtraDecreaseSalary1() + b.getExtraDecreaseSalary1(),
-                    a.getExtraDecreaseSalary2() + b.getExtraDecreaseSalary2(),
-                    a.getExtraDecreaseSalary3() + b.getExtraDecreaseSalary3(),
-                    a.getExtraDecreaseSalary4() + b.getExtraDecreaseSalary4(),
-                    a.getExtraDecreaseSalary5() + b.getExtraDecreaseSalary5(),
-                    a.getDecreaseTotalSalary() + b.getDecreaseTotalSalary(),
-                    a.getIndividualIncomeTax() + b.getIndividualIncomeTax(),
-                    a.getActualAmount() + b.getActualAmount()
-            ));
+            Optional<EmployeeSalary> EmployeeSalaryTotalOptional = summaryEmployeeSalary(list);
 
             if (EmployeeSalaryTotalOptional.isPresent()) {
                 BeanUtils.copyProperties(EmployeeSalaryTotalOptional.get(), vo);
@@ -130,6 +100,41 @@ public class EmployeeSalaryReportService {
             reportVoList.add(vo);
         }
         return reportVoList;
+    }
+
+    private static Optional<EmployeeSalary> summaryEmployeeSalary(List<EmployeeSalary> list) {
+        Optional<EmployeeSalary> EmployeeSalaryTotalOptional = list.stream().reduce((a, b) -> new EmployeeSalary(
+                a.getPostSalary() + b.getPostSalary(),
+                a.getAdditionPostSalary() + b.getAdditionPostSalary(),
+                a.getRankSalary() + b.getRankSalary(),
+                a.getAdditionRankSalary() + b.getAdditionRankSalary(),
+                a.getPerformanceSalary() + b.getPerformanceSalary(),
+                a.getAdditionPerformanceSalary() + b.getAdditionPerformanceSalary(),
+                a.getExtraIncreaseSalary1() + b.getExtraIncreaseSalary1(),
+                a.getExtraIncreaseSalary2() + b.getExtraIncreaseSalary2(),
+                a.getExtraIncreaseSalary3() + b.getExtraIncreaseSalary3(),
+                a.getExtraIncreaseSalary4() + b.getExtraIncreaseSalary4(),
+                a.getExtraIncreaseSalary5() + b.getExtraIncreaseSalary5(),
+                a.getSalaryTotal() + b.getSalaryTotal(),
+                a.getBonusSalary() + b.getBonusSalary(),
+                a.getHousingSalary() + b.getBonusSalary(),
+                a.getSalaryPayable() + b.getRankSalary(),
+                a.getEndowmentInsurance() + b.getEndowmentInsurance(),
+                a.getMedicalInsurance() + b.getMedicalInsurance(),
+                a.getUnemploymentInsurance() + b.getMedicalInsurance(),
+                a.getHousingAccumulationFunds() + b.getHousingAccumulationFunds(),
+                a.getUnionFees() + b.getUnionFees(),
+                a.getOccupationalAnnuity() + b.getOccupationalAnnuity(),
+                a.getExtraDecreaseSalary1() + b.getExtraDecreaseSalary1(),
+                a.getExtraDecreaseSalary2() + b.getExtraDecreaseSalary2(),
+                a.getExtraDecreaseSalary3() + b.getExtraDecreaseSalary3(),
+                a.getExtraDecreaseSalary4() + b.getExtraDecreaseSalary4(),
+                a.getExtraDecreaseSalary5() + b.getExtraDecreaseSalary5(),
+                a.getDecreaseTotalSalary() + b.getDecreaseTotalSalary(),
+                a.getIndividualIncomeTax() + b.getIndividualIncomeTax(),
+                a.getActualAmount() + b.getActualAmount()
+        ));
+        return EmployeeSalaryTotalOptional;
     }
 
 

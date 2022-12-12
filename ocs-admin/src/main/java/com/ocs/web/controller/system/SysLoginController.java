@@ -5,6 +5,7 @@ import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.domain.entity.SysMenu;
 import com.ocs.common.core.domain.entity.SysUser;
 import com.ocs.common.core.domain.model.LoginBody;
+import com.ocs.common.utils.PasswordUtils;
 import com.ocs.common.utils.SecurityUtils;
 import com.ocs.framework.web.service.SysLoginService;
 import com.ocs.framework.web.service.SysPermissionService;
@@ -42,7 +43,7 @@ public class SysLoginController {
     public Result login(@RequestBody LoginBody loginBody) {
         Result ajax = Result.success();
         // 生成令牌
-        String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
+        String token = loginService.login(loginBody.getUsername(), PasswordUtils.decrypt(loginBody.getPassword()), loginBody.getCode(),
                 loginBody.getUuid());
         ajax.put(Constants.TOKEN, token);
         return ajax;

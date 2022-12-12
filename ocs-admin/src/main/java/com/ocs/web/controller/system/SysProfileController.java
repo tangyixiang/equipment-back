@@ -8,6 +8,7 @@ import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.domain.entity.SysUser;
 import com.ocs.common.core.domain.model.LoginUser;
 import com.ocs.common.enums.BusinessType;
+import com.ocs.common.utils.PasswordUtils;
 import com.ocs.common.utils.SecurityUtils;
 import com.ocs.common.utils.StringUtils;
 import com.ocs.common.utils.file.FileUploadUtils;
@@ -80,6 +81,9 @@ public class SysProfileController extends BaseController {
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
     public Result updatePwd(String oldPassword, String newPassword) {
+        // 解密
+        oldPassword = PasswordUtils.decrypt(oldPassword);
+        newPassword = PasswordUtils.decrypt(newPassword);
         LoginUser loginUser = getLoginUser();
         String userName = loginUser.getUsername();
         String password = loginUser.getPassword();
