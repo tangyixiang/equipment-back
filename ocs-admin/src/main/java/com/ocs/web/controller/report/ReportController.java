@@ -5,6 +5,7 @@ import com.ocs.busi.domain.dto.EmployeeSalaryReportDto;
 import com.ocs.busi.domain.vo.EmployeeSalaryReportVo;
 import com.ocs.busi.report.EmployeeSalaryReportService;
 import com.ocs.common.core.domain.Result;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,12 +26,16 @@ public class ReportController {
 
     @PostMapping("/employee/salary")
     public Result employeeSalary(@RequestBody EmployeeSalaryReportDto employeeSalaryReportDto) {
+
+        if (ObjectUtils.isEmpty(employeeSalaryReportDto.getRange()) || ObjectUtils.isEmpty(employeeSalaryReportDto.getCondition())) {
+            return Result.success(Collections.emptyList());
+        }
+
         List<LocalDateTime> range = employeeSalaryReportDto.getRange();
         List<String> condition = employeeSalaryReportDto.getCondition();
 
         employeeSalaryReportDto.setStartPeriod(DateUtil.format(range.get(0), "yyyyMM"));
         employeeSalaryReportDto.setEndPeriod(DateUtil.format(range.get(1), "yyyyMM"));
-
         employeeSalaryReportDto.setPeriodCondition(condition.contains("period"));
         employeeSalaryReportDto.setDeptCondition(condition.contains("dept"));
         employeeSalaryReportDto.setEmployeeTypeCondition(condition.contains("employeeType"));
