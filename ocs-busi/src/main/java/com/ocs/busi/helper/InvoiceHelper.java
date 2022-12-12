@@ -42,13 +42,11 @@ public class InvoiceHelper {
             }
 
             List.of(billingStaff, payee, reviewer).stream().forEach(name -> {
-                List<CompanyEmployee> employeeList = companyEmployeeMapper.findByNickName(name);
-                if (employeeList.size() == 0) {
-                    throw new ServiceException("职员:" + name + ", 不存在");
-                }
+                validateEmployee(name);
             });
         });
     }
+
 
     /*
      * 缴款人”需要与系统的“客户名称”校验，“社会信用统一代码”需要跟系统的客户资料里的“社会信用统一代码”校验，“编制人”需要跟“职员”校验。
@@ -70,11 +68,17 @@ public class InvoiceHelper {
                 throw new ServiceException("缴款人:" + payer + ",社会信用统一代码与系统录入的不匹配");
             }
 
-            List<CompanyEmployee> employeeList = companyEmployeeMapper.findByNickName(creator);
-            if (employeeList.size() == 0) {
-                throw new ServiceException("职员:" + creator + ", 不存在");
-            }
+            validateEmployee(creator);
         });
     }
+
+    private void validateEmployee(String name) {
+        List<CompanyEmployee> employeeList = companyEmployeeMapper.findByNickName(name);
+        if (employeeList.size() == 0) {
+            throw new ServiceException("职员:" + name + ", 不存在");
+        }
+        employeeList.stream().filter(employee -> employee.getStatus().equals("0")).findAny().orElseThrow(() -> new ServiceException("职员:" + name + ", 被禁用"));
+    }
+
 
 }
