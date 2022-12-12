@@ -2,6 +2,7 @@ package com.ocs.busi.domain.vo;
 
 import com.ocs.common.annotation.Excel;
 import lombok.Data;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public class EmployeeSalaryReportVo {
 
     private String id;
 
-    @Excel(name = "分组")
+    @Excel(name = "分组", align = HorizontalAlignment.LEFT)
     private String name;
 
     private String type;
