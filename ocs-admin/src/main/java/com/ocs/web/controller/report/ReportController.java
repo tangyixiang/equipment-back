@@ -5,6 +5,8 @@ import com.ocs.busi.domain.dto.EmployeeSalaryReportDto;
 import com.ocs.busi.domain.vo.EmployeeSalaryReportVo;
 import com.ocs.busi.report.EmployeeSalaryReportService;
 import com.ocs.common.core.domain.Result;
+import com.ocs.common.utils.StringUtils;
+import com.ocs.common.utils.poi.ExcelUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,10 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @RequestMapping("/report")
@@ -51,6 +56,34 @@ public class ReportController {
         }
 
         return Result.success(statistics);
+    }
+
+
+    @PostMapping("/employee/salary/result")
+    public void employeeSalaryResult(@RequestBody EmployeeSalaryReportDto employeeSalaryReportDto, HttpServletResponse response) {
+        Result result = employeeSalary(employeeSalaryReportDto);
+        List<EmployeeSalaryReportVo> exportList = new ArrayList<>();
+        List<EmployeeSalaryReportVo> list = (List<EmployeeSalaryReportVo>) result.get(Result.DATA_TAG);
+        // 空格构建层次
+        for (EmployeeSalaryReportVo vo : list) {
+            AtomicInteger loop = new AtomicInteger(0);
+            exportList.add(vo);
+            flat(vo.getChildren(), exportList, loop);
+        }
+
+        ExcelUtil<EmployeeSalaryReportVo> util = new ExcelUtil<>(EmployeeSalaryReportVo.class);
+        util.exportExcel(response, exportList, "分录数据");
+    }
+
+    private void flat(List<EmployeeSalaryReportVo> list, List<EmployeeSalaryReportVo> exportList, AtomicInteger loop) {
+        if (ObjectUtils.isNotEmpty(list)) {
+            int i = loop.incrementAndGet();
+            for (EmployeeSalaryReportVo vo : list) {
+                vo.setName(StringUtils.leftPad(" ", i * 4) + vo.getName());
+                exportList.add(vo);
+                flat(vo.getChildren(), exportList, new AtomicInteger(i));
+            }
+        }
     }
 
 

@@ -33,7 +33,7 @@ public class SysJobController extends BaseController {
     /**
      * 查询定时任务列表
      */
-    @PreAuthorize("@ss.hasPermi('monitor:job:list')")
+    // @PreAuthorize("@ss.hasPermi('monitor:job:list')")
     @GetMapping("/list")
     public TableDataInfo list(SysJob sysJob) {
         startPage();

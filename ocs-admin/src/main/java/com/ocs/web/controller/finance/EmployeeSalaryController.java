@@ -4,11 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ocs.busi.domain.entity.EmployeeSalary;
 import com.ocs.busi.helper.CrudHelper;
 import com.ocs.busi.service.EmployeeSalaryService;
-import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
-import com.ocs.common.helper.QueryHelper;
+import com.ocs.common.utils.StringUtils;
 import com.ocs.common.utils.TemplateDownloadUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,9 +43,12 @@ public class EmployeeSalaryController extends BaseController {
     }
 
     @GetMapping("/list")
-    public TableDataInfo list(EmployeeSalary employeeSalary) {
+    public TableDataInfo list(String salaryPeriod) {
         startPage("create_time desc");
-        QueryWrapper<EmployeeSalary> queryWrapper = QueryHelper.dynamicCondition(employeeSalary, CommonConstants.QUERY_LIKE);
+        QueryWrapper<EmployeeSalary> queryWrapper = new QueryWrapper<>();
+        if (StringUtils.isNotEmpty(salaryPeriod)){
+            queryWrapper.eq("salary_period", salaryPeriod);
+        }
         List<EmployeeSalary> list = employeeSalaryService.list(queryWrapper);
         return getDataTable(list);
     }
