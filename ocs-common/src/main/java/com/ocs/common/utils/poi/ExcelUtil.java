@@ -630,7 +630,7 @@ public class ExcelUtil<T> {
             if (StringUtils.isNotNull(value)) {
                 cell.setCellStyle(styles.get("number"));
                 // cell.setCellValue(StringUtils.contains(Convert.toStr(value), ".") ? Convert.toDouble(value) : Convert.toInt(value));
-                cell.setCellValue(new BigDecimal(Convert.toDouble(value)).setScale(2, RoundingMode.HALF_UP).toString());
+                cell.setCellValue(new BigDecimal(Convert.toDouble(value)).setScale(2, RoundingMode.HALF_UP).doubleValue());
             }
         } else if (Excel.ColumnType.IMAGE == attr.cellType()) {
             ClientAnchor anchor = new XSSFClientAnchor(0, 0, 0, 0, (short) cell.getColumnIndex(), cell.getRow().getRowNum(), (short) (cell.getColumnIndex() + 1), cell.getRow().getRowNum() + 1);
