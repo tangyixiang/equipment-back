@@ -1,6 +1,8 @@
 package com.ocs.busi.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ocs.busi.config.DoubleSerializerConfig;
 import com.ocs.common.core.domain.SimpleEntity;
 import lombok.Data;
 
@@ -61,63 +63,73 @@ public class EmployeeSalary extends SimpleEntity {
     /**
      * 岗位工资
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "岗位工资不能为空")
     private Double postSalary = 0d;
 
-
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "补岗位工资不能为空")
     private Double additionPostSalary;
 
     /**
      * 薪级工资
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "薪级工资不能为空")
     private Double rankSalary;
 
-
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "补薪级工资不能为空")
     private Double additionRankSalary;
 
     /**
      * 基础性绩效工资
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "基础性绩效工资不能为空")
     private Double performanceSalary;
 
     /**
      * 基础性绩效工资
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "补基础性绩效工资不能为空")
     private Double additionPerformanceSalary;
 
     /**
      * 预留增项1
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     private Double extraIncreaseSalary1 = 0d;
 
     /**
      * 预留增项2
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     private Double extraIncreaseSalary2 = 0d;
 
     /**
      * 预留增项3
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     private Double extraIncreaseSalary3 = 0d;
 
     /**
      * 预留增项4
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     private Double extraIncreaseSalary4 = 0d;
 
     /**
      * 预留增项5
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     private Double extraIncreaseSalary5 = 0d;
 
     /**
      * 合计
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "合计不能为空")
     private Double salaryTotal;
 
@@ -125,12 +137,14 @@ public class EmployeeSalary extends SimpleEntity {
     /**
      * 激励性绩效
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "激励性绩效不能为空")
     private Double bonusSalary;
 
     /**
      * 住房物业服务补贴
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "住房物业服务补贴不能为空")
     private Double housingSalary;
 
@@ -138,42 +152,49 @@ public class EmployeeSalary extends SimpleEntity {
     /**
      * 应发工资
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "应发合计不能为空")
     private Double salaryPayable;
 
     /**
      * 养老保险
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "养老保险不能为空")
     private Double endowmentInsurance;
 
     /**
      * 医保
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "医保不能为空")
     private Double medicalInsurance;
 
     /**
      * 失业保险
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "失业保险不能为空")
     private Double unemploymentInsurance;
 
     /**
      * 公积金
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "公积金不能为空")
     private Double housingAccumulationFunds;
 
     /**
      * 工会费
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "工会会费不能为空")
     private Double unionFees;
 
     /**
      * 职业年金
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "职业年金不能为空")
     private Double occupationalAnnuity;
 
@@ -181,43 +202,51 @@ public class EmployeeSalary extends SimpleEntity {
     /**
      * 预留减项1
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     private Double extraDecreaseSalary1 = 0d;
 
     /**
      * 预留减项2
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     private Double extraDecreaseSalary2 = 0d;
 
     /**
      * 预留减项3
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     private Double extraDecreaseSalary3 = 0d;
 
     /**
      * 预留减项4
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     private Double extraDecreaseSalary4 = 0d;
 
     /**
      * 预留减项5
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     private Double extraDecreaseSalary5 = 0d;
 
     /**
      * 扣款合计
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "扣款合计不能为空")
     private Double decreaseTotalSalary;
 
     /**
      * 个人所得税
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "个税不能为空")
     private Double individualIncomeTax;
 
     /**
      * 实发金额
      */
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @NotNull(message = "实发金额不能为空")
     private Double actualAmount;
 
@@ -226,7 +255,8 @@ public class EmployeeSalary extends SimpleEntity {
      */
     private String remark;
 
-    public EmployeeSalary(){}
+    public EmployeeSalary() {
+    }
 
     public EmployeeSalary(Double postSalary, Double additionPostSalary, Double rankSalary, Double additionRankSalary,
                           Double performanceSalary, Double additionPerformanceSalary,

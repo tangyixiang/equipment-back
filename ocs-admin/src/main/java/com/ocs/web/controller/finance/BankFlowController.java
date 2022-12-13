@@ -67,8 +67,10 @@ public class BankFlowController extends BaseController {
         }
         startPage("create_time desc");
         QueryWrapper<BankFlow> queryWrapper = QueryHelper.dynamicCondition(bankFlow, CommonConstants.QUERY_LIKE, false);
-        queryWrapper.ge(ObjectUtils.isNotEmpty(tradeTimeArray.size()), "trade_time", LocalDateTime.of(tradeTimeArray.get(0), LocalTime.MIN));
-        queryWrapper.le(ObjectUtils.isNotEmpty(tradeTimeArray.size()), "trade_time", LocalDateTime.of(tradeTimeArray.get(1), LocalTime.of(23, 59, 59)));
+        if (ObjectUtils.isNotEmpty(tradeTimeArray)) {
+            queryWrapper.ge("trade_time", LocalDateTime.of(tradeTimeArray.get(0), LocalTime.MIN));
+            queryWrapper.le("trade_time", LocalDateTime.of(tradeTimeArray.get(1), LocalTime.of(23, 59, 59)));
+        }
 
         List<BankFlow> list = bankFlowService.list(queryWrapper);
         return getDataTable(list);

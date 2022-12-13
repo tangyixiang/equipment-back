@@ -51,13 +51,13 @@ public class InvoiceDataSplit {
     /**
      * 借方
      */
-    @Excel(name = "借方")
+    @Excel(name = "借方", cellType = Excel.ColumnType.NUMERIC)
     protected String borrow;
 
     /**
      * 贷方
      */
-    @Excel(name = "贷方")
+    @Excel(name = "贷方", cellType = Excel.ColumnType.NUMERIC)
     protected String loan;
 
     /**
