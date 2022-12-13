@@ -29,6 +29,12 @@ public class ReportController {
     @Autowired
     private EmployeeSalaryReportService employeeSalaryReportService;
 
+    /**
+     * 员工工资报表
+     *
+     * @param employeeSalaryReportDto
+     * @return
+     */
     @PostMapping("/employee/salary")
     public Result employeeSalary(@RequestBody EmployeeSalaryReportDto employeeSalaryReportDto) {
 
@@ -58,7 +64,12 @@ public class ReportController {
         return Result.success(statistics);
     }
 
-
+    /**
+     * 员工工资报表导出
+     *
+     * @param employeeSalaryReportDto
+     * @param response
+     */
     @PostMapping("/employee/salary/result")
     public void employeeSalaryResult(@RequestBody EmployeeSalaryReportDto employeeSalaryReportDto, HttpServletResponse response) {
         Result result = employeeSalary(employeeSalaryReportDto);

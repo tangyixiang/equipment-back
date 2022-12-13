@@ -1,5 +1,6 @@
 package com.ocs.busi.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ocs.common.core.domain.SimpleEntity;
@@ -7,7 +8,9 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @TableName bank_flow
@@ -108,4 +111,6 @@ public class BankFlow extends SimpleEntity {
 
     private String del;
 
+    @TableField(exist = false)
+    private List<LocalDate> tradeTimeArray;
 }

@@ -10,7 +10,6 @@ import com.ocs.common.utils.poi.ExcelUtil;
 import com.ocs.system.domain.SysConfig;
 import com.ocs.system.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +28,6 @@ public class SysConfigController extends BaseController {
     /**
      * 获取参数配置列表
      */
-    @PreAuthorize("@ss.hasPermi('system:config:list')")
     @GetMapping("/list")
     public TableDataInfo list(SysConfig config) {
         startPage();
@@ -38,7 +36,6 @@ public class SysConfigController extends BaseController {
     }
 
     @Log(title = "参数管理", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('system:config:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysConfig config) {
         List<SysConfig> list = configService.selectConfigList(config);
@@ -49,7 +46,6 @@ public class SysConfigController extends BaseController {
     /**
      * 根据参数编号获取详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping(value = "/{configId}")
     public Result getInfo(@PathVariable Long configId) {
         return Result.success(configService.selectConfigById(configId));
@@ -66,7 +62,6 @@ public class SysConfigController extends BaseController {
     /**
      * 新增参数配置
      */
-    @PreAuthorize("@ss.hasPermi('system:config:add')")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
     public Result add(@Validated @RequestBody SysConfig config) {
@@ -80,7 +75,6 @@ public class SysConfigController extends BaseController {
     /**
      * 修改参数配置
      */
-    @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public Result edit(@Validated @RequestBody SysConfig config) {
@@ -94,7 +88,6 @@ public class SysConfigController extends BaseController {
     /**
      * 删除参数配置
      */
-    @PreAuthorize("@ss.hasPermi('system:config:remove')")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
     public Result remove(@PathVariable Long[] configIds) {
@@ -105,7 +98,6 @@ public class SysConfigController extends BaseController {
     /**
      * 刷新参数缓存
      */
-    @PreAuthorize("@ss.hasPermi('system:config:remove')")
     @Log(title = "参数管理", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
     public Result refreshCache() {

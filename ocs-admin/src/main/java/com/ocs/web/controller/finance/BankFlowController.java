@@ -11,7 +11,8 @@ import com.ocs.common.core.page.TableDataInfo;
 import com.ocs.common.helper.QueryHelper;
 import com.ocs.common.utils.TemplateDownloadUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
@@ -54,10 +58,17 @@ public class BankFlowController extends BaseController {
         TemplateDownloadUtils.downloadByFileName("银行流水导入模板.xlsx", response);
     }
 
-    @GetMapping("/list")
-    public TableDataInfo list(BankFlow bankFlow) {
+    @PostMapping("/list")
+    public TableDataInfo list(@RequestBody BankFlow bankFlow) {
+        List<LocalDate> tradeTimeArray = bankFlow.getTradeTimeArray();
+        if (tradeTimeArray.size() > 0) {
+            bankFlow.setTradeTimeArray(null);
+        }
         startPage("create_time desc");
         QueryWrapper<BankFlow> queryWrapper = QueryHelper.dynamicCondition(bankFlow, CommonConstants.QUERY_LIKE, false);
+        queryWrapper.ge(tradeTimeArray.size() > 0, "trade_time", LocalDateTime.of(tradeTimeArray.get(0), LocalTime.MIN));
+        queryWrapper.le(tradeTimeArray.size() > 0, "trade_time", LocalDateTime.of(tradeTimeArray.get(1), LocalTime.of(23, 59, 59)));
+
         List<BankFlow> list = bankFlowService.list(queryWrapper);
         return getDataTable(list);
     }

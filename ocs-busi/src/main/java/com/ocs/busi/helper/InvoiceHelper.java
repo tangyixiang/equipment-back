@@ -29,7 +29,7 @@ public class InvoiceHelper {
      */
     public void validateOperate(List<InvoiceOperating> list) {
 
-        list.parallelStream().forEach(invoiceOperating -> {
+        for (InvoiceOperating invoiceOperating : list) {
             String buyerName = invoiceOperating.getBuyerName();
             String billingStaff = invoiceOperating.getBillingStaff();
             String payee = invoiceOperating.getPayee();
@@ -41,10 +41,10 @@ public class InvoiceHelper {
                 throw new ServiceException("购方名称:" + buyerName + ",不存在");
             }
 
-            List.of(billingStaff, payee, reviewer).stream().forEach(name -> {
+            for (String name : List.of(billingStaff, payee, reviewer)) {
                 validateEmployee(name);
-            });
-        });
+            }
+        }
     }
 
 
@@ -53,7 +53,7 @@ public class InvoiceHelper {
      */
     public void validateFinance(List<InvoiceFinance> list) {
 
-        list.parallelStream().forEach(invoiceFinance -> {
+        for (InvoiceFinance invoiceFinance : list) {
             String payer = invoiceFinance.getPayer();
             String socialCreditCode = invoiceFinance.getSocialCreditCode();
             String creator = invoiceFinance.getCreator();
@@ -69,7 +69,7 @@ public class InvoiceHelper {
             }
 
             validateEmployee(creator);
-        });
+        }
     }
 
     public void validateEmployee(String name) {
