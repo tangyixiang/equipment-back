@@ -10,6 +10,7 @@ import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
 import com.ocs.common.helper.QueryHelper;
 import com.ocs.common.utils.TemplateDownloadUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,13 +62,13 @@ public class BankFlowController extends BaseController {
     @PostMapping("/list")
     public TableDataInfo list(@RequestBody BankFlow bankFlow) {
         List<LocalDate> tradeTimeArray = bankFlow.getTradeTimeArray();
-        if (tradeTimeArray.size() > 0) {
+        if (ObjectUtils.isNotEmpty(bankFlow.getTradeTimeArray())) {
             bankFlow.setTradeTimeArray(null);
         }
         startPage("create_time desc");
         QueryWrapper<BankFlow> queryWrapper = QueryHelper.dynamicCondition(bankFlow, CommonConstants.QUERY_LIKE, false);
-        queryWrapper.ge(tradeTimeArray.size() > 0, "trade_time", LocalDateTime.of(tradeTimeArray.get(0), LocalTime.MIN));
-        queryWrapper.le(tradeTimeArray.size() > 0, "trade_time", LocalDateTime.of(tradeTimeArray.get(1), LocalTime.of(23, 59, 59)));
+        queryWrapper.ge(ObjectUtils.isNotEmpty(tradeTimeArray.size()), "trade_time", LocalDateTime.of(tradeTimeArray.get(0), LocalTime.MIN));
+        queryWrapper.le(ObjectUtils.isNotEmpty(tradeTimeArray.size()), "trade_time", LocalDateTime.of(tradeTimeArray.get(1), LocalTime.of(23, 59, 59)));
 
         List<BankFlow> list = bankFlowService.list(queryWrapper);
         return getDataTable(list);
