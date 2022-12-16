@@ -6,15 +6,12 @@ import cn.hutool.poi.exceptions.POIException;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.dto.BankFlowUploadDto;
 import com.ocs.busi.domain.entity.BankFlow;
-import com.ocs.busi.domain.entity.BankFlowSplit;
 import com.ocs.busi.domain.entity.CompanyClientOrg;
 import com.ocs.busi.helper.ExcelCellHelper;
 import com.ocs.busi.helper.SerialNumberHelper;
 import com.ocs.busi.helper.ValidateHelper;
 import com.ocs.busi.mapper.BankFlowMapper;
-import com.ocs.busi.mapper.BankFlowSplitMapper;
 import com.ocs.busi.service.BankFlowService;
-import com.ocs.busi.service.BankFlowSplitService;
 import com.ocs.busi.service.CompanyClientOrgService;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
@@ -45,10 +42,6 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
 
     private static final Logger logger = LoggerFactory.getLogger(BankFlowServiceImpl.class);
 
-    @Autowired
-    private BankFlowSplitService bankFlowSplitService;
-    @Autowired
-    private BankFlowSplitMapper bankFlowSplitMapper;
     @Autowired
     private CompanyClientOrgService companyClientOrgService;
 
@@ -91,20 +84,6 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
 
         bankFlowList.forEach(bankFlow -> {
             bankFlow.setId(serialNumberHelper.generateNextId(idPattern, 4));
-
-            BankFlow oldData = getBaseMapper().findByBankSiteCode(bankFlow.getBankSiteCode());
-            if (oldData != null) {
-                // 先删除拆分的数据
-                List<BankFlowSplit> bankFlowSplitList = bankFlowSplitMapper.findByBankFlowId(oldData.getId());
-                if (bankFlowSplitList.size() > 0) {
-                    bankFlowSplitList.forEach(split -> split.setDel(CommonConstants.STATUS_DEL));
-                    bankFlowSplitService.updateBatchById(bankFlowSplitList);
-                    // TODO 根据拆分信息取消对账单
-                }
-                // TODO 取消对账单
-
-            }
-
             saveOrUpdate(bankFlow);
         });
     }
@@ -145,6 +124,7 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
                 bankFlow.setTradeType(handleTradeType(convertString(rowlist.get(4))));
                 String price = bankFlow.getTradeType().equals(CommonConstants.BORROW) ? convertString(rowlist.get(5)) : convertString(rowlist.get(6));
                 bankFlow.setPrice(Double.parseDouble(price));
+                bankFlow.setUnConfirmPrice(Double.parseDouble(price));
                 bankFlow.setAdversaryBankCode(convertString(rowlist.get(7)));
                 bankFlow.setSummary(convertString(rowlist.get(8)));
                 bankFlow.setComment(convertString(rowlist.get(9)));

@@ -6,7 +6,6 @@ import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.ocs.web.controller.task.TaskController;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -16,7 +15,7 @@ import java.util.*;
  * @author tangyixiang
  * @Date 2022/10/13
  */
-@SpringBootTest
+// @SpringBootTest
 public class OfficeApplicationTest {
 
     private String SQL = "SELECT COLUMN_NAME AS dataIndex ,COLUMN_COMMENT AS title FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '%s' ORDER BY ordinal_position";
@@ -50,6 +49,15 @@ public class OfficeApplicationTest {
         Parameter[] parameters = method.getParameters();
         for (Parameter parameter : parameters) {
             System.out.println(parameter.getName());
+        }
+    }
+
+    @Test
+    void doubleTest(){
+        double a = 1d;
+
+        if (a > 0){
+            System.out.println("aaaa");
         }
     }
 

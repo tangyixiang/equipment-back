@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +32,10 @@ public class FlowTask {
     @Autowired
     private BankFlowService bankFlowService;
 
+    List<String> notReconciled = List.of(CommonConstants.NOT_RECONCILED, CommonConstants.PART_RECONCILED);
+
+    LambdaQueryWrapper<CompanyReceivables> receivablesWrapper = new LambdaQueryWrapper<CompanyReceivables>().in(CompanyReceivables::getReconciliationFlag, notReconciled);
+
     /*
      * 自动对账规则：
      * 在系统“财务”—“应收对账管理”中，将所有的经营发票、财政发票和初始化应收单汇总了，统称为“应收单”。
@@ -43,15 +49,36 @@ public class FlowTask {
      *
      * */
 
-    //TODO 先精准匹配金额，再模糊匹配金额
+    // TODO 先精准匹配金额，再模糊匹配金额
+
     /**
      * 对账任务运行
      */
     public void reconciliationTask() {
         logger.info("对账任务开始运行");
-        List<String> notReconciled = List.of(CommonConstants.NOT_RECONCILED, CommonConstants.PART_RECONCILED);
-        LambdaQueryWrapper<CompanyReceivables> receivablesWrapper = new LambdaQueryWrapper<CompanyReceivables>()
-                .in(CompanyReceivables::getReconciliationFlag, notReconciled);
+        CompanyReceivables current = new CompanyReceivables();
+        // 精准对账
+        logger.info("银行流水金额 >= 应收单金额对账开始");
+        priceExactMatch(current, flow ->
+                (flow.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED) || flow.getReconciliationFlag().equals(CommonConstants.PART_RECONCILED))
+                        && new BigDecimal(flow.getUnConfirmPrice()).compareTo(new BigDecimal(current.getUnConfirmAmount())) > -1);
+
+        logger.info("银行流水金额 >= 应收单金额对账结束");
+
+        logger.info("银行流水金额 < 应收单金额对账开始");
+
+        pricePartMatch();
+        logger.info("银行流水金额 < 应收单金额对账结束");
+
+    }
+
+    /**
+     * 单笔银行流水能覆盖单笔应收账单
+     *
+     * @param current
+     * @param predicate
+     */
+    public void priceExactMatch(CompanyReceivables current, Predicate<BankFlow> predicate) {
         // 未对账的应收单
         List<CompanyReceivables> receivablesList = companyReceivablesService.list(receivablesWrapper);
         String today = DateUtil.format(new Date(), "yyyyMMdd");
@@ -69,21 +96,23 @@ public class FlowTask {
             list.stream().sorted(Comparator.comparing(CompanyReceivables::getInvoicingDate));
 
             for (CompanyReceivables companyReceivables : list) {
-                Optional<BankFlow> bankFlowOptional = bankFlowList.stream().filter(flow ->
-                        flow.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED) && flow.getPrice().equals(companyReceivables.getUnConfirmAmount())).findFirst();
+                current.setUnConfirmAmount(companyReceivables.getUnConfirmAmount());
+                Optional<BankFlow> bankFlowOptional = bankFlowList.stream().filter(predicate).findFirst();
                 if (bankFlowOptional.isPresent()) {
                     // 对账ID
                     String dzId = "ZD-" + today + "/" + RandomStringUtils.randomNumeric(5);
 
                     BankFlow bankFlow = bankFlowOptional.get();
+                    bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + companyReceivables.getUnConfirmAmount());
+                    bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() - companyReceivables.getUnConfirmAmount());
                     // 已对账
-                    bankFlow.setReconciliationFlag(CommonConstants.RECONCILED);
+                    bankFlow.setReconciliationFlag(bankFlow.getUnConfirmPrice().equals(0d) ? CommonConstants.RECONCILED : CommonConstants.PART_RECONCILED);
                     // 自动对账
                     bankFlow.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
 
                     if (ObjectUtils.isNotEmpty(bankFlow.getAssociationId())) {
                         bankFlow.getAssociationId().add(dzId);
-                    }else {
+                    } else {
                         bankFlow.setAssociationId(List.of(dzId));
                     }
 
@@ -93,18 +122,76 @@ public class FlowTask {
 
                     if (ObjectUtils.isNotEmpty(companyReceivables.getAssociationId())) {
                         companyReceivables.getAssociationId().add(dzId);
-                    }else {
+                    } else {
                         companyReceivables.setAssociationId(List.of(dzId));
                     }
-
-
+                    bankFlowService.updateById(bankFlow);
                 }
-
             }
+            companyReceivablesService.updateBatchById(list);
         }
-
-
     }
 
+    /**
+     * 多笔银行流水覆盖一笔应收账单
+     *
+     */
+    public void pricePartMatch() {
+        // 未对账的应收单
+        List<CompanyReceivables> receivablesList = companyReceivablesService.list(receivablesWrapper);
+        String today = DateUtil.format(new Date(), "yyyyMMdd");
+
+        Map<String, List<CompanyReceivables>> receivablesGroupMap = receivablesList.stream().collect(Collectors.groupingBy(CompanyReceivables::getClientOrgName));
+
+        for (String clientOrgName : receivablesGroupMap.keySet()) {
+            logger.info("客户:{},开始自动对账", clientOrgName);
+
+            LambdaQueryWrapper<BankFlow> bankFlowWrapper = new LambdaQueryWrapper<BankFlow>()
+                    .in(BankFlow::getReconciliationFlag, notReconciled).eq(BankFlow::getAdversaryOrgName, clientOrgName);
+
+            List<BankFlow> bankFlowList = bankFlowService.list(bankFlowWrapper);
+            List<CompanyReceivables> list = receivablesGroupMap.get(clientOrgName);
+            list.stream().sorted(Comparator.comparing(CompanyReceivables::getInvoicingDate));
+
+            for (CompanyReceivables companyReceivables : list) {
+                // 对账ID
+                String dzId = "ZD-" + today + "/" + RandomStringUtils.randomNumeric(5);
+                Double unConfirmAmount = companyReceivables.getUnConfirmAmount();
+                double multiBankFlowAmount = 0d;
+                double diff = 0d;
+                // 多笔流水去匹配
+                for (BankFlow bankFlow : bankFlowList) {
+                    multiBankFlowAmount = multiBankFlowAmount + bankFlow.getUnConfirmPrice();
+                    diff = new BigDecimal(unConfirmAmount).divide(new BigDecimal(multiBankFlowAmount)).doubleValue();
+                    if (diff <= 0) {
+                        bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() - Math.abs(diff));
+                        bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + Math.abs(diff));
+                        bankFlow.setReconciliationFlag(bankFlow.getUnConfirmPrice().equals(0d) ? CommonConstants.RECONCILED : CommonConstants.PART_RECONCILED);
+                        bankFlow.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
+                        break;
+                    } else {
+                        bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + bankFlow.getUnConfirmPrice());
+                        bankFlow.setUnConfirmPrice(0d);
+                        bankFlow.setReconciliationFlag(CommonConstants.RECONCILED);
+                        bankFlow.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
+                    }
+                }
+                // 说明所有的流水都无法完全覆盖
+                if (diff > 0) {
+                    companyReceivables.setReconciliationFlag(CommonConstants.PART_RECONCILED);
+                    companyReceivables.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
+                    companyReceivables.setConfirmAmount(companyReceivables.getReceivableAmount() - diff);
+                    companyReceivables.setUnConfirmAmount(diff);
+                }else {
+                    companyReceivables.setReconciliationFlag(CommonConstants.RECONCILED);
+                    companyReceivables.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
+                    companyReceivables.setConfirmAmount(companyReceivables.getConfirmAmount() + companyReceivables.getUnConfirmAmount());
+                    companyReceivables.setUnConfirmAmount(0d);
+                }
+                bankFlowService.updateBatchById(bankFlowList);
+            }
+            companyReceivablesService.updateBatchById(list);
+        }
+    }
 
 }

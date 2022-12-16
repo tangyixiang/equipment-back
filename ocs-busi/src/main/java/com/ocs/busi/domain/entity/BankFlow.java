@@ -62,7 +62,7 @@ public class BankFlow extends SimpleEntity {
     /**
      * 已对账金额
      */
-    private Double confirmPrice;
+    private Double confirmPrice = 0d;
 
     /**
      * 未对账金额
@@ -115,11 +115,6 @@ public class BankFlow extends SimpleEntity {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> associationId;
-
-    /**
-     * 数据是否拆分
-     */
-    private Boolean dataSplit;
 
     private String del;
 

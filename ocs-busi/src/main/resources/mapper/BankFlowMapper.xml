@@ -23,7 +23,6 @@
         <result property="reconciliationFlag" column="reconciliation_flag" jdbcType="VARCHAR"/>
         <result property="reconciliationModel" column="reconciliation_model" jdbcType="VARCHAR"/>
         <result property="associationId" column="association_id" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
-        <result property="dataSplit" column="data_split" jdbcType="INTEGER"/>
         <result property="del" column="del" jdbcType="VARCHAR"/>
         <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
         <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
