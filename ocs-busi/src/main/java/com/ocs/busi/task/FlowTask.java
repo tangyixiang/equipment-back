@@ -168,12 +168,22 @@ public class FlowTask {
                         bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + Math.abs(diff));
                         bankFlow.setReconciliationFlag(bankFlow.getUnConfirmPrice().equals(0d) ? CommonConstants.RECONCILED : CommonConstants.PART_RECONCILED);
                         bankFlow.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
+                        if (ObjectUtils.isNotEmpty(bankFlow.getAssociationId())) {
+                            bankFlow.getAssociationId().add(dzId);
+                        } else {
+                            bankFlow.setAssociationId(List.of(dzId));
+                        }
                         break;
                     } else {
                         bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + bankFlow.getUnConfirmPrice());
                         bankFlow.setUnConfirmPrice(0d);
                         bankFlow.setReconciliationFlag(CommonConstants.RECONCILED);
                         bankFlow.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
+                        if (ObjectUtils.isNotEmpty(bankFlow.getAssociationId())) {
+                            bankFlow.getAssociationId().add(dzId);
+                        } else {
+                            bankFlow.setAssociationId(List.of(dzId));
+                        }
                     }
                 }
                 // 说明所有的流水都无法完全覆盖
@@ -187,6 +197,11 @@ public class FlowTask {
                     companyReceivables.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
                     companyReceivables.setConfirmAmount(companyReceivables.getConfirmAmount() + companyReceivables.getUnConfirmAmount());
                     companyReceivables.setUnConfirmAmount(0d);
+                }
+                if (ObjectUtils.isNotEmpty(companyReceivables.getAssociationId())) {
+                    companyReceivables.getAssociationId().add(dzId);
+                } else {
+                    companyReceivables.setAssociationId(List.of(dzId));
                 }
                 bankFlowService.updateBatchById(bankFlowList);
             }
