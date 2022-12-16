@@ -3,6 +3,7 @@ package com.ocs.busi.domain.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.ocs.common.core.domain.SimpleEntity;
 import lombok.Data;
 
@@ -16,7 +17,7 @@ import java.util.List;
  * @TableName bank_flow
  */
 @Data
-@TableName(value = "bank_flow")
+@TableName(value = "bank_flow", autoResultMap = true)
 public class BankFlow extends SimpleEntity {
     /**
      * 流水ID
@@ -58,6 +59,16 @@ public class BankFlow extends SimpleEntity {
      */
     private Double price;
 
+    /**
+     * 已对账金额
+     */
+    private Double confirmPrice;
+
+    /**
+     * 未对账金额
+     */
+    private Double unConfirmPrice;
+
 
     /**
      * 对方行号
@@ -90,7 +101,7 @@ public class BankFlow extends SimpleEntity {
     private String otherInfo;
 
     /**
-     * 对账标识  Y 已对账  N 未对账
+     * 对账标识  1 已对账  2 未对账
      */
     private String reconciliationFlag;
 
@@ -102,7 +113,8 @@ public class BankFlow extends SimpleEntity {
     /**
      * 关联对账ID
      */
-    private String associationId;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> associationId;
 
     /**
      * 数据是否拆分

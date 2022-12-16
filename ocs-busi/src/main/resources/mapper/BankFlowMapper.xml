@@ -11,7 +11,9 @@
         <result property="adversaryAccount" column="adversary_account" jdbcType="VARCHAR"/>
         <result property="tradeTime" column="trade_time" jdbcType="DATE"/>
         <result property="tradeType" column="trade_type" jdbcType="VARCHAR"/>
-        <result property="price" column="price" jdbcType="BIGINT"/>
+        <result property="price" column="price" jdbcType="DOUBLE"/>
+        <result property="confirmPrice" column="price" jdbcType="DOUBLE"/>
+        <result property="unConfirmPrice" column="price" jdbcType="DOUBLE"/>
         <result property="adversaryBankCode" column="adversary_bank_code" jdbcType="VARCHAR"/>
         <result property="summary" column="summary" jdbcType="VARCHAR"/>
         <result property="comment" column="comment" jdbcType="VARCHAR"/>
@@ -20,7 +22,7 @@
         <result property="otherInfo" column="other_info" jdbcType="VARCHAR"/>
         <result property="reconciliationFlag" column="reconciliation_flag" jdbcType="VARCHAR"/>
         <result property="reconciliationModel" column="reconciliation_model" jdbcType="VARCHAR"/>
-        <result property="associationId" column="association_id" jdbcType="VARCHAR"/>
+        <result property="associationId" column="association_id" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result property="dataSplit" column="data_split" jdbcType="INTEGER"/>
         <result property="del" column="del" jdbcType="VARCHAR"/>
         <result property="createBy" column="create_by" jdbcType="VARCHAR"/>

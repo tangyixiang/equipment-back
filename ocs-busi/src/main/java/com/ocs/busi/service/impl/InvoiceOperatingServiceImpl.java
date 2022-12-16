@@ -6,14 +6,17 @@ import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ocs.busi.domain.entity.CompanyReceivables;
 import com.ocs.busi.domain.entity.InvoiceOperating;
 import com.ocs.busi.domain.entity.InvoiceOperatingSplit;
 import com.ocs.busi.helper.ExcelCellHelper;
 import com.ocs.busi.helper.InvoiceHelper;
 import com.ocs.busi.helper.ValidateHelper;
 import com.ocs.busi.mapper.InvoiceOperatingMapper;
+import com.ocs.busi.service.CompanyReceivablesService;
 import com.ocs.busi.service.InvoiceOperatingService;
 import com.ocs.busi.service.InvoiceOperatingSplitService;
+import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -41,6 +44,8 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
     private InvoiceOperatingSplitService invoiceOperatingSplitService;
     @Autowired
     private InvoiceHelper invoiceHelper;
+    @Autowired
+    private CompanyReceivablesService receivablesService;
 
     @Override
     @Transactional
@@ -50,7 +55,7 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
         invoiceHelper.validateOperate(invoiceOperatingList);
 
         invoiceOperatingList.forEach(invoice -> {
-            invoice.setId(IdUtil.objectId());
+            invoice.setId(IdUtil.getSnowflakeNextIdStr());
             InvoiceOperating oldData = getBaseMapper().findByFlowId(invoice.getFlowId());
             // 如果生成凭证,只保留最近3次的记录
             if (oldData != null && oldData.getDataSplit() == Boolean.TRUE) {
@@ -74,6 +79,30 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
         remove(new LambdaQueryWrapper<InvoiceOperating>().eq(InvoiceOperating::getInvoicingPeriod, period));
         // 再导入
         saveOrUpdateBatch(invoiceOperatingList);
+        saveReceivable(invoiceOperatingList, period);
+    }
+
+
+    private void saveReceivable(List<InvoiceOperating> invoiceOperatingList, String period) {
+        List<CompanyReceivables> receivablesList = new ArrayList<>();
+        for (InvoiceOperating invoice : invoiceOperatingList) {
+            CompanyReceivables receivables = new CompanyReceivables();
+            receivables.setId(invoice.getId());
+            receivables.setPeriod(invoice.getInvoicingPeriod());
+            receivables.setSourceType(CommonConstants.RECEIVABLE_OPERATE);
+            receivables.setInvoicingDate(invoice.getInvoicingTime().toLocalDate());
+            receivables.setClientOrgName(invoice.getBuyerName());
+            receivables.setReceivableAmount(Double.parseDouble(invoice.getTotalPriceIncludingTax()));
+            receivables.setUnConfirmAmount(Double.parseDouble(invoice.getTotalPriceIncludingTax()));
+            receivables.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
+            receivablesList.add(receivables);
+        }
+        // 删除之前的这个期间的数据
+        receivablesService.remove(new LambdaQueryWrapper<CompanyReceivables>()
+                .eq(CompanyReceivables::getPeriod, period).eq(CompanyReceivables::getSourceType,CommonConstants.RECEIVABLE_OPERATE));
+        // 应收账单
+        receivablesService.saveBatch(receivablesList);
+
     }
 
     private List<InvoiceOperating> convertExcelToInvoice(InputStream inputStream, String period) {

@@ -16,9 +16,11 @@ public class CommonConstants {
     public static final String QUERY_EQUAL = "equal";
 
     // 已对账
-    public static final String RECONCILED = "Y";
+    public static final String RECONCILED = "1";
     // 未对账
-    public static final String NOT_RECONCILED = "Y";
+    public static final String NOT_RECONCILED = "2";
+    // 部分对账
+    public static final String PART_RECONCILED = "3";
 
     // 自动对账
     public static final String AUTO_RECONCILIATION = "1";
@@ -34,6 +36,13 @@ public class CommonConstants {
     public static final String DATA_LOG_IMPORT = "1";
     // 导出
     public static final String DATA_LOG_EXPORT = "2";
+
+    // 应收对账单类型-财政发票类型
+    public static final String RECEIVABLE_FINANCE = "1";
+    // 应收对账单类型-经营发票类型
+    public static final String RECEIVABLE_OPERATE = "2";
+    // 应收对账单类型-初始化类型
+    public static final String RECEIVABLE_CUSTOM = "3";
 
     /**
      * 分录任务

@@ -128,7 +128,7 @@ public class InvoiceOperating extends SimpleEntity {
     /**
      * 单位
      */
-    @NotBlank(message = "商品编码不能为空")
+    @NotBlank(message = "单位不能为空")
     private String unit;
 
     /**

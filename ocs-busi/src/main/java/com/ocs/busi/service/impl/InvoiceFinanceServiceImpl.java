@@ -6,13 +6,16 @@ import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ocs.busi.domain.entity.CompanyReceivables;
 import com.ocs.busi.domain.entity.InvoiceFinance;
 import com.ocs.busi.domain.entity.InvoiceFinanceSplit;
 import com.ocs.busi.helper.InvoiceHelper;
 import com.ocs.busi.helper.ValidateHelper;
 import com.ocs.busi.mapper.InvoiceFinanceMapper;
+import com.ocs.busi.service.CompanyReceivablesService;
 import com.ocs.busi.service.InvoiceFinanceService;
 import com.ocs.busi.service.InvoiceFinanceSplitService;
+import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -40,6 +44,8 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
     private InvoiceFinanceSplitService invoiceFinanceSplitService;
     @Autowired
     private InvoiceHelper invoiceHelper;
+    @Autowired
+    private CompanyReceivablesService receivablesService;
 
     @Override
     @Transactional
@@ -49,7 +55,7 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
         invoiceHelper.validateFinance(invoiceFinanceList);
 
         invoiceFinanceList.forEach(invoice -> {
-            invoice.setId(IdUtil.objectId());
+            invoice.setId(IdUtil.getSnowflakeNextIdStr());
             InvoiceFinance oldData = getBaseMapper().findByInvoiceId(invoice.getInvoiceId());
             // 如果生成凭证,只保留最近3次的记录
             if (oldData != null && oldData.getDataSplit() == Boolean.TRUE) {
@@ -70,13 +76,34 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
                     }
                 }
             }
-            saveOrUpdate(invoice);
         });
 
         // 删除这个期间
         remove(new LambdaQueryWrapper<InvoiceFinance>().eq(InvoiceFinance::getInvoicingPeriod, period));
-
         saveOrUpdateBatch(invoiceFinanceList);
+        saveReceivable(invoiceFinanceList,period);
+    }
+
+    private void saveReceivable(List<InvoiceFinance> invoiceFinanceList, String period) {
+        List<CompanyReceivables> receivablesList = new ArrayList<>();
+        for (InvoiceFinance invoice : invoiceFinanceList) {
+            CompanyReceivables receivables = new CompanyReceivables();
+            receivables.setId(invoice.getId());
+            receivables.setPeriod(invoice.getInvoicingPeriod());
+            receivables.setSourceType(CommonConstants.RECEIVABLE_FINANCE);
+            receivables.setInvoicingDate(LocalDate.parse(invoice.getInvoicingDate()));
+            receivables.setClientOrgName(invoice.getPayer());
+            receivables.setReceivableAmount(Double.parseDouble(invoice.getPrice()));
+            receivables.setUnConfirmAmount(Double.parseDouble(invoice.getPrice()));
+            receivables.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
+            receivablesList.add(receivables);
+        }
+        // 删除之前的这个期间的数据
+        receivablesService.remove(new LambdaQueryWrapper<CompanyReceivables>()
+                .eq(CompanyReceivables::getPeriod, period).eq(CompanyReceivables::getSourceType,CommonConstants.RECEIVABLE_FINANCE));
+
+        // 应收账单
+        receivablesService.saveBatch(receivablesList);
 
     }
 

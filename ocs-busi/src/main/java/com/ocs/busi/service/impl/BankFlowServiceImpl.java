@@ -151,6 +151,7 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
                 bankFlow.setAdversaryOrgName(convertString(rowlist.get(10)));
                 bankFlow.setBalance(convertString(rowlist.get(11)));
                 bankFlow.setOtherInfo(convertString(rowlist.get(12)));
+                bankFlow.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
                 bankFlow.setDel(CommonConstants.STATUS_NORMAL);
 
                 ValidateHelper.validData(bankFlow);
