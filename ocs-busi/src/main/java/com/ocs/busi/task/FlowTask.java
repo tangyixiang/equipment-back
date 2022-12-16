@@ -49,8 +49,6 @@ public class FlowTask {
      *
      * */
 
-    // TODO 先精准匹配金额，再模糊匹配金额
-
     /**
      * 对账任务运行
      */
@@ -59,9 +57,7 @@ public class FlowTask {
         CompanyReceivables current = new CompanyReceivables();
         // 精准对账
         logger.info("银行流水金额 >= 应收单金额对账开始");
-        priceExactMatch(current, flow ->
-                (flow.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED) || flow.getReconciliationFlag().equals(CommonConstants.PART_RECONCILED))
-                        && new BigDecimal(flow.getUnConfirmPrice()).compareTo(new BigDecimal(current.getUnConfirmAmount())) > -1);
+        priceExactMatch();
         logger.info("银行流水金额 >= 应收单金额对账结束");
         logger.info("银行流水金额 < 应收单金额对账开始");
         pricePartMatch();
@@ -71,11 +67,8 @@ public class FlowTask {
 
     /**
      * 单笔银行流水能覆盖单笔应收账单
-     *
-     * @param current
-     * @param predicate
      */
-    public void priceExactMatch(CompanyReceivables current, Predicate<BankFlow> predicate) {
+    public void priceExactMatch() {
         // 未对账的应收单
         List<CompanyReceivables> receivablesList = companyReceivablesService.list(receivablesWrapper);
         String today = DateUtil.format(new Date(), "yyyyMMdd");
@@ -91,8 +84,9 @@ public class FlowTask {
             list.stream().sorted(Comparator.comparing(CompanyReceivables::getInvoicingDate));
 
             for (CompanyReceivables companyReceivables : list) {
-                current.setUnConfirmAmount(companyReceivables.getUnConfirmAmount());
-                Optional<BankFlow> bankFlowOptional = bankFlowList.stream().filter(predicate).findFirst();
+                Optional<BankFlow> bankFlowOptional = bankFlowList.stream().filter(flow ->
+                        (flow.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED) || flow.getReconciliationFlag().equals(CommonConstants.PART_RECONCILED))
+                                && new BigDecimal(flow.getUnConfirmPrice()).compareTo(new BigDecimal(companyReceivables.getUnConfirmAmount())) > -1).findFirst();
                 if (bankFlowOptional.isPresent()) {
                     // 对账ID
                     String dzId = "ZD-" + today + "/" + RandomStringUtils.randomNumeric(5);
@@ -170,7 +164,7 @@ public class FlowTask {
                     companyReceivables.setUnConfirmAmount(0d);
                 }
                 companyReceivables.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
-                companyReceivables.setReconciliationFlag(diff > 0 ? CommonConstants.PART_RECONCILED:CommonConstants.RECONCILED);
+                companyReceivables.setReconciliationFlag(diff > 0 ? CommonConstants.PART_RECONCILED : CommonConstants.RECONCILED);
                 companyReceivables.setAssociationId(addAssociationId(dzId, companyReceivables.getAssociationId()));
                 bankFlowService.updateBatchById(bankFlowList);
             }
