@@ -99,6 +99,7 @@ public class FlowTask {
                 String dzId = "ZD-" + today + "/" + RandomStringUtils.randomNumeric(5);
 
                 BankFlow bankFlow = bankFlowOptional.get();
+                // 已对账金额
                 bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + companyReceivables.getUnConfirmAmount());
                 bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() - companyReceivables.getUnConfirmAmount());
                 // 已对账
@@ -110,6 +111,7 @@ public class FlowTask {
                 companyReceivables.setReconciliationFlag(CommonConstants.RECONCILED);
                 companyReceivables.setReconciliationModel(reconciliationModel);
                 companyReceivables.setConfirmAmount(companyReceivables.getConfirmAmount() + companyReceivables.getUnConfirmAmount());
+                companyReceivables.setUnConfirmAmount(0d);
                 companyReceivables.setAssociationId(addAssociationId(dzId, companyReceivables.getAssociationId()));
                 bankFlowService.updateById(bankFlow);
             }
@@ -145,7 +147,7 @@ public class FlowTask {
                 // 多笔流水去匹配
                 for (BankFlow bankFlow : bankFlowList) {
                     multiBankFlowAmount = multiBankFlowAmount + bankFlow.getUnConfirmPrice();
-                    diff = new BigDecimal(unConfirmAmount).divide(new BigDecimal(multiBankFlowAmount)).doubleValue();
+                    diff = new BigDecimal(unConfirmAmount).subtract(new BigDecimal(multiBankFlowAmount)).doubleValue();
 
                     bankFlow.setReconciliationFlag(CommonConstants.RECONCILED);
                     bankFlow.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
