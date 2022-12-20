@@ -37,27 +37,23 @@ public class ReportController {
      */
     @PostMapping("/employee/salary")
     public Result employeeSalary(@RequestBody EmployeeSalaryReportDto employeeSalaryReportDto) {
-
         if (ObjectUtils.isEmpty(employeeSalaryReportDto.getRange()) || ObjectUtils.isEmpty(employeeSalaryReportDto.getCondition())) {
             return Result.success(Collections.emptyList());
         }
-
         List<LocalDateTime> range = employeeSalaryReportDto.getRange();
         List<String> condition = employeeSalaryReportDto.getCondition();
 
         employeeSalaryReportDto.setStartPeriod(DateUtil.format(range.get(0), "yyyyMM"));
         employeeSalaryReportDto.setEndPeriod(DateUtil.format(range.get(1), "yyyyMM"));
-        employeeSalaryReportDto.setPeriodCondition(condition.contains("period"));
-        employeeSalaryReportDto.setDeptCondition(condition.contains("dept"));
-        employeeSalaryReportDto.setEmployeeTypeCondition(condition.contains("employeeType"));
 
-        List<EmployeeSalaryReportVo> statistics = employeeSalaryReportService.statistics(employeeSalaryReportDto);
+        List<EmployeeSalaryReportVo> statistics = employeeSalaryReportService.statistics(condition, employeeSalaryReportDto);
 
         EmployeeSalaryReportVo totalEmployeeSalaryReportVo = null;
 
         if (statistics.size() > 1) {
             totalEmployeeSalaryReportVo = summary(statistics).get();
             totalEmployeeSalaryReportVo.setName("合计");
+            totalEmployeeSalaryReportVo.setType("total");
             statistics.add(totalEmployeeSalaryReportVo);
         }
 
@@ -83,6 +79,15 @@ public class ReportController {
         }
 
         ExcelUtil<EmployeeSalaryReportVo> util = new ExcelUtil<>(EmployeeSalaryReportVo.class);
+
+        exportList.forEach(vo -> {
+            vo.setEmployeeName(vo.getEmployeeName());
+            vo.setName(vo.getName());
+            vo.setTotalPerformanceSalary(vo.getTotalPerformanceSalary());
+            vo.setTotalRankSalary(vo.getTotalRankSalary());
+            vo.setTotalPostSalary(vo.getTotalPostSalary());
+        });
+
         util.exportExcel(response, exportList, "分录数据");
     }
 
@@ -90,7 +95,9 @@ public class ReportController {
         if (ObjectUtils.isNotEmpty(list)) {
             int i = loop.incrementAndGet();
             for (EmployeeSalaryReportVo vo : list) {
-                vo.setName(StringUtils.leftPad(" ", i * 4) + vo.getName());
+                if (!vo.getType().equals("employeeName")) {
+                    vo.setName(StringUtils.leftPad(" ", i * 4) + vo.getName());
+                }
                 exportList.add(vo);
                 flat(vo.getChildren(), exportList, new AtomicInteger(i));
             }

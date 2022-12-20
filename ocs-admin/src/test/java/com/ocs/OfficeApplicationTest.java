@@ -54,11 +54,9 @@ public class OfficeApplicationTest {
 
     @Test
     void doubleTest(){
-        double a = 1d;
+        List<String> strings = List.of("a", "b", "c", "d");
 
-        if (a > 0){
-            System.out.println("aaaa");
-        }
+        System.out.println(strings.indexOf("d"));
     }
 
 }

@@ -24,58 +24,22 @@ public class EmployeeSalaryReportService {
     @Autowired
     private EmployeeSalaryService employeeSalaryService;
 
-    public List<EmployeeSalaryReportVo> statistics(EmployeeSalaryReportDto employeeSalaryReportDto) {
-        List<EmployeeSalaryGroupModel> topModelList = new ArrayList<>();
+
+    public List<EmployeeSalaryReportVo> statistics(List<String> conditions, EmployeeSalaryReportDto employeeSalaryReportDto) {
 
         LambdaQueryWrapper<EmployeeSalary> wrapper = new LambdaQueryWrapper<EmployeeSalary>().ge(EmployeeSalary::getSalaryPeriod, employeeSalaryReportDto.getStartPeriod())
                 .le(EmployeeSalary::getSalaryPeriod, employeeSalaryReportDto.getEndPeriod());
         // 获取所有的数据
         List<EmployeeSalary> list = employeeSalaryService.list(wrapper);
+        // 数据分组
+        List<EmployeeSalaryGroupModel> groupModelList = groupByCondition(list, conditions, conditions.get(0));
 
-        // 根据期间分
-        if (employeeSalaryReportDto.isPeriodCondition()) {
-            topModelList = groupByCondition(list, "period");
-        }
-        // 根据部门分
-        if (employeeSalaryReportDto.isDeptCondition()) {
-            // 期间划分有值
-            if (topModelList.size() != 0) {
-                for (EmployeeSalaryGroupModel employeeSalaryGroupModel : topModelList) {
-                    List<EmployeeSalary> periodSalaryList = employeeSalaryGroupModel.getList();
-                    List<EmployeeSalaryGroupModel> deptModelList = groupByCondition(periodSalaryList, "dept");
-                    employeeSalaryGroupModel.setChildModel(deptModelList);
-                }
-            } else {
-                topModelList = groupByCondition(list, "dept");
-            }
-        }
-
-        // 根据员工类型分
-        if (employeeSalaryReportDto.isEmployeeTypeCondition()) {
-            // 期间划分有值
-            if (topModelList.size() != 0) {
-                for (EmployeeSalaryGroupModel employeeSalaryGroupModel : topModelList) {
-                    // 说明按部门划分了
-                    if (ObjectUtils.isNotEmpty(employeeSalaryGroupModel.getChildModel())) {
-                        for (EmployeeSalaryGroupModel salaryGroupModel : employeeSalaryGroupModel.getChildModel()) {
-                            List<EmployeeSalaryGroupModel> groupModelList = groupByCondition(salaryGroupModel.getList(), "employeeType");
-                            salaryGroupModel.setChildModel(groupModelList);
-                        }
-                    } else {
-                        List<EmployeeSalaryGroupModel> groupModelList = groupByCondition(employeeSalaryGroupModel.getList(), "employeeType");
-                        employeeSalaryGroupModel.setChildModel(groupModelList);
-                    }
-                }
-            } else {
-                topModelList = groupByCondition(list, "employeeType");
-            }
-        }
-
-        List<EmployeeSalaryReportVo> reportVoList = convertToVo(topModelList);
+        List<EmployeeSalaryReportVo> reportVoList = convertToVo(groupModelList);
 
         return reportVoList;
 
     }
+
 
     private List<EmployeeSalaryReportVo> convertToVo(List<EmployeeSalaryGroupModel> modelList) {
         List<EmployeeSalaryReportVo> reportVoList = new ArrayList<>();
@@ -138,7 +102,7 @@ public class EmployeeSalaryReportService {
     }
 
 
-    private List<EmployeeSalaryGroupModel> groupByCondition(List<EmployeeSalary> list, String type) {
+    private List<EmployeeSalaryGroupModel> groupByCondition(List<EmployeeSalary> list, List<String> conditions, String type) {
         List<EmployeeSalaryGroupModel> modelList = new ArrayList<>();
         Map<Object, List<EmployeeSalary>> collect = null;
         if (type.equals("period")) {
@@ -153,11 +117,20 @@ public class EmployeeSalaryReportService {
             collect = list.stream().collect(Collectors.groupingBy(EmployeeSalary::getEmployeeType));
         }
 
+        if (type.equals("employeeName")) {
+            collect = list.stream().collect(Collectors.groupingBy(EmployeeSalary::getEmployeeName));
+        }
+
         for (Object key : collect.keySet()) {
             EmployeeSalaryGroupModel deptGroupModel = new EmployeeSalaryGroupModel();
             deptGroupModel.setName(key + "");
             deptGroupModel.setType(type);
             deptGroupModel.setList(collect.get(key));
+            int index = conditions.indexOf(type);
+            if (index != -1 && index + 1 < conditions.size()) {
+                deptGroupModel.setChildModel(groupByCondition(collect.get(key), conditions, conditions.get(index + 1)));
+            }
+
             modelList.add(deptGroupModel);
         }
 

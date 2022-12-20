@@ -16,6 +16,9 @@ public class EmployeeSalaryReportVo {
     @Excel(name = "分组", align = HorizontalAlignment.LEFT)
     private String name;
 
+    @Excel(name = "姓名")
+    private String employeeName;
+
     private String type;
 
     // private EmployeeSalary employeeSalary;
@@ -28,6 +31,10 @@ public class EmployeeSalaryReportVo {
     private Double additionPostSalary;
 
     @JsonSerialize(using = DoubleSerializerConfig.class)
+    @Excel(name = "岗位工资合计", cellType = Excel.ColumnType.NUMERIC)
+    private Double totalPostSalary;
+
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @Excel(name = "薪级工资", cellType = Excel.ColumnType.NUMERIC)
     private Double rankSalary;
 
@@ -36,12 +43,20 @@ public class EmployeeSalaryReportVo {
     private Double additionRankSalary;
 
     @JsonSerialize(using = DoubleSerializerConfig.class)
+    @Excel(name = "薪级工资合计", cellType = Excel.ColumnType.NUMERIC)
+    private Double totalRankSalary;
+
+    @JsonSerialize(using = DoubleSerializerConfig.class)
     @Excel(name = "基础性绩效工资", cellType = Excel.ColumnType.NUMERIC)
     private Double performanceSalary;
 
     @JsonSerialize(using = DoubleSerializerConfig.class)
     @Excel(name = "补基础性绩效工资", cellType = Excel.ColumnType.NUMERIC)
     private Double additionPerformanceSalary;
+
+    @JsonSerialize(using = DoubleSerializerConfig.class)
+    @Excel(name = "基础性绩效工资合计", cellType = Excel.ColumnType.NUMERIC)
+    private Double totalPerformanceSalary;
 
     @JsonSerialize(using = DoubleSerializerConfig.class)
     @Excel(name = "预留增项1", cellType = Excel.ColumnType.NUMERIC)
@@ -177,5 +192,26 @@ public class EmployeeSalaryReportVo {
         this.decreaseTotalSalary = decreaseTotalSalary;
         this.individualIncomeTax = individualIncomeTax;
         this.actualAmount = actualAmount;
+    }
+
+    public String getName() {
+        return type.equals("employeeName") ? "" : name;
+    }
+
+    public String getEmployeeName() {
+        return type.equals("employeeName") ? name : "";
+    }
+
+
+    public Double getTotalPostSalary() {
+        return postSalary + additionPostSalary;
+    }
+
+    public Double getTotalRankSalary() {
+        return rankSalary + additionRankSalary;
+    }
+
+    public Double getTotalPerformanceSalary() {
+        return performanceSalary + additionPerformanceSalary;
     }
 }

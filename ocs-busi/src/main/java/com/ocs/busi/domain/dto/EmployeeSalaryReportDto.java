@@ -2,7 +2,6 @@ package com.ocs.busi.domain.dto;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,6 +22,9 @@ public class EmployeeSalaryReportDto {
 
     // 人员性质
     private boolean employeeTypeCondition;
+
+    // 人员名字
+    private boolean employeeNameCondition;
 
     private List<LocalDateTime> range;
 
