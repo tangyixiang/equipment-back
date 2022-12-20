@@ -32,6 +32,7 @@ public class InvoiceOperatingController extends BaseController {
     @Autowired
     private InvoiceOperatingService invoiceOperatingService;
 
+
     @RequestMapping("/uploadValidate")
     public Result uploadValidate(MultipartFile file, String period) throws IOException {
         InputStream inputStream = file.getInputStream();

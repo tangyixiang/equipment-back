@@ -38,6 +38,7 @@ public class BankFlowController extends BaseController {
     @Autowired
     private BankFlowService bankFlowService;
 
+
     @RequestMapping("/uploadValidate")
     public Result uploadValidate(MultipartFile file, BankFlowUploadDto bankFlowUploadDto) throws IOException {
         InputStream inputStream = file.getInputStream();
@@ -76,5 +77,23 @@ public class BankFlowController extends BaseController {
         return getDataTable(list);
     }
 
+    @PostMapping("/listUnReconcile")
+    public TableDataInfo listUnReconcile(@RequestBody BankFlow bankFlow) {
+        List<LocalDate> tradeTimeArray = bankFlow.getTradeTimeArray();
+        if (ObjectUtils.isNotEmpty(bankFlow.getTradeTimeArray())) {
+            bankFlow.setTradeTimeArray(null);
+        }
+        startPage("create_time desc");
+        QueryWrapper<BankFlow> queryWrapper = QueryHelper.dynamicCondition(bankFlow, CommonConstants.QUERY_LIKE, false);
+        if (ObjectUtils.isNotEmpty(tradeTimeArray)) {
+            queryWrapper.ge("trade_time", LocalDateTime.of(tradeTimeArray.get(0), LocalTime.MIN));
+            queryWrapper.le("trade_time", LocalDateTime.of(tradeTimeArray.get(1), LocalTime.of(23, 59, 59)));
+        }
+        queryWrapper.notIn("reconciliation_flag", CommonConstants.RECONCILED);
+
+
+        List<BankFlow> list = bankFlowService.list(queryWrapper);
+        return getDataTable(list);
+    }
 
 }

@@ -5,24 +5,62 @@
 <mapper namespace="com.ocs.busi.mapper.CompanyReceivablesMapper">
 
     <resultMap id="BaseResultMap" type="com.ocs.busi.domain.entity.CompanyReceivables">
-            <id property="id" column="id" jdbcType="VARCHAR"/>
-            <result property="period" column="period" jdbcType="VARCHAR"/>
-            <result property="sourceType" column="source_type" jdbcType="VARCHAR"/>
-            <result property="invoicingDate" column="invoicing_date" jdbcType="DATE"/>
-            <result property="clientOrgName" column="client_org_name" jdbcType="VARCHAR"/>
-            <result property="applyCheckDate" column="apply_check_date" jdbcType="DATE"/>
-            <result property="receivableAmount" column="receivable_amount" jdbcType="DOUBLE"/>
-            <result property="confirmAmount" column="confirm_amount" jdbcType="DOUBLE"/>
-            <result property="unConfirmAmount" column="un_confirm_amount" jdbcType="DOUBLE"/>
-            <result property="reconciliationFlag" column="reconciliation_flag" jdbcType="VARCHAR"/>
-            <result property="reconciliationModel" column="reconciliation_model" jdbcType="VARCHAR"/>
-            <result property="associationId" column="association_id" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
-            <result property="remark" column="remark" jdbcType="VARCHAR"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
-            <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <id property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="period" column="period" jdbcType="VARCHAR"/>
+        <result property="sourceType" column="source_type" jdbcType="VARCHAR"/>
+        <result property="invoicingDate" column="invoicing_date" jdbcType="DATE"/>
+        <result property="clientOrgName" column="client_org_name" jdbcType="VARCHAR"/>
+        <result property="applyCheckDate" column="apply_check_date" jdbcType="DATE"/>
+        <result property="receivableAmount" column="receivable_amount" jdbcType="DOUBLE"/>
+        <result property="confirmAmount" column="confirm_amount" jdbcType="DOUBLE"/>
+        <result property="unConfirmAmount" column="un_confirm_amount" jdbcType="DOUBLE"/>
+        <result property="reconciliationFlag" column="reconciliation_flag" jdbcType="VARCHAR"/>
+        <result property="reconciliationModel" column="reconciliation_model" jdbcType="VARCHAR"/>
+        <result property="associationId" column="association_id"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
     </resultMap>
 
+    <select id="findByCondition" resultMap="BaseResultMap">
+        select * from company_receivables
+        <where>
+            <if test="id != null and id != ''">
+                AND id = #{id}
+            </if>
+            <if test="sourceType != null and sourceType != ''">
+                AND source_type = #{sourceType}
+            </if>
+            <if test="period != null and period != ''">
+                AND period = #{period}
+            </if>
+            <if test="invoiceStartDate != null">
+                AND invoicing_date &gt;= #{invoiceStartDate}
+            </if>
+            <if test="invoiceEndDate != null">
+                AND invoicing_date &lt;= #{invoiceEndDate}
+            </if>
+            <if test="amountStart != null">
+                AND receivable_amount &gt;= #{amountStart}
+            </if>
+            <if test="amountEnd != null">
+                AND receivable_amount &lt;= #{amountEnd}
+            </if>
+            <if test="clientOrgName != null and clientOrgName != ''">
+                AND client_org_name = #{clientOrgName}
+            </if>
+            <if test="reconciliationFlag != null and reconciliationFlag != ''">
+                AND reconciliation_flag = #{reconciliationFlag}
+            </if>
+            <if test="reconciliationModel != null and reconciliationModel != ''">
+                AND reconciliation_model = #{reconciliationModel}
+            </if>
+        
+        </where>
+
+    </select>
 
 </mapper>

@@ -13,6 +13,7 @@
         <setting name="defaultExecutorType" value="SIMPLE"/>
         <!-- 指定 MyBatis 所用日志的具体实现 -->
         <setting name="logImpl" value="SLF4J"/>
+<!--        <setting name="logImpl" value="org.apache.ibatis.logging.stdout.StdOutImpl"/>-->
         <!-- 使用驼峰命名法转换字段 -->
         <!-- <setting name="mapUnderscoreToCamelCase" value="true"/> -->
     </settings>

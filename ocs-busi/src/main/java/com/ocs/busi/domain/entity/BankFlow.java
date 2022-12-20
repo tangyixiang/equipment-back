@@ -62,7 +62,7 @@ public class BankFlow extends SimpleEntity {
     /**
      * 已对账金额
      */
-    private Double confirmPrice = 0d;
+    private Double confirmPrice;
 
     /**
      * 未对账金额

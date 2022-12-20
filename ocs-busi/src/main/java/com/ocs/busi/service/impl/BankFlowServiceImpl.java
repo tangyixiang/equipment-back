@@ -124,6 +124,7 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
                 bankFlow.setTradeType(handleTradeType(convertString(rowlist.get(4))));
                 String price = bankFlow.getTradeType().equals(CommonConstants.BORROW) ? convertString(rowlist.get(5)) : convertString(rowlist.get(6));
                 bankFlow.setPrice(Double.parseDouble(price));
+                bankFlow.setConfirmPrice(0d);
                 bankFlow.setUnConfirmPrice(Double.parseDouble(price));
                 bankFlow.setAdversaryBankCode(convertString(rowlist.get(7)));
                 bankFlow.setSummary(convertString(rowlist.get(8)));

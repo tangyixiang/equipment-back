@@ -1,43 +1,155 @@
 package com.ocs.web.controller.finance;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ocs.busi.domain.dto.CompanyReceivablesDto;
+import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyReceivables;
+import com.ocs.busi.mapper.CompanyReceivablesMapper;
+import com.ocs.busi.service.BankFlowService;
 import com.ocs.busi.service.CompanyReceivablesService;
+import com.ocs.busi.task.FlowTask;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
-import com.ocs.common.helper.QueryHelper;
+import com.ocs.common.exception.ServiceException;
+import com.ocs.common.utils.StringUtils;
+import com.ocs.common.utils.TemplateDownloadUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/company/receivable")
 public class CompanyReceivablesController extends BaseController {
 
     @Autowired
-    private CompanyReceivablesService CompanyReceivablesService;
+    private CompanyReceivablesService companyReceivablesService;
+    @Autowired
+    private CompanyReceivablesMapper companyReceivablesMapper;
+    @Autowired
+    private BankFlowService bankFlowService;
+    @Autowired
+    private FlowTask flowTask;
+
+
+    @RequestMapping("/template/download")
+    public void templateDownload(String fileName, HttpServletResponse response) {
+        TemplateDownloadUtils.downloadByFileName("应收单初始化导入模板.xlsx", response);
+    }
+
 
     @RequestMapping("/upload")
     public Result importReceivables(MultipartFile file) throws IOException {
         InputStream inputStream = file.getInputStream();
-        CompanyReceivablesService.importReceivables(inputStream);
+        companyReceivablesService.importReceivables(inputStream);
         return Result.success();
     }
 
-    @GetMapping("/list")
-    public TableDataInfo list(CompanyReceivables CompanyReceivables) {
+    @PostMapping("/list")
+    public TableDataInfo list(@RequestBody CompanyReceivablesDto companyReceivablesDto) {
         startPage();
-        QueryWrapper<CompanyReceivables> wrapper = QueryHelper.dynamicCondition(CompanyReceivables, CommonConstants.QUERY_LIKE, false);
-        List<CompanyReceivables> list = CompanyReceivablesService.list(wrapper);
+        List<CompanyReceivables> list = companyReceivablesMapper.findByCondition(companyReceivablesDto);
         return getDataTable(list);
+    }
+
+    @PostMapping("/match")
+    public Result matchFlow(@RequestBody CompanyReceivablesDto companyReceivablesDto) {
+        List<String> receivablesIds = companyReceivablesDto.getReceivablesIds();
+        List<String> bankFlowIds = companyReceivablesDto.getBankFlowIds();
+
+        List<CompanyReceivables> receivablesList = companyReceivablesService.listByIds(receivablesIds);
+        List<CompanyReceivables> companyReceivablesList = receivablesList.stream().filter(receivable -> !receivable.getReconciliationFlag().equals(CommonConstants.RECONCILED)).collect(Collectors.toList());
+
+        if (companyReceivablesList.size() == 0) {
+            throw new ServiceException("不存在未对账的应收账单");
+        }
+
+        Map<String, List<CompanyReceivables>> receivablesGroupMap = companyReceivablesList.stream().collect(Collectors.groupingBy(CompanyReceivables::getClientOrgName));
+        if (receivablesGroupMap.keySet().size() > 1) {
+            throw new ServiceException("应收单选择了不同名称的客户");
+        }
+
+        List<BankFlow> bankFlowList = bankFlowService.listByIds(bankFlowIds);
+        Map<String, List<BankFlow>> bankFlowGroupMap = bankFlowList.stream().collect(Collectors.groupingBy(BankFlow::getAdversaryOrgName));
+        if (bankFlowGroupMap.keySet().size() > 1) {
+            throw new ServiceException("银行流水选择了不同名称的客户");
+        }
+        String today = DateUtil.format(new Date(), "yyyyMMdd");
+        logger.info("开始手动对账");
+        flowTask.bankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, bankFlowList, receivablesList);
+
+        return Result.success();
+    }
+
+    @PostMapping("/cancel")
+    @Transactional
+    public Result cancel(@RequestBody CompanyReceivablesDto companyReceivablesDto) {
+        List<String> receivablesIds = companyReceivablesDto.getReceivablesIds();
+        List<CompanyReceivables> receivablesList = companyReceivablesService.listByIds(receivablesIds);
+
+        for (CompanyReceivables companyReceivables : receivablesList) {
+            if (!companyReceivables.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED)) {
+                List<String> associationId = companyReceivables.getAssociationId();
+                ArrayList<BankFlow> associationBankFlow = new ArrayList<>();
+                for (String id : associationId) {
+                    LambdaQueryWrapper<BankFlow> wrapper = new LambdaQueryWrapper<BankFlow>().like(BankFlow::getAssociationId, id);
+                    List<BankFlow> list = bankFlowService.list(wrapper);
+                    associationBankFlow.addAll(list);
+                }
+                companyReceivables.setAssociationId(Collections.emptyList());
+                companyReceivables.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
+                companyReceivables.setReconciliationModel("");
+
+                associationBankFlow.forEach(bankFlow -> {
+                    bankFlow.setAssociationId(Collections.emptyList());
+                    bankFlow.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
+                    bankFlow.setReconciliationModel("");
+                });
+
+                bankFlowService.updateBatchById(associationBankFlow);
+            }
+        }
+        companyReceivablesService.updateBatchById(receivablesList);
+        return Result.success();
+    }
+
+    @PostMapping("/delInitData")
+    public Result delInitData() {
+
+        LambdaQueryWrapper<CompanyReceivables> wrapper = new LambdaQueryWrapper<CompanyReceivables>().eq(CompanyReceivables::getSourceType, CommonConstants.RECEIVABLE_CUSTOM);
+
+        List<CompanyReceivables> companyReceivablesList = companyReceivablesService.list(wrapper);
+        for (CompanyReceivables companyReceivables : companyReceivablesList) {
+            List<String> associationId = companyReceivables.getAssociationId();
+            ArrayList<BankFlow> associationBankFlow = new ArrayList<>();
+            for (String id : associationId) {
+                if (StringUtils.isNotEmpty(id)){
+                    LambdaQueryWrapper<BankFlow> bankFlowWrapper = new LambdaQueryWrapper<BankFlow>().like(BankFlow::getAssociationId, id);
+                    List<BankFlow> list = bankFlowService.list(bankFlowWrapper);
+                    associationBankFlow.addAll(list);
+                }
+            }
+            associationBankFlow.forEach(bankFlow -> {
+                bankFlow.setAssociationId(Collections.emptyList());
+                bankFlow.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
+                bankFlow.setReconciliationModel("");
+            });
+        }
+        companyReceivablesService.remove(wrapper);
+
+        return Result.success();
     }
 
 }

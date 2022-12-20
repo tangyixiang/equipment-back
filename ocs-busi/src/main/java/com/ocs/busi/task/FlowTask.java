@@ -13,10 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +52,7 @@ public class FlowTask {
     /**
      * 对账任务运行
      */
+    @Transactional
     public void reconciliationTask() {
         logger.info("对账任务开始运行");
         CompanyReceivables current = new CompanyReceivables();
@@ -83,32 +84,37 @@ public class FlowTask {
             List<CompanyReceivables> list = receivablesGroupMap.get(clientOrgName);
             list.stream().sorted(Comparator.comparing(CompanyReceivables::getInvoicingDate));
 
-            for (CompanyReceivables companyReceivables : list) {
-                Optional<BankFlow> bankFlowOptional = bankFlowList.stream().filter(flow ->
-                        (flow.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED) || flow.getReconciliationFlag().equals(CommonConstants.PART_RECONCILED))
-                                && new BigDecimal(flow.getUnConfirmPrice()).compareTo(new BigDecimal(companyReceivables.getUnConfirmAmount())) > -1).findFirst();
-                if (bankFlowOptional.isPresent()) {
-                    // 对账ID
-                    String dzId = "ZD-" + today + "/" + RandomStringUtils.randomNumeric(5);
-
-                    BankFlow bankFlow = bankFlowOptional.get();
-                    bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + companyReceivables.getUnConfirmAmount());
-                    bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() - companyReceivables.getUnConfirmAmount());
-                    // 已对账
-                    bankFlow.setReconciliationFlag(bankFlow.getUnConfirmPrice().equals(0d) ? CommonConstants.RECONCILED : CommonConstants.PART_RECONCILED);
-                    // 自动对账
-                    bankFlow.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
-                    bankFlow.setAssociationId(addAssociationId(dzId, bankFlow.getAssociationId()));
-                    // 对账单
-                    companyReceivables.setReconciliationFlag(CommonConstants.RECONCILED);
-                    companyReceivables.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
-                    companyReceivables.setConfirmAmount(companyReceivables.getConfirmAmount() + companyReceivables.getUnConfirmAmount());
-                    companyReceivables.setAssociationId(addAssociationId(dzId, companyReceivables.getAssociationId()));
-                    bankFlowService.updateById(bankFlow);
-                }
-            }
-            companyReceivablesService.updateBatchById(list);
+            bankFlowMatch(today, CommonConstants.AUTO_RECONCILIATION, bankFlowList, list);
         }
+    }
+
+    @Transactional
+    public void bankFlowMatch(String today, String reconciliationModel, List<BankFlow> bankFlowList, List<CompanyReceivables> list) {
+        for (CompanyReceivables companyReceivables : list) {
+            Optional<BankFlow> bankFlowOptional = bankFlowList.stream().filter(flow ->
+                    (flow.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED) || flow.getReconciliationFlag().equals(CommonConstants.PART_RECONCILED))
+                            && new BigDecimal(flow.getUnConfirmPrice()).compareTo(new BigDecimal(companyReceivables.getUnConfirmAmount())) > -1).findFirst();
+            if (bankFlowOptional.isPresent()) {
+                // 对账ID
+                String dzId = "ZD-" + today + "/" + RandomStringUtils.randomNumeric(5);
+
+                BankFlow bankFlow = bankFlowOptional.get();
+                bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + companyReceivables.getUnConfirmAmount());
+                bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() - companyReceivables.getUnConfirmAmount());
+                // 已对账
+                bankFlow.setReconciliationFlag(bankFlow.getUnConfirmPrice().equals(0d) ? CommonConstants.RECONCILED : CommonConstants.PART_RECONCILED);
+                // 自动对账
+                bankFlow.setReconciliationModel(reconciliationModel);
+                bankFlow.setAssociationId(addAssociationId(dzId, bankFlow.getAssociationId()));
+                // 对账单
+                companyReceivables.setReconciliationFlag(CommonConstants.RECONCILED);
+                companyReceivables.setReconciliationModel(reconciliationModel);
+                companyReceivables.setConfirmAmount(companyReceivables.getConfirmAmount() + companyReceivables.getUnConfirmAmount());
+                companyReceivables.setAssociationId(addAssociationId(dzId, companyReceivables.getAssociationId()));
+                bankFlowService.updateById(bankFlow);
+            }
+        }
+        companyReceivablesService.updateBatchById(list);
     }
 
     /**

@@ -30,6 +30,7 @@ public class EmployeeSalaryController extends BaseController {
     @Autowired
     private EmployeeSalaryService employeeSalaryService;
 
+
     @RequestMapping("/upload")
     public Result importSalary(MultipartFile file, String period) throws IOException {
         InputStream inputStream = file.getInputStream();
