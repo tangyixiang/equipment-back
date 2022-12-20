@@ -6,10 +6,12 @@ import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyClientOrg;
 import com.ocs.busi.domain.entity.CompanyReceivables;
 import com.ocs.busi.helper.ValidateHelper;
 import com.ocs.busi.mapper.CompanyReceivablesMapper;
+import com.ocs.busi.service.BankFlowService;
 import com.ocs.busi.service.CompanyClientOrgService;
 import com.ocs.busi.service.CompanyReceivablesService;
 import com.ocs.common.constant.CommonConstants;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -39,6 +42,8 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
 
     @Autowired
     private CompanyClientOrgService clientOrgService;
+    @Autowired
+    private BankFlowService bankFlowService;
 
     @Override
     @Transactional
@@ -52,6 +57,35 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
             }
         }
         saveBatch(receivablesList);
+    }
+
+    @Override
+    public void cancel(List<String> receivablesIds) {
+        List<CompanyReceivables> receivablesList = listByIds(receivablesIds);
+
+        for (CompanyReceivables companyReceivables : receivablesList) {
+            if (!companyReceivables.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED)) {
+                List<String> associationId = companyReceivables.getAssociationId();
+                ArrayList<BankFlow> associationBankFlow = new ArrayList<>();
+                for (String id : associationId) {
+                    LambdaQueryWrapper<BankFlow> wrapper = new LambdaQueryWrapper<BankFlow>().like(BankFlow::getAssociationId, id);
+                    List<BankFlow> list = bankFlowService.list(wrapper);
+                    associationBankFlow.addAll(list);
+                }
+                companyReceivables.setAssociationId(Collections.emptyList());
+                companyReceivables.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
+                companyReceivables.setReconciliationModel("");
+
+                associationBankFlow.forEach(bankFlow -> {
+                    bankFlow.setAssociationId(Collections.emptyList());
+                    bankFlow.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
+                    bankFlow.setReconciliationModel("");
+                });
+
+                bankFlowService.updateBatchById(associationBankFlow);
+            }
+        }
+        updateBatchById(receivablesList);
     }
 
     private List<CompanyReceivables> convertExcelToReceivables(InputStream inputStream) {

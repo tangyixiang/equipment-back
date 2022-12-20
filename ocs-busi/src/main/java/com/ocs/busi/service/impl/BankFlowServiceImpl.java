@@ -3,16 +3,19 @@ package com.ocs.busi.service.impl;
 import cn.hutool.poi.excel.sax.Excel07SaxReader;
 import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.dto.BankFlowUploadDto;
 import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyClientOrg;
+import com.ocs.busi.domain.entity.CompanyReceivables;
 import com.ocs.busi.helper.ExcelCellHelper;
 import com.ocs.busi.helper.SerialNumberHelper;
 import com.ocs.busi.helper.ValidateHelper;
 import com.ocs.busi.mapper.BankFlowMapper;
 import com.ocs.busi.service.BankFlowService;
 import com.ocs.busi.service.CompanyClientOrgService;
+import com.ocs.busi.service.CompanyReceivablesService;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
 import com.ocs.common.utils.DateUtils;
@@ -44,6 +47,8 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
 
     @Autowired
     private CompanyClientOrgService companyClientOrgService;
+    @Autowired
+    private CompanyReceivablesService companyReceivablesService;
 
     @Override
     public Map<String, Object> uploadValidate(InputStream inputStream, BankFlowUploadDto bankFlowUploadDto) {
@@ -78,13 +83,34 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
     public synchronized void importBankFlow(InputStream inputStream, BankFlowUploadDto bankFlowUploadDto) {
         List<BankFlow> bankFlowList = convertExcelToFlow(inputStream, bankFlowUploadDto);
 
+        LambdaQueryWrapper<BankFlow> wrapper = new LambdaQueryWrapper<BankFlow>().eq(BankFlow::getSelfAccount, bankFlowUploadDto.getAccount())
+                .ge(BankFlow::getTradeTime, bankFlowUploadDto.getStartDate()).le(BankFlow::getTradeTime, bankFlowUploadDto.getEndDate());
+
+        List<BankFlow> list = list(wrapper);
+
+        List<String> receivablesIdList = new ArrayList<>();
+
+        for (BankFlow bankFlow : list) {
+            List<String> associationId = bankFlow.getAssociationId();
+            LambdaQueryWrapper<CompanyReceivables> queryWrapper = new LambdaQueryWrapper<CompanyReceivables>().like(CompanyReceivables::getAssociationId, associationId);
+            List<CompanyReceivables> companyReceivablesList = companyReceivablesService.list(queryWrapper);
+            List<String> ids = companyReceivablesList.stream().map(CompanyReceivables::getId).collect(Collectors.toList());
+            receivablesIdList.addAll(ids);
+        }
+        // 取消关联的应收单
+        if (receivablesIdList.size() > 0) {
+            companyReceivablesService.cancel(receivablesIdList);
+        }
+        // 删除旧的银行流水
+        remove(wrapper);
+
         String idPattern = "YHSL" + DateUtils.dateTimeNow("yyyyMMdd");
         BankFlow todayLastDataFlow = Optional.ofNullable(getBaseMapper().findByDateIn(LocalDate.now(), LocalDate.now().plusDays(1))).orElse(new BankFlow());
         SerialNumberHelper serialNumberHelper = new SerialNumberHelper(todayLastDataFlow.getId(), idPattern);
 
         bankFlowList.forEach(bankFlow -> {
             bankFlow.setId(serialNumberHelper.generateNextId(idPattern, 4));
-            saveOrUpdate(bankFlow);
+            save(bankFlow);
         });
     }
 
@@ -112,9 +138,9 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
             String selfAccount = convertString(rowlist.get(1));
             LocalDateTime tradeTime = ExcelCellHelper.handleDate(rowlist.get(3) + "");
 
-            boolean timeCondition = tradeTime.isBefore(LocalDateTime.of(bankFlowUploadDto.getEndDate(), LocalTime.MAX))
+            boolean timeCondition = tradeTime.isBefore(LocalDateTime.of(bankFlowUploadDto.getEndDate(), LocalTime.of(23, 59, 59)))
                     && tradeTime.isAfter(LocalDateTime.of(bankFlowUploadDto.getStartDate(), LocalTime.MIN));
-
+            logger.info("");
             if (selfAccount.equals(bankFlowUploadDto.getAccount()) && timeCondition) {
                 BankFlow bankFlow = new BankFlow();
                 bankFlow.setBankSiteCode(convertString(rowlist.get(0)));

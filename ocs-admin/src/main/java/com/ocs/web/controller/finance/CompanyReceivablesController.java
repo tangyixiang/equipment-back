@@ -97,31 +97,7 @@ public class CompanyReceivablesController extends BaseController {
     @Transactional
     public Result cancel(@RequestBody CompanyReceivablesDto companyReceivablesDto) {
         List<String> receivablesIds = companyReceivablesDto.getReceivablesIds();
-        List<CompanyReceivables> receivablesList = companyReceivablesService.listByIds(receivablesIds);
-
-        for (CompanyReceivables companyReceivables : receivablesList) {
-            if (!companyReceivables.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED)) {
-                List<String> associationId = companyReceivables.getAssociationId();
-                ArrayList<BankFlow> associationBankFlow = new ArrayList<>();
-                for (String id : associationId) {
-                    LambdaQueryWrapper<BankFlow> wrapper = new LambdaQueryWrapper<BankFlow>().like(BankFlow::getAssociationId, id);
-                    List<BankFlow> list = bankFlowService.list(wrapper);
-                    associationBankFlow.addAll(list);
-                }
-                companyReceivables.setAssociationId(Collections.emptyList());
-                companyReceivables.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
-                companyReceivables.setReconciliationModel("");
-
-                associationBankFlow.forEach(bankFlow -> {
-                    bankFlow.setAssociationId(Collections.emptyList());
-                    bankFlow.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
-                    bankFlow.setReconciliationModel("");
-                });
-
-                bankFlowService.updateBatchById(associationBankFlow);
-            }
-        }
-        companyReceivablesService.updateBatchById(receivablesList);
+        companyReceivablesService.cancel(receivablesIds);
         return Result.success();
     }
 

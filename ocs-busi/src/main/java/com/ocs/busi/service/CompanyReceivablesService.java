@@ -4,6 +4,7 @@ import com.ocs.busi.domain.entity.CompanyReceivables;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.io.InputStream;
+import java.util.List;
 
 /**
 * @author tangyx
@@ -13,4 +14,6 @@ import java.io.InputStream;
 public interface CompanyReceivablesService extends IService<CompanyReceivables> {
 
     void importReceivables(InputStream inputStream);
+
+    void cancel(List<String> receivablesIds);
 }
