@@ -99,7 +99,10 @@ public class TaskController extends BaseController {
     @PostMapping("/run")
     public Result run(@RequestBody @Validated TaskRunDto taskRunDto) {
         SysJob sysJob = sysJobService.selectJobById(taskRunDto.getJobId());
-        sysJob.setParam(taskRunDto.getParams());
+        // 只有初始化配置时,给了参数配置才起作用
+        if (StringUtils.isNotEmpty(sysJob.getParam())) {
+            sysJob.setParam(taskRunDto.getParams());
+        }
         CompletableFuture.runAsync(() -> {
             try {
                 sysJobService.updateJob(sysJob);
