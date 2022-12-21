@@ -6,6 +6,9 @@ import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyClientOrg;
 import com.ocs.busi.domain.entity.CompanyReceivables;
@@ -47,6 +50,8 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
     private CompanyClientOrgService clientOrgService;
     @Autowired
     private BankFlowService bankFlowService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
     @Transactional
@@ -68,7 +73,13 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
 
         for (CompanyReceivables companyReceivables : receivablesList) {
             if (!companyReceivables.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED)) {
-                List<ReceivableBankFlowMapping> bankFlowMappingList = companyReceivables.getRemark();
+                JavaType javaType = objectMapper.getTypeFactory().constructCollectionType(List.class, ReceivableBankFlowMapping.class);
+                List<ReceivableBankFlowMapping> bankFlowMappingList = null;
+                try {
+                    bankFlowMappingList = objectMapper.readValue(objectMapper.writeValueAsString(companyReceivables.getRemark()), javaType);
+                } catch (JsonProcessingException e) {
+                    throw new ServiceException(e.getMessage());
+                }
 
                 List<String> bankFlowIds = bankFlowMappingList.stream().map(ReceivableBankFlowMapping::getBankFlowId).collect(Collectors.toList());
                 Map<String, Double> map = bankFlowMappingList.stream().collect(Collectors.toMap(ReceivableBankFlowMapping::getBankFlowId, ReceivableBankFlowMapping::getUsePrice));
@@ -85,6 +96,8 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
                 companyReceivables.setAssociationId(Collections.emptyList());
                 companyReceivables.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
                 companyReceivables.setReconciliationModel("");
+                companyReceivables.setConfirmAmount(0d);
+                companyReceivables.setUnConfirmAmount(companyReceivables.getReceivableAmount());
                 companyReceivables.setRemark(Collections.emptyList());
                 bankFlowService.updateBatchById(bankFlows);
             }

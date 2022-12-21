@@ -1,7 +1,7 @@
 package com.ocs.busi.service;
 
-import com.ocs.busi.domain.entity.CompanyReceivables;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ocs.busi.domain.entity.CompanyReceivables;
 
 import java.io.InputStream;
 import java.util.List;
