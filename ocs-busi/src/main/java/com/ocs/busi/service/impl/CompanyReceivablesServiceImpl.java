@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyClientOrg;
 import com.ocs.busi.domain.entity.CompanyReceivables;
+import com.ocs.busi.domain.model.ReceivableBankFlowMapping;
 import com.ocs.busi.helper.ValidateHelper;
 import com.ocs.busi.mapper.CompanyReceivablesMapper;
 import com.ocs.busi.service.BankFlowService;
@@ -28,7 +29,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * @author tangyx
@@ -65,24 +68,25 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
 
         for (CompanyReceivables companyReceivables : receivablesList) {
             if (!companyReceivables.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED)) {
-                List<String> associationId = companyReceivables.getAssociationId();
-                ArrayList<BankFlow> associationBankFlow = new ArrayList<>();
-                for (String id : associationId) {
-                    LambdaQueryWrapper<BankFlow> wrapper = new LambdaQueryWrapper<BankFlow>().like(BankFlow::getAssociationId, id);
-                    List<BankFlow> list = bankFlowService.list(wrapper);
-                    associationBankFlow.addAll(list);
+                List<ReceivableBankFlowMapping> bankFlowMappingList = companyReceivables.getRemark();
+
+                List<String> bankFlowIds = bankFlowMappingList.stream().map(ReceivableBankFlowMapping::getBankFlowId).collect(Collectors.toList());
+                Map<String, Double> map = bankFlowMappingList.stream().collect(Collectors.toMap(ReceivableBankFlowMapping::getBankFlowId, ReceivableBankFlowMapping::getUsePrice));
+                List<BankFlow> bankFlows = bankFlowService.listByIds(bankFlowIds);
+                for (BankFlow bankFlow : bankFlows) {
+                    Double usePrice = map.get(bankFlow.getId());
+                    bankFlow.setAssociationId(Collections.emptyList());
+                    bankFlow.setReconciliationModel("");
+                    bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() + usePrice);
+                    bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() - usePrice);
+                    bankFlow.setReconciliationFlag(bankFlow.getConfirmPrice() == 0 ? CommonConstants.NOT_RECONCILED : CommonConstants.PART_RECONCILED);
                 }
+
                 companyReceivables.setAssociationId(Collections.emptyList());
                 companyReceivables.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
                 companyReceivables.setReconciliationModel("");
-
-                associationBankFlow.forEach(bankFlow -> {
-                    bankFlow.setAssociationId(Collections.emptyList());
-                    bankFlow.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
-                    bankFlow.setReconciliationModel("");
-                });
-
-                bankFlowService.updateBatchById(associationBankFlow);
+                companyReceivables.setRemark(Collections.emptyList());
+                bankFlowService.updateBatchById(bankFlows);
             }
         }
         updateBatchById(receivablesList);

@@ -18,7 +18,8 @@
         <result property="reconciliationModel" column="reconciliation_model" jdbcType="VARCHAR"/>
         <result property="associationId" column="association_id"
                 typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
-        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
         <result property="createBy" column="create_by" jdbcType="VARCHAR"/>

@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyReceivables;
+import com.ocs.busi.domain.model.ReceivableBankFlowMapping;
 import com.ocs.busi.service.BankFlowService;
 import com.ocs.busi.service.CompanyReceivablesService;
 import com.ocs.common.constant.CommonConstants;
@@ -124,6 +125,8 @@ public class FlowTask {
                 companyReceivables.setReconciliationFlag(CommonConstants.RECONCILED);
                 companyReceivables.setReconciliationModel(reconciliationModel);
                 companyReceivables.setConfirmAmount(companyReceivables.getConfirmAmount() + companyReceivables.getUnConfirmAmount());
+                // 记录使用了这笔银行流水的金额
+                companyReceivables.getRemark().add(new ReceivableBankFlowMapping(bankFlow.getId(), companyReceivables.getUnConfirmAmount()));
                 companyReceivables.setUnConfirmAmount(0d);
                 companyReceivables.setAssociationId(addAssociationId(dzId, companyReceivables.getAssociationId()));
                 bankFlowService.updateById(bankFlow);
@@ -167,6 +170,7 @@ public class FlowTask {
                 logger.info("多笔银行流水金额匹配开始");
                 // 多笔流水去匹配
                 for (BankFlow bankFlow : bankFlowList) {
+                    double lastMultiBankFlowAmount = multiBankFlowAmount;
                     multiBankFlowAmount = multiBankFlowAmount + bankFlow.getUnConfirmPrice();
                     diff = new BigDecimal(unConfirmAmount).subtract(new BigDecimal(multiBankFlowAmount)).doubleValue();
                     logger.info("部分对账,多笔银行流水金额:{},diff:{}", multiBankFlowAmount, diff);
@@ -174,21 +178,27 @@ public class FlowTask {
                     bankFlow.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
                     bankFlow.setAssociationId(addAssociationId(dzId, bankFlow.getAssociationId()));
 
-                    // 如果差值相等，则用掉所有余额
                     if (diff < 0) {
-                        bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() - Math.abs(diff));
-                        bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + Math.abs(diff));
+                        double useUnConfirmAmount = unConfirmAmount - lastMultiBankFlowAmount;
+                        // 记录使用了这笔银行流水的金额
+                        companyReceivables.getRemark().add(new ReceivableBankFlowMapping(bankFlow.getId(), useUnConfirmAmount));
+                        bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() - useUnConfirmAmount);
+                        bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + useUnConfirmAmount);
                         bankFlow.setReconciliationFlag(CommonConstants.PART_RECONCILED);
                         break;
                     } else if (diff == 0) {
+                        // 如果差值相等，则用掉所有余额
+                        companyReceivables.getRemark().add(new ReceivableBankFlowMapping(bankFlow.getId(), bankFlow.getUnConfirmPrice()));
                         bankFlow.setUnConfirmPrice(0d);
                         bankFlow.setConfirmPrice(bankFlow.getPrice());
                         bankFlow.setReconciliationFlag(CommonConstants.RECONCILED);
                         break;
                     } else {
+                        companyReceivables.getRemark().add(new ReceivableBankFlowMapping(bankFlow.getId(), bankFlow.getUnConfirmPrice()));
                         bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + bankFlow.getUnConfirmPrice());
                         bankFlow.setUnConfirmPrice(0d);
                     }
+
                 }
                 logger.info("多笔银行流水金额匹配结束");
                 // 说明所有的流水都无法完全覆盖

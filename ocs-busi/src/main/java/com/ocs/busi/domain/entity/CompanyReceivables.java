@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.ocs.busi.domain.model.ReceivableBankFlowMapping;
 import com.ocs.common.core.domain.SimpleEntity;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -85,7 +87,8 @@ public class CompanyReceivables extends SimpleEntity {
     /**
      * 备注
      */
-    private String remark;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<ReceivableBankFlowMapping> remark = new ArrayList<>();
 
 
 }
