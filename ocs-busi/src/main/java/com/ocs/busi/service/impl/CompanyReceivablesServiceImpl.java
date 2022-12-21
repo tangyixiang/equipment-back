@@ -117,6 +117,7 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
             companyReceivables.setSourceType(CommonConstants.RECEIVABLE_CUSTOM);
             companyReceivables.setClientOrgName(convertString(rowlist.get(2)));
             companyReceivables.setReceivableAmount(covertDouble(convertString(rowlist.get(3))));
+            companyReceivables.setUnConfirmAmount(companyReceivables.getReceivableAmount());
             companyReceivables.setInvoicingDate(LocalDate.parse(convertString(rowlist.get(4))));
             companyReceivables.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
 
