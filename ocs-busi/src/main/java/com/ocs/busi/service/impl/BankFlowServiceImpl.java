@@ -83,7 +83,8 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
         List<BankFlow> bankFlowList = convertExcelToFlow(inputStream, bankFlowUploadDto);
 
         LambdaQueryWrapper<BankFlow> wrapper = new LambdaQueryWrapper<BankFlow>().eq(BankFlow::getSelfAccount, bankFlowUploadDto.getAccount())
-                .ge(BankFlow::getTradeTime, bankFlowUploadDto.getStartDate()).le(BankFlow::getTradeTime, bankFlowUploadDto.getEndDate());
+                .ge(BankFlow::getTradeTime, LocalDateTime.of(bankFlowUploadDto.getStartDate(), LocalTime.MIN))
+                .le(BankFlow::getTradeTime, LocalDateTime.of(bankFlowUploadDto.getEndDate(), LocalTime.of(23, 59, 59)));
 
         List<BankFlow> list = list(wrapper);
 
