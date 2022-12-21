@@ -1,10 +1,13 @@
 package com.ocs.common.helper;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ocs.common.constant.CommonConstants;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.cglib.beans.BeanMap;
+
+import java.util.Map;
 
 /**
  * @author tangyixiang
@@ -26,6 +29,11 @@ public class QueryHelper {
         queryWrapper.eq("del", del != null && !del ? CommonConstants.STATUS_NORMAL : CommonConstants.STATUS_DEL);
         return queryWrapper;
     }
+
+    public static Map<String, Object> dynamicConditionMap(Object bean) {
+        return BeanUtil.beanToMap(bean);
+    }
+
 
     /**
      * 动态生成查询条件(不带删除)

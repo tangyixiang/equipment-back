@@ -88,7 +88,9 @@ public class CompanyReceivablesController extends BaseController {
         }
         String today = DateUtil.format(new Date(), "yyyyMMdd");
         logger.info("开始手动对账");
-        flowTask.bankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, bankFlowList, receivablesList);
+        flowTask.bankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, bankFlowList, receivablesList, "equal");
+        flowTask.bankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, bankFlowList, receivablesList, "gt");
+        flowTask.multiPartMatch(today, receivablesList, bankFlowList);
 
         return Result.success();
     }
@@ -111,7 +113,7 @@ public class CompanyReceivablesController extends BaseController {
             List<String> associationId = companyReceivables.getAssociationId();
             ArrayList<BankFlow> associationBankFlow = new ArrayList<>();
             for (String id : associationId) {
-                if (StringUtils.isNotEmpty(id)){
+                if (StringUtils.isNotEmpty(id)) {
                     LambdaQueryWrapper<BankFlow> bankFlowWrapper = new LambdaQueryWrapper<BankFlow>().like(BankFlow::getAssociationId, id);
                     List<BankFlow> list = bankFlowService.list(bankFlowWrapper);
                     associationBankFlow.addAll(list);

@@ -40,8 +40,7 @@ import java.util.stream.Collectors;
  * @createDate 2022-11-01 15:42:04
  */
 @Service
-public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
-        implements BankFlowService {
+public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> implements BankFlowService {
 
     private static final Logger logger = LoggerFactory.getLogger(BankFlowServiceImpl.class);
 
@@ -112,6 +111,11 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow>
             bankFlow.setId(serialNumberHelper.generateNextId(idPattern, 4));
             save(bankFlow);
         });
+    }
+
+    @Override
+    public List<BankFlow> findByCondition(BankFlow bankFlow) {
+        return null;
     }
 
     private List<BankFlow> convertExcelToFlow(InputStream inputStream, BankFlowUploadDto bankFlowUploadDto) {

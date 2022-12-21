@@ -1,7 +1,6 @@
 package com.ocs.busi.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.ocs.common.core.domain.SimpleEntity;
@@ -27,7 +26,7 @@ public class BankFlow extends SimpleEntity {
     /**
      * 凭证号
      */
-    @TableId
+    // @TableId
     @NotBlank(message = "凭证号不能为空")
     private String bankSiteCode;
 
@@ -120,4 +119,10 @@ public class BankFlow extends SimpleEntity {
 
     @TableField(exist = false)
     private List<LocalDate> tradeTimeArray;
+
+    @TableField(exist = false)
+    private String associationIdStr;
+
+
+
 }

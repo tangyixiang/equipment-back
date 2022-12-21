@@ -22,7 +22,8 @@
         <result property="otherInfo" column="other_info" jdbcType="VARCHAR"/>
         <result property="reconciliationFlag" column="reconciliation_flag" jdbcType="VARCHAR"/>
         <result property="reconciliationModel" column="reconciliation_model" jdbcType="VARCHAR"/>
-        <result property="associationId" column="association_id" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result property="associationId" column="association_id"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result property="del" column="del" jdbcType="VARCHAR"/>
         <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
         <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
@@ -48,6 +49,42 @@
         select bank_site_code
         from bank_flow
         where bank_site_code in (${bankSiteCodeStr})
+    </select>
+
+    <select id="findByCondition" resultMap="BaseResultMap">
+        select * from bank_flow
+        <where>
+            <if test="selfAccount != null and selfAccount != ''">
+                AND self_account like concat('%', #{selfAccount}, '%')
+            </if>
+            <if test="adversaryAccount != null and adversaryAccount != ''">
+                AND adversary_account = #{adversaryAccount}
+            </if>
+            <if test="tradeType != null and tradeType != ''">
+                AND trade_type = #{tradeType}
+            </if>
+            <if test="adversaryBankCode != null and adversaryBankCode != ''">
+                AND adversary_account like concat('%', #{adversaryBankCode}, '%')
+            </if>
+            <if test="tradeTimeStart != null">
+                AND trade_time &gt;= #{tradeTimeStart}
+            </if>
+            <if test="tradeTimeEnd != null">
+                AND trade_time &lt;= #{tradeTimeEnd}
+            </if>
+            <if test="comment != null and comment != ''">
+                AND comment like concat('%', #{comment}, '%')
+            </if>
+            <if test="adversaryOrgName != null and adversaryOrgName != ''">
+                AND adversary_account like concat('%', #{adversaryOrgName}, '%')
+            </if>
+            <if test="reconciliationFlag != null and reconciliationFlag != ''">
+                AND reconciliation_flag = #{reconciliationFlag}
+            </if>
+            <if test="associationIdStr != null and associationIdStr != ''">
+                AND association_id like concat('%', #{associationIdStr}, '%')
+            </if>
+        </where>
     </select>
 
 

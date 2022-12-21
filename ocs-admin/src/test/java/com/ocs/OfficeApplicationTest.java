@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -54,9 +55,7 @@ public class OfficeApplicationTest {
 
     @Test
     void doubleTest(){
-        List<String> strings = List.of("a", "b", "c", "d");
-
-        System.out.println(strings.indexOf("d"));
+        System.out.println(new BigDecimal(3540d).compareTo(new BigDecimal(3540d)));
     }
 
 }

@@ -1,8 +1,10 @@
 package com.ocs.web.controller.finance;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ocs.busi.domain.dto.BankFlowDto;
 import com.ocs.busi.domain.dto.BankFlowUploadDto;
 import com.ocs.busi.domain.entity.BankFlow;
+import com.ocs.busi.mapper.BankFlowMapper;
 import com.ocs.busi.service.BankFlowService;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.core.controller.BaseController;
@@ -37,6 +39,8 @@ public class BankFlowController extends BaseController {
 
     @Autowired
     private BankFlowService bankFlowService;
+    @Autowired
+    private BankFlowMapper bankFlowMapper;
 
 
     @RequestMapping("/uploadValidate")
@@ -61,19 +65,14 @@ public class BankFlowController extends BaseController {
     }
 
     @PostMapping("/list")
-    public TableDataInfo list(@RequestBody BankFlow bankFlow) {
-        List<LocalDate> tradeTimeArray = bankFlow.getTradeTimeArray();
-        if (ObjectUtils.isNotEmpty(bankFlow.getTradeTimeArray())) {
-            bankFlow.setTradeTimeArray(null);
-        }
+    public TableDataInfo list(@RequestBody BankFlowDto bankFlowDto) {
         startPage("create_time desc");
-        QueryWrapper<BankFlow> queryWrapper = QueryHelper.dynamicCondition(bankFlow, CommonConstants.QUERY_LIKE, false);
-        if (ObjectUtils.isNotEmpty(tradeTimeArray)) {
-            queryWrapper.ge("trade_time", LocalDateTime.of(tradeTimeArray.get(0), LocalTime.MIN));
-            queryWrapper.le("trade_time", LocalDateTime.of(tradeTimeArray.get(1), LocalTime.of(23, 59, 59)));
+        if (ObjectUtils.isNotEmpty(bankFlowDto.getTradeTimeArray())) {
+            bankFlowDto.setTradeTimeStart(LocalDateTime.of(bankFlowDto.getTradeTimeArray().get(0), LocalTime.MIN));
+            bankFlowDto.setTradeTimeEnd(LocalDateTime.of(bankFlowDto.getTradeTimeArray().get(1), LocalTime.of(23, 59, 59)));
         }
 
-        List<BankFlow> list = bankFlowService.list(queryWrapper);
+        List<BankFlow> list = bankFlowMapper.findByCondition(bankFlowDto);
         return getDataTable(list);
     }
 
@@ -90,7 +89,7 @@ public class BankFlowController extends BaseController {
             queryWrapper.le("trade_time", LocalDateTime.of(tradeTimeArray.get(1), LocalTime.of(23, 59, 59)));
         }
         queryWrapper.notIn("reconciliation_flag", CommonConstants.RECONCILED);
-
+        queryWrapper.eq("trade_type", CommonConstants.LOAN);
 
         List<BankFlow> list = bankFlowService.list(queryWrapper);
         return getDataTable(list);
