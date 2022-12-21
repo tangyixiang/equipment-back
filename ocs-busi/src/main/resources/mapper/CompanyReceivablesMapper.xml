@@ -58,7 +58,10 @@
             <if test="reconciliationModel != null and reconciliationModel != ''">
                 AND reconciliation_model = #{reconciliationModel}
             </if>
-        
+            <if test="associationIdStr != null and associationIdStr != ''">
+                AND association_id like concat('%', #{associationIdStr}, '%')
+            </if>
+
         </where>
 
     </select>

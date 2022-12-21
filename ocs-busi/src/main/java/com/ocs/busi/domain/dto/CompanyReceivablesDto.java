@@ -42,4 +42,6 @@ public class CompanyReceivablesDto {
     // 对账模式
     private String reconciliationModel;
 
+    private String associationIdStr;
+
 }

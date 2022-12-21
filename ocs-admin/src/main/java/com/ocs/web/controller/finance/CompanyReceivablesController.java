@@ -49,7 +49,6 @@ public class CompanyReceivablesController extends BaseController {
         TemplateDownloadUtils.downloadByFileName("应收单初始化导入模板.xlsx", response);
     }
 
-
     @RequestMapping("/upload")
     public Result importReceivables(MultipartFile file) throws IOException {
         InputStream inputStream = file.getInputStream();

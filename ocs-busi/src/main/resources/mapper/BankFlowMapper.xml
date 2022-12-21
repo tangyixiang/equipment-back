@@ -64,7 +64,7 @@
                 AND trade_type = #{tradeType}
             </if>
             <if test="adversaryBankCode != null and adversaryBankCode != ''">
-                AND adversary_account like concat('%', #{adversaryBankCode}, '%')
+                AND adversary_bank_code like concat('%', #{adversaryBankCode}, '%')
             </if>
             <if test="tradeTimeStart != null">
                 AND trade_time &gt;= #{tradeTimeStart}
@@ -76,10 +76,13 @@
                 AND comment like concat('%', #{comment}, '%')
             </if>
             <if test="adversaryOrgName != null and adversaryOrgName != ''">
-                AND adversary_account like concat('%', #{adversaryOrgName}, '%')
+                AND adversary_org_name like concat('%', #{adversaryOrgName}, '%')
             </if>
             <if test="reconciliationFlag != null and reconciliationFlag != ''">
                 AND reconciliation_flag = #{reconciliationFlag}
+            </if>
+            <if test="reconciliationModel != null and reconciliationModel != ''">
+                AND reconciliation_model = #{reconciliationModel}
             </if>
             <if test="associationIdStr != null and associationIdStr != ''">
                 AND association_id like concat('%', #{associationIdStr}, '%')
