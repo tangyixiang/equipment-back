@@ -95,20 +95,21 @@ public class FlowTask {
 
     public void bankFlowMatch(String today, String reconciliationModel, List<BankFlow> bankFlowList, List<CompanyReceivables> list, String type) {
         for (CompanyReceivables companyReceivables : list) {
-
             String bankAccount = companyReceivables.getSourceType().equals(CommonConstants.RECEIVABLE_FINANCE)
                     || companyReceivables.getSourceType().equals(CommonConstants.RECEIVABLE_CUSTOM_FINANCE) ? "9558852102002052299" : "2103215119300148266";
 
             Optional<BankFlow> bankFlowOptional;
             if (type.equals("equal")) {
                 // 先找到银行账号相同的，再过滤
-                bankFlowOptional = bankFlowList.stream().filter(flow -> flow.getSelfAccount().equals(bankAccount)).filter(flow ->
+                bankFlowOptional = bankFlowList.stream().filter(flow ->
                         (flow.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED) || flow.getReconciliationFlag().equals(CommonConstants.PART_RECONCILED))
-                                && new BigDecimal(flow.getUnConfirmPrice()).compareTo(new BigDecimal(companyReceivables.getUnConfirmAmount())) == 0).findFirst();
+                                && new BigDecimal(flow.getUnConfirmPrice()).compareTo(new BigDecimal(companyReceivables.getUnConfirmAmount())) == 0
+                                && flow.getSelfAccount().equals(bankAccount)).findFirst();
             } else {
-                bankFlowOptional = bankFlowList.stream().filter(flow -> flow.getSelfAccount().equals(bankAccount)).filter(flow ->
+                bankFlowOptional = bankFlowList.stream().filter(flow ->
                         (flow.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED) || flow.getReconciliationFlag().equals(CommonConstants.PART_RECONCILED))
-                                && new BigDecimal(flow.getUnConfirmPrice()).compareTo(new BigDecimal(companyReceivables.getUnConfirmAmount())) > 0).findFirst();
+                                && new BigDecimal(flow.getUnConfirmPrice()).compareTo(new BigDecimal(companyReceivables.getUnConfirmAmount())) > 0
+                                && flow.getSelfAccount().equals(bankAccount)).findFirst();
             }
 
             if (bankFlowOptional.isPresent()) {
@@ -261,7 +262,7 @@ public class FlowTask {
                 diff = new BigDecimal(unConfirmAmount).subtract(new BigDecimal(multiBankFlowAmount)).doubleValue();
                 logger.info("部分对账,多笔银行流水金额:{},diff:{}", multiBankFlowAmount, diff);
                 bankFlow.setReconciliationFlag(CommonConstants.RECONCILED);
-                bankFlow.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
+                bankFlow.setReconciliationModel(CommonConstants.MANUAL_RECONCILIATION);
                 bankFlow.setAssociationId(addAssociationId(dzId, bankFlow.getAssociationId()));
 
                 if (diff < 0) {

@@ -91,6 +91,7 @@ public class CompanyReceivablesController extends BaseController {
             throw new ServiceException("应收单客户与银行流水客户不一致");
         }
 
+        String oldState = receivablesList.stream().map(CompanyReceivables::getReconciliationFlag).collect(Collectors.joining(","));
 
         String today = DateUtil.format(new Date(), "yyyyMMdd");
         logger.info("开始手动对账");
@@ -100,7 +101,6 @@ public class CompanyReceivablesController extends BaseController {
 
         List<CompanyReceivables> newReceivablesList = companyReceivablesService.listByIds(receivablesIds);
 
-        String oldState = receivablesList.stream().map(CompanyReceivables::getReconciliationFlag).collect(Collectors.joining(","));
         String newState = newReceivablesList.stream().map(CompanyReceivables::getReconciliationFlag).collect(Collectors.joining(","));
 
         if (oldState.equals(newState)) {
