@@ -105,7 +105,8 @@ public class CompanyReceivablesController extends BaseController {
     @PostMapping("/delInitData")
     public Result delInitData() {
 
-        LambdaQueryWrapper<CompanyReceivables> wrapper = new LambdaQueryWrapper<CompanyReceivables>().eq(CompanyReceivables::getSourceType, CommonConstants.RECEIVABLE_CUSTOM);
+        LambdaQueryWrapper<CompanyReceivables> wrapper = new LambdaQueryWrapper<CompanyReceivables>()
+                .in(CompanyReceivables::getSourceType, CommonConstants.RECEIVABLE_CUSTOM_FINANCE, CommonConstants.RECEIVABLE_CUSTOM_OPERATE);
 
         List<CompanyReceivables> companyReceivablesList = companyReceivablesService.list(wrapper);
         for (CompanyReceivables companyReceivables : companyReceivablesList) {

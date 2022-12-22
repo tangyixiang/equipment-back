@@ -1,6 +1,5 @@
 package com.ocs.web.controller.finance;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ocs.busi.domain.dto.BankFlowDto;
 import com.ocs.busi.domain.dto.BankFlowUploadDto;
 import com.ocs.busi.domain.entity.BankFlow;
@@ -10,7 +9,6 @@ import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
-import com.ocs.common.helper.QueryHelper;
 import com.ocs.common.utils.TemplateDownloadUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -77,21 +74,14 @@ public class BankFlowController extends BaseController {
     }
 
     @PostMapping("/listUnReconcile")
-    public TableDataInfo listUnReconcile(@RequestBody BankFlow bankFlow) {
-        List<LocalDate> tradeTimeArray = bankFlow.getTradeTimeArray();
-        if (ObjectUtils.isNotEmpty(bankFlow.getTradeTimeArray())) {
-            bankFlow.setTradeTimeArray(null);
-        }
+    public TableDataInfo listUnReconcile(@RequestBody BankFlowDto bankFlowDto) {
         startPage("create_time desc");
-        QueryWrapper<BankFlow> queryWrapper = QueryHelper.dynamicCondition(bankFlow, CommonConstants.QUERY_LIKE, false);
-        if (ObjectUtils.isNotEmpty(tradeTimeArray)) {
-            queryWrapper.ge("trade_time", LocalDateTime.of(tradeTimeArray.get(0), LocalTime.MIN));
-            queryWrapper.le("trade_time", LocalDateTime.of(tradeTimeArray.get(1), LocalTime.of(23, 59, 59)));
+        if (ObjectUtils.isNotEmpty(bankFlowDto.getTradeTimeArray())) {
+            bankFlowDto.setTradeTimeStart(LocalDateTime.of(bankFlowDto.getTradeTimeArray().get(0), LocalTime.MIN));
+            bankFlowDto.setTradeTimeEnd(LocalDateTime.of(bankFlowDto.getTradeTimeArray().get(1), LocalTime.of(23, 59, 59)));
         }
-        queryWrapper.notIn("reconciliation_flag", CommonConstants.RECONCILED);
-        queryWrapper.eq("trade_type", CommonConstants.LOAN);
-
-        List<BankFlow> list = bankFlowService.list(queryWrapper);
+        bankFlowDto.setTradeType(CommonConstants.LOAN);
+        List<BankFlow> list = bankFlowMapper.findByCondition(bankFlowDto);
         return getDataTable(list);
     }
 

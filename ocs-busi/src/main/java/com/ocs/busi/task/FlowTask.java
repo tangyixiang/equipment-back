@@ -96,13 +96,18 @@ public class FlowTask {
     @Transactional
     public void bankFlowMatch(String today, String reconciliationModel, List<BankFlow> bankFlowList, List<CompanyReceivables> list, String type) {
         for (CompanyReceivables companyReceivables : list) {
+
+            String bankAccount = companyReceivables.getSourceType().equals(CommonConstants.RECEIVABLE_FINANCE)
+                    || companyReceivables.getSourceType().equals(CommonConstants.RECEIVABLE_CUSTOM_FINANCE) ? "9558852102002052299" : "2103215119300148266";
+
             Optional<BankFlow> bankFlowOptional;
             if (type.equals("equal")) {
-                bankFlowOptional = bankFlowList.stream().filter(flow ->
+                // 先找到银行账号相同的，再过滤
+                bankFlowOptional = bankFlowList.stream().filter(flow -> flow.getSelfAccount().equals(bankAccount)).filter(flow ->
                         (flow.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED) || flow.getReconciliationFlag().equals(CommonConstants.PART_RECONCILED))
                                 && new BigDecimal(flow.getUnConfirmPrice()).compareTo(new BigDecimal(companyReceivables.getUnConfirmAmount())) == 0).findFirst();
             } else {
-                bankFlowOptional = bankFlowList.stream().filter(flow ->
+                bankFlowOptional = bankFlowList.stream().filter(flow -> flow.getSelfAccount().equals(bankAccount)).filter(flow ->
                         (flow.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED) || flow.getReconciliationFlag().equals(CommonConstants.PART_RECONCILED))
                                 && new BigDecimal(flow.getUnConfirmPrice()).compareTo(new BigDecimal(companyReceivables.getUnConfirmAmount())) > 0).findFirst();
             }
@@ -219,39 +224,56 @@ public class FlowTask {
     }
 
     public void multiPartMatch(String today, List<CompanyReceivables> receivablesList, List<BankFlow> bankFlowList) {
-        receivablesList.stream().sorted(Comparator.comparing(CompanyReceivables::getInvoicingDate));
-
         for (CompanyReceivables companyReceivables : receivablesList) {
+            logger.info("客户:{},开始手动对账", companyReceivables.getClientOrgName());
+
+
+            List<BankFlow> filterBankFlows = bankFlowList.stream().filter(flow -> notReconciled.contains(flow.getReconciliationFlag())).collect(Collectors.toList());
+            if (ObjectUtils.isEmpty(filterBankFlows)) {
+                logger.info("未找到符合条件的银行流水");
+                continue;
+            }
             // 对账ID
             String dzId = "ZD-" + today + "/" + RandomStringUtils.randomNumeric(5);
             Double unConfirmAmount = companyReceivables.getUnConfirmAmount();
             double multiBankFlowAmount = 0d;
             double diff = 0d;
+
+            logger.info("部分对账,应收单金额:{}", unConfirmAmount);
+            logger.info("多笔银行流水金额匹配开始");
             // 多笔流水去匹配
             for (BankFlow bankFlow : bankFlowList) {
+                double lastMultiBankFlowAmount = multiBankFlowAmount;
                 multiBankFlowAmount = multiBankFlowAmount + bankFlow.getUnConfirmPrice();
                 diff = new BigDecimal(unConfirmAmount).subtract(new BigDecimal(multiBankFlowAmount)).doubleValue();
-
+                logger.info("部分对账,多笔银行流水金额:{},diff:{}", multiBankFlowAmount, diff);
                 bankFlow.setReconciliationFlag(CommonConstants.RECONCILED);
-                bankFlow.setReconciliationModel(CommonConstants.MANUAL_RECONCILIATION);
+                bankFlow.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
                 bankFlow.setAssociationId(addAssociationId(dzId, bankFlow.getAssociationId()));
 
-                // 如果差值相等，则用掉所有余额
                 if (diff < 0) {
-                    bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() - Math.abs(diff));
-                    bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + Math.abs(diff));
+                    double useUnConfirmAmount = unConfirmAmount - lastMultiBankFlowAmount;
+                    // 记录使用了这笔银行流水的金额
+                    companyReceivables.getRemark().add(new ReceivableBankFlowMapping(bankFlow.getId(), useUnConfirmAmount));
+                    bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() - useUnConfirmAmount);
+                    bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + useUnConfirmAmount);
                     bankFlow.setReconciliationFlag(CommonConstants.PART_RECONCILED);
                     break;
                 } else if (diff == 0) {
+                    // 如果差值相等，则用掉所有余额
+                    companyReceivables.getRemark().add(new ReceivableBankFlowMapping(bankFlow.getId(), bankFlow.getUnConfirmPrice()));
                     bankFlow.setUnConfirmPrice(0d);
                     bankFlow.setConfirmPrice(bankFlow.getPrice());
                     bankFlow.setReconciliationFlag(CommonConstants.RECONCILED);
                     break;
                 } else {
+                    companyReceivables.getRemark().add(new ReceivableBankFlowMapping(bankFlow.getId(), bankFlow.getUnConfirmPrice()));
                     bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + bankFlow.getUnConfirmPrice());
                     bankFlow.setUnConfirmPrice(0d);
                 }
+
             }
+            logger.info("多笔银行流水金额匹配结束");
             // 说明所有的流水都无法完全覆盖
             if (diff > 0) {
                 companyReceivables.setConfirmAmount(companyReceivables.getReceivableAmount() - diff);
@@ -260,7 +282,7 @@ public class FlowTask {
                 companyReceivables.setConfirmAmount(companyReceivables.getConfirmAmount() + companyReceivables.getUnConfirmAmount());
                 companyReceivables.setUnConfirmAmount(0d);
             }
-            companyReceivables.setReconciliationModel(CommonConstants.MANUAL_RECONCILIATION);
+            companyReceivables.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
             companyReceivables.setReconciliationFlag(diff > 0 ? CommonConstants.PART_RECONCILED : CommonConstants.RECONCILED);
             companyReceivables.setAssociationId(addAssociationId(dzId, companyReceivables.getAssociationId()));
             bankFlowService.updateBatchById(bankFlowList);

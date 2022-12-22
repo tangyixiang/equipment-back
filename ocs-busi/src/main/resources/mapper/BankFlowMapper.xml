@@ -81,6 +81,9 @@
             <if test="reconciliationFlag != null and reconciliationFlag != ''">
                 AND reconciliation_flag = #{reconciliationFlag}
             </if>
+            <if test="tradeType != null and tradeType != ''">
+                AND trade_type = #{tradeType}
+            </if>
             <if test="reconciliationModel != null and reconciliationModel != ''">
                 AND reconciliation_model = #{reconciliationModel}
             </if>

@@ -114,11 +114,6 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
         });
     }
 
-    @Override
-    public List<BankFlow> findByCondition(BankFlow bankFlow) {
-        return null;
-    }
-
     private List<BankFlow> convertExcelToFlow(InputStream inputStream, BankFlowUploadDto bankFlowUploadDto) {
         List<BankFlow> bankFlowList = new ArrayList<>();
         Excel07SaxReader reader = new Excel07SaxReader(createRowHandler(bankFlowList, bankFlowUploadDto));
