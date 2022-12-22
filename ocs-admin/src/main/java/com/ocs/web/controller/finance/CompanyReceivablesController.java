@@ -85,6 +85,12 @@ public class CompanyReceivablesController extends BaseController {
         if (bankFlowGroupMap.keySet().size() > 1) {
             throw new ServiceException("银行流水选择了不同名称的客户");
         }
+
+        if (!receivablesGroupMap.keySet().containsAll(bankFlowGroupMap.keySet())){
+            throw new ServiceException("应收单客户与银行流水客户不一致");
+        }
+
+
         String today = DateUtil.format(new Date(), "yyyyMMdd");
         logger.info("开始手动对账");
         flowTask.bankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, bankFlowList, receivablesList, "equal");
