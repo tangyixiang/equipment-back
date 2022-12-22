@@ -96,7 +96,7 @@ public class CompanyReceivablesController extends BaseController {
         String oldState = receivablesList.stream().map(CompanyReceivables::getReconciliationFlag).collect(Collectors.joining(","));
         String newState = newReceivablesList.stream().map(CompanyReceivables::getReconciliationFlag).collect(Collectors.joining(","));
 
-        if (!oldState.equals(newState)) {
+        if (oldState.equals(newState)) {
             throw new ServiceException("对账失败");
         }
 
