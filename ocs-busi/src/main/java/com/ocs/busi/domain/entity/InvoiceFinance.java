@@ -1,6 +1,5 @@
 package com.ocs.busi.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ocs.common.core.domain.SimpleEntity;
 import lombok.Data;
@@ -64,7 +63,6 @@ public class InvoiceFinance extends SimpleEntity {
     /**
      * 票号
      */
-    @TableId
     @NotBlank(message = "票号不能为空")
     private String invoiceId;
 

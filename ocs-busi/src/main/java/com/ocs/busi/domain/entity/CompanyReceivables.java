@@ -82,7 +82,7 @@ public class CompanyReceivables extends SimpleEntity {
      * 应收对账ID
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<String> associationId;
+    private List<String> associationId = new ArrayList<>();
 
     /**
      * 备注

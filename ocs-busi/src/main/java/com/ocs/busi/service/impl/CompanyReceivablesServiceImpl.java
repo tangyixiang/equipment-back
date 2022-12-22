@@ -127,7 +127,7 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
             CompanyReceivables companyReceivables = new CompanyReceivables();
             companyReceivables.setId(IdUtil.getSnowflakeNextIdStr());
             companyReceivables.setPeriod(convertString(rowlist.get(0)));
-            companyReceivables.setSourceType(convertString(rowlist.get(0)).equals("初始化经营发票") ? CommonConstants.RECEIVABLE_CUSTOM_OPERATE : CommonConstants.RECEIVABLE_CUSTOM_FINANCE);
+            companyReceivables.setSourceType(convertString(rowlist.get(1)).trim().equals("初始化经营发票") ? CommonConstants.RECEIVABLE_CUSTOM_OPERATE : CommonConstants.RECEIVABLE_CUSTOM_FINANCE);
             companyReceivables.setClientOrgName(convertString(rowlist.get(2)));
             companyReceivables.setReceivableAmount(covertDouble(convertString(rowlist.get(3))));
             companyReceivables.setUnConfirmAmount(companyReceivables.getReceivableAmount());

@@ -165,6 +165,10 @@ public class FlowTask {
             list.stream().sorted(Comparator.comparing(CompanyReceivables::getInvoicingDate));
 
             for (CompanyReceivables companyReceivables : list) {
+                // 根据性质不同,使用不同的账号对账
+                String bankAccount = companyReceivables.getSourceType().equals(CommonConstants.RECEIVABLE_FINANCE)
+                        || companyReceivables.getSourceType().equals(CommonConstants.RECEIVABLE_CUSTOM_FINANCE) ? "9558852102002052299" : "2103215119300148266";
+
                 // 对账ID
                 String dzId = "ZD-" + today + "/" + RandomStringUtils.randomNumeric(5);
                 Double unConfirmAmount = companyReceivables.getUnConfirmAmount();
@@ -175,6 +179,10 @@ public class FlowTask {
                 logger.info("多笔银行流水金额匹配开始");
                 // 多笔流水去匹配
                 for (BankFlow bankFlow : bankFlowList) {
+                    if (!bankFlow.getSelfAccount().equals(bankAccount)) {
+                        logger.info("银行流水账号与应收单类型不一致,银行账号:{},应收单账号:{}", bankFlow.getSelfAccount(), bankAccount);
+                        continue;
+                    }
                     double lastMultiBankFlowAmount = multiBankFlowAmount;
                     multiBankFlowAmount = multiBankFlowAmount + bankFlow.getUnConfirmPrice();
                     diff = new BigDecimal(unConfirmAmount).subtract(new BigDecimal(multiBankFlowAmount)).doubleValue();
@@ -282,7 +290,7 @@ public class FlowTask {
                 companyReceivables.setConfirmAmount(companyReceivables.getConfirmAmount() + companyReceivables.getUnConfirmAmount());
                 companyReceivables.setUnConfirmAmount(0d);
             }
-            companyReceivables.setReconciliationModel(CommonConstants.AUTO_RECONCILIATION);
+            companyReceivables.setReconciliationModel(CommonConstants.MANUAL_RECONCILIATION);
             companyReceivables.setReconciliationFlag(diff > 0 ? CommonConstants.PART_RECONCILED : CommonConstants.RECONCILED);
             companyReceivables.setAssociationId(addAssociationId(dzId, companyReceivables.getAssociationId()));
             bankFlowService.updateBatchById(bankFlowList);
