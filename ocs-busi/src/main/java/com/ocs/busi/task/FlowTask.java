@@ -235,8 +235,14 @@ public class FlowTask {
         for (CompanyReceivables companyReceivables : receivablesList) {
             logger.info("客户:{},开始手动对账", companyReceivables.getClientOrgName());
 
-
-            List<BankFlow> filterBankFlows = bankFlowList.stream().filter(flow -> notReconciled.contains(flow.getReconciliationFlag())).collect(Collectors.toList());
+            if (companyReceivables.getReconciliationFlag().equals(CommonConstants.RECONCILED)) {
+                logger.info("客户:{},已对账完成无需对账", companyReceivables.getClientOrgName());
+                continue;
+            }
+            // 根据性质不同,使用不同的账号对账
+            String bankAccount = companyReceivables.getSourceType().equals(CommonConstants.RECEIVABLE_FINANCE)
+                    || companyReceivables.getSourceType().equals(CommonConstants.RECEIVABLE_CUSTOM_FINANCE) ? "9558852102002052299" : "2103215119300148266";
+            List<BankFlow> filterBankFlows = bankFlowList.stream().filter(flow -> flow.getSelfAccount().equals(bankAccount)).filter(flow -> notReconciled.contains(flow.getReconciliationFlag())).collect(Collectors.toList());
             if (ObjectUtils.isEmpty(filterBankFlows)) {
                 logger.info("未找到符合条件的银行流水");
                 continue;
