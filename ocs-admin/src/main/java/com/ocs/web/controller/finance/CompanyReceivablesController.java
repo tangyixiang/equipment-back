@@ -64,6 +64,7 @@ public class CompanyReceivablesController extends BaseController {
     }
 
     @PostMapping("/match")
+    @Transactional
     public Result matchFlow(@RequestBody CompanyReceivablesDto companyReceivablesDto) {
         List<String> receivablesIds = companyReceivablesDto.getReceivablesIds();
         List<String> bankFlowIds = companyReceivablesDto.getBankFlowIds();
@@ -86,7 +87,7 @@ public class CompanyReceivablesController extends BaseController {
             throw new ServiceException("银行流水选择了不同名称的客户");
         }
 
-        if (!receivablesGroupMap.keySet().containsAll(bankFlowGroupMap.keySet())){
+        if (!receivablesGroupMap.keySet().containsAll(bankFlowGroupMap.keySet())) {
             throw new ServiceException("应收单客户与银行流水客户不一致");
         }
 

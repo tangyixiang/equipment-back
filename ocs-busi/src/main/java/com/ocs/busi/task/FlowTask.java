@@ -68,7 +68,6 @@ public class FlowTask {
         logger.info("银行流水金额 < 应收单金额对账开始");
         pricePartMatch();
         logger.info("银行流水金额 < 应收单金额对账结束");
-
     }
 
     /**
@@ -93,7 +92,7 @@ public class FlowTask {
         }
     }
 
-    @Transactional
+
     public void bankFlowMatch(String today, String reconciliationModel, List<BankFlow> bankFlowList, List<CompanyReceivables> list, String type) {
         for (CompanyReceivables companyReceivables : list) {
 
