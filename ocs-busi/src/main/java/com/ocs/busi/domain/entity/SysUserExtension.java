@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -49,7 +50,7 @@ public class SysUserExtension {
 
         private LocalDateTime endDate;
 
-        private List<String> attachment;
+        private List<HashMap<String,Object>> attachment;
     }
 
 
