@@ -93,7 +93,7 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
                 companyReceivables.setReconciliationModel("");
                 companyReceivables.setConfirmAmount(0d);
                 companyReceivables.setUnConfirmAmount(companyReceivables.getReceivableAmount());
-                companyReceivables.setRemark(Collections.emptyList());
+                companyReceivables.setRemark(new ArrayList<>());
                 bankFlowService.updateBatchById(bankFlows);
             }
         }

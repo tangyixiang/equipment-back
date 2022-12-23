@@ -1,7 +1,6 @@
 package com.ocs.web.controller.finance;
 
 import cn.hutool.core.date.DateUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ocs.busi.domain.dto.CompanyReceivablesDto;
 import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyReceivables;
@@ -14,7 +13,6 @@ import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
 import com.ocs.common.exception.ServiceException;
-import com.ocs.common.utils.StringUtils;
 import com.ocs.common.utils.TemplateDownloadUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -118,30 +118,11 @@ public class CompanyReceivablesController extends BaseController {
     }
 
     @PostMapping("/delInitData")
-    public Result delInitData() {
-
-        LambdaQueryWrapper<CompanyReceivables> wrapper = new LambdaQueryWrapper<CompanyReceivables>()
-                .in(CompanyReceivables::getSourceType, CommonConstants.RECEIVABLE_CUSTOM_FINANCE, CommonConstants.RECEIVABLE_CUSTOM_OPERATE);
-
-        List<CompanyReceivables> companyReceivablesList = companyReceivablesService.list(wrapper);
-        for (CompanyReceivables companyReceivables : companyReceivablesList) {
-            List<String> associationId = companyReceivables.getAssociationId();
-            ArrayList<BankFlow> associationBankFlow = new ArrayList<>();
-            for (String id : associationId) {
-                if (StringUtils.isNotEmpty(id)) {
-                    LambdaQueryWrapper<BankFlow> bankFlowWrapper = new LambdaQueryWrapper<BankFlow>().like(BankFlow::getAssociationId, id);
-                    List<BankFlow> list = bankFlowService.list(bankFlowWrapper);
-                    associationBankFlow.addAll(list);
-                }
-            }
-            associationBankFlow.forEach(bankFlow -> {
-                bankFlow.setAssociationId(Collections.emptyList());
-                bankFlow.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
-                bankFlow.setReconciliationModel("");
-            });
-        }
-        companyReceivablesService.remove(wrapper);
-
+    @Transactional
+    public Result delInitData(@RequestBody CompanyReceivablesDto companyReceivablesDto) {
+        List<String> receivablesIds = companyReceivablesDto.getReceivablesIds();
+        companyReceivablesService.cancel(receivablesIds);
+        companyReceivablesService.removeBatchByIds(receivablesIds);
         return Result.success();
     }
 
