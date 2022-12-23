@@ -6,9 +6,6 @@ import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyClientOrg;
 import com.ocs.busi.domain.entity.CompanyReceivables;
@@ -24,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,17 +39,20 @@ import java.util.stream.Collectors;
  * @createDate 2022-12-16 11:15:50
  */
 @Service
-public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivablesMapper, CompanyReceivables>
-        implements CompanyReceivablesService {
+public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivablesMapper, CompanyReceivables> implements CompanyReceivablesService {
 
     private static final Logger logger = LoggerFactory.getLogger(CompanyReceivablesServiceImpl.class);
+
+    @Value("${busi.config.bankAccount.finance}")
+    private String financeBankAccount;
+    @Value("${busi.config.bankAccount.operate}")
+    private String operateBankAccount;
 
     @Autowired
     private CompanyClientOrgService clientOrgService;
     @Autowired
     private BankFlowService bankFlowService;
-    @Autowired
-    private ObjectMapper objectMapper;
+
 
     @Override
     @Transactional
@@ -73,13 +74,7 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
 
         for (CompanyReceivables companyReceivables : receivablesList) {
             if (!companyReceivables.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED)) {
-                JavaType javaType = objectMapper.getTypeFactory().constructCollectionType(List.class, ReceivableBankFlowMapping.class);
-                List<ReceivableBankFlowMapping> bankFlowMappingList = null;
-                try {
-                    bankFlowMappingList = objectMapper.readValue(objectMapper.writeValueAsString(companyReceivables.getRemark()), javaType);
-                } catch (JsonProcessingException e) {
-                    throw new ServiceException(e.getMessage());
-                }
+                List<ReceivableBankFlowMapping> bankFlowMappingList = companyReceivables.getRemark();
 
                 List<String> bankFlowIds = bankFlowMappingList.stream().map(ReceivableBankFlowMapping::getBankFlowId).collect(Collectors.toList());
                 Map<String, Double> map = bankFlowMappingList.stream().collect(Collectors.toMap(ReceivableBankFlowMapping::getBankFlowId, ReceivableBankFlowMapping::getUsePrice));
@@ -128,6 +123,7 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
             companyReceivables.setId(IdUtil.getSnowflakeNextIdStr());
             companyReceivables.setPeriod(convertString(rowlist.get(0)));
             companyReceivables.setSourceType(convertString(rowlist.get(1)).trim().equals("初始化经营发票") ? CommonConstants.RECEIVABLE_CUSTOM_OPERATE : CommonConstants.RECEIVABLE_CUSTOM_FINANCE);
+            companyReceivables.setBankAccount(companyReceivables.getSourceType().equals(CommonConstants.RECEIVABLE_CUSTOM_OPERATE) ? operateBankAccount : financeBankAccount);
             companyReceivables.setClientOrgName(convertString(rowlist.get(2)));
             companyReceivables.setReceivableAmount(covertDouble(convertString(rowlist.get(3))));
             companyReceivables.setUnConfirmAmount(companyReceivables.getReceivableAmount());

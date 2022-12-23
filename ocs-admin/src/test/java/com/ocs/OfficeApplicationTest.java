@@ -2,24 +2,32 @@ package com.ocs;
 
 
 import cn.hutool.core.text.NamingCase;
+import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
+import com.ocs.busi.domain.entity.CompanyReceivables;
+import com.ocs.busi.domain.model.ReceivableBankFlowMapping;
+import com.ocs.busi.service.CompanyReceivablesService;
 import com.ocs.web.controller.task.TaskController;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
  * @author tangyixiang
  * @Date 2022/10/13
  */
-// @SpringBootTest
+@SpringBootTest
 public class OfficeApplicationTest {
 
     private String SQL = "SELECT COLUMN_NAME AS dataIndex ,COLUMN_COMMENT AS title FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '%s' ORDER BY ordinal_position";
+
+    @Autowired
+    CompanyReceivablesService companyReceivablesService;
 
     @Test
     public void dbConvert() {
@@ -53,9 +61,26 @@ public class OfficeApplicationTest {
         }
     }
 
-    @Test
+    // @Test
     void doubleTest(){
-        System.out.println(new BigDecimal(3540d).compareTo(new BigDecimal(3540d)));
+
+        CompanyReceivables companyReceivables = new CompanyReceivables();
+        String snowflakeNextIdStr = IdUtil.getSnowflakeNextIdStr();
+        companyReceivables.setId(snowflakeNextIdStr);
+
+        ReceivableBankFlowMapping receivableBankFlowMapping = new ReceivableBankFlowMapping();
+        receivableBankFlowMapping.setBankFlowId("1");
+        receivableBankFlowMapping.setUsePrice(4324322d);
+
+        companyReceivables.getRemark().add(receivableBankFlowMapping);
+
+        companyReceivablesService.save(companyReceivables);
+
+        CompanyReceivables receivables = companyReceivablesService.getById(snowflakeNextIdStr);
+        for (ReceivableBankFlowMapping bankFlowMapping : receivables.getRemark()) {
+            System.out.println(bankFlowMapping);
+        }
+
     }
 
 }

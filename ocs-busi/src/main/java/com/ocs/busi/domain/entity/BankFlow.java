@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -113,7 +114,7 @@ public class BankFlow extends SimpleEntity {
      * 关联对账ID
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<String> associationId;
+    private List<String> associationId = new ArrayList<>();
 
     private String del;
 

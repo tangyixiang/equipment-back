@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,9 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
         implements InvoiceFinanceService {
 
     private static final Logger logger = LoggerFactory.getLogger(InvoiceFinanceServiceImpl.class);
+
+    @Value("${busi.config.bankAccount.finance}")
+    private String bankAccount;
 
     @Autowired
     private InvoiceFinanceSplitService invoiceFinanceSplitService;
@@ -81,7 +85,7 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
         // 删除这个期间
         remove(new LambdaQueryWrapper<InvoiceFinance>().eq(InvoiceFinance::getInvoicingPeriod, period));
         saveBatch(invoiceFinanceList);
-        saveReceivable(invoiceFinanceList,period);
+        saveReceivable(invoiceFinanceList, period);
     }
 
     private void saveReceivable(List<InvoiceFinance> invoiceFinanceList, String period) {
@@ -91,6 +95,7 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
             receivables.setId(invoice.getId());
             receivables.setPeriod(invoice.getInvoicingPeriod());
             receivables.setSourceType(CommonConstants.RECEIVABLE_FINANCE);
+            receivables.setBankAccount(bankAccount);
             receivables.setInvoicingDate(LocalDate.parse(invoice.getInvoicingDate()));
             receivables.setClientOrgName(invoice.getPayer());
             receivables.setReceivableAmount(Double.parseDouble(invoice.getPrice()));
@@ -100,7 +105,7 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
         }
         // 删除之前的这个期间的数据
         receivablesService.remove(new LambdaQueryWrapper<CompanyReceivables>()
-                .eq(CompanyReceivables::getPeriod, period).eq(CompanyReceivables::getSourceType,CommonConstants.RECEIVABLE_FINANCE));
+                .eq(CompanyReceivables::getPeriod, period).eq(CompanyReceivables::getSourceType, CommonConstants.RECEIVABLE_FINANCE));
 
         // 应收账单
         receivablesService.saveBatch(receivablesList);

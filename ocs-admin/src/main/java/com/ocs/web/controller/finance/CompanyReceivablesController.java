@@ -97,10 +97,9 @@ public class CompanyReceivablesController extends BaseController {
         logger.info("开始手动对账");
         flowTask.bankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, bankFlowList, receivablesList, "equal");
         flowTask.bankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, bankFlowList, receivablesList, "gt");
-        flowTask.multiPartMatch(today, receivablesList, bankFlowList);
+        flowTask.multiBankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, receivablesList, bankFlowList);
 
         List<CompanyReceivables> newReceivablesList = companyReceivablesService.listByIds(receivablesIds);
-
         String newState = newReceivablesList.stream().map(CompanyReceivables::getReconciliationFlag).collect(Collectors.joining(","));
 
         if (oldState.equals(newState)) {
