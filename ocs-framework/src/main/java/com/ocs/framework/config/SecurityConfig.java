@@ -1,5 +1,6 @@
 package com.ocs.framework.config;
 
+import com.ocs.framework.config.properties.IgnoreUrlProperties;
 import com.ocs.framework.config.properties.PermitAllUrlProperties;
 import com.ocs.framework.security.filter.JwtAuthenticationTokenFilter;
 import com.ocs.framework.security.handle.AuthenticationEntryPointImpl;
@@ -25,6 +26,10 @@ import org.springframework.web.filter.CorsFilter;
  */
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private IgnoreUrlProperties ignoreUrlProperties;
+
     /**
      * 自定义用户认证逻辑
      */
@@ -101,10 +106,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 过滤请求
                 .authorizeRequests()
                 // 对于登录login 注册register 验证码captchaImage 允许匿名访问
-                .antMatchers("/login", "/register", "/captchaImage", "/front/column").anonymous()
+                // .antMatchers("/login", "/register", "/captchaImage", "/front/column").anonymous()
+                .antMatchers(ignoreUrlProperties.getUrls()).anonymous()
                 // 静态资源，可匿名访问
-                .antMatchers(HttpMethod.GET, "/", "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**").permitAll()
-                .antMatchers("/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/*/api-docs", "/druid/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/" , "/*.html" , "/**/*.html" , "/**/*.css" , "/**/*.js" , "/profile/**").permitAll()
+                .antMatchers("/swagger-ui.html" , "/swagger-resources/**" , "/webjars/**" , "/*/api-docs" , "/druid/**").permitAll()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()

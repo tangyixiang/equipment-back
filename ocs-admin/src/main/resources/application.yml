@@ -42,7 +42,7 @@ spring:
     basename: i18n/messages
   profiles:
 #    active: dev
-    active: prod
+      active: prod
   # 文件上传
   servlet:
     multipart:
@@ -106,3 +106,11 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+security:
+  whiteUrl:
+    - /login
+    - /register"
+    - /captchaImage
+    - /front/column
+    - /template/**

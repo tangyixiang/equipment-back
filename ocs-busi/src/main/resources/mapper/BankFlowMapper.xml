@@ -12,8 +12,8 @@
         <result property="tradeTime" column="trade_time" jdbcType="DATE"/>
         <result property="tradeType" column="trade_type" jdbcType="VARCHAR"/>
         <result property="price" column="price" jdbcType="DOUBLE"/>
-        <result property="confirmPrice" column="price" jdbcType="DOUBLE"/>
-        <result property="unConfirmPrice" column="price" jdbcType="DOUBLE"/>
+        <result property="confirmPrice" column="confirm_price" jdbcType="DOUBLE"/>
+        <result property="unConfirmPrice" column="un_confirm_price" jdbcType="DOUBLE"/>
         <result property="adversaryBankCode" column="adversary_bank_code" jdbcType="VARCHAR"/>
         <result property="summary" column="summary" jdbcType="VARCHAR"/>
         <result property="comment" column="comment" jdbcType="VARCHAR"/>
