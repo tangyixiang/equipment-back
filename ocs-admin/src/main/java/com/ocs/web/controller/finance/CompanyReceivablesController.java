@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -76,20 +75,20 @@ public class CompanyReceivablesController extends BaseController {
             throw new ServiceException("不存在未对账的应收账单");
         }
 
-        Map<String, List<CompanyReceivables>> receivablesGroupMap = companyReceivablesList.stream().collect(Collectors.groupingBy(CompanyReceivables::getClientOrgName));
-        if (receivablesGroupMap.keySet().size() > 1) {
-            throw new ServiceException("应收单选择了不同名称的客户");
-        }
-
         List<BankFlow> bankFlowList = bankFlowService.listByIds(bankFlowIds);
-        Map<String, List<BankFlow>> bankFlowGroupMap = bankFlowList.stream().collect(Collectors.groupingBy(BankFlow::getAdversaryOrgName));
+        // Map<String, List<CompanyReceivables>> receivablesGroupMap = companyReceivablesList.stream().collect(Collectors.groupingBy(CompanyReceivables::getClientOrgName));
+        // if (receivablesGroupMap.keySet().size() > 1) {
+        //     throw new ServiceException("应收单选择了不同名称的客户");
+        // }
+
+        /*Map<String, List<BankFlow>> bankFlowGroupMap = bankFlowList.stream().collect(Collectors.groupingBy(BankFlow::getAdversaryOrgName));
         if (bankFlowGroupMap.keySet().size() > 1) {
             throw new ServiceException("银行流水选择了不同名称的客户");
         }
 
         if (!receivablesGroupMap.keySet().containsAll(bankFlowGroupMap.keySet())) {
             throw new ServiceException("应收单客户与银行流水客户不一致");
-        }
+        }*/
 
         String oldState = receivablesList.stream().map(CompanyReceivables::getReconciliationFlag).collect(Collectors.joining(","));
 
