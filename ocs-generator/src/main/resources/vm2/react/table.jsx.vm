@@ -1,0 +1,189 @@
+import { Button, message, Modal } from 'antd'
+import React, { useState, useRef, useEffect } from 'react'
+import { add${moduleName}, update${moduleName}, del${moduleName}, list${moduleName} } from '@/api${apiPath}'
+import ProTable from '@ant-design/pro-table'
+import TableModal from './components/edit'
+import { pagination } from '@/constants'
+
+
+function ${moduleName}TableList() {
+    const actionRef = useRef()
+
+    const [modalVisible, setModalVisible] = useState(false)
+    const [currentRow, setCurrentRow] = useState()
+    const [selectedRowsState, setSelectedRows] = useState([])
+
+
+    const resetData = () => {
+        setModalVisible(false)
+        setCurrentRow(undefined)
+        actionRef.current?.reload()
+    }
+
+
+    const handleAdd = async (fields) => {
+        const resp = await add${moduleName}({ ...fields })
+        if (resp.code === 200) {
+            message.success('保存成功')
+            resetData()
+        }
+    }
+
+
+    const handleUpdate = async (fields) => {
+        const resp = await update${moduleName}({ ...fields })
+        if (resp.code === 200) {
+            message.success('保存成功')
+            resetData()
+        }
+    }
+
+
+    const handleRemove = async (selectedRows) => {
+        if (!selectedRows) return true
+        const resp = await del${moduleName}(selectedRows.map((row) => row.postId).join(','))
+        if (resp.code === 200) {
+            message.success('删除成功')
+           return true
+        }else {
+            return false
+        }
+    }
+
+    const handleRemoveOne = async (selectedRow) => {
+        if (!selectedRow) return true
+        const params = [selectedRow.postId]
+        const resp = await del${moduleName}(params.join(','))
+        if (resp.code === 200) {
+            message.success('删除成功')
+            setSelectedRows([])
+            return true
+        }else {
+            return false
+        }
+
+    }
+
+
+    const columns = [
+        #foreach($column in $columnFields)
+            {
+                title: '$column.columnComment',
+                dataIndex: '$column.javaField',
+                valueType: 'text',
+                hideInSearch: true,
+            },
+        #end
+        {
+            title: '操作',
+            width: '220px',
+            hideInSearch: true,
+            render: (_, record) => [
+                <Button
+                    type="link"
+                    size="small"
+                    key="edit"
+                    onClick={() => {
+                        setModalVisible(true)
+                        setCurrentRow(record)
+                    }}
+                >
+                    编辑
+                </Button>,
+                <Button
+                    type="link"
+                    size="small"
+                    danger
+                    key="batchRemove"
+                    onClick={async () => {
+                        Modal.confirm({
+                            title: '删除',
+                            content: '确定删除该项吗？',
+                            okText: '确认',
+                            cancelText: '取消',
+                            onOk: async () => {
+                                const success = await handleRemoveOne(record)
+                                if (success) {
+                                    actionRef.current?.reload()()
+                                }
+                            },
+                        })
+                    }}
+                >
+                    删除
+                </Button>,
+            ],
+        },
+    ]
+
+    return (
+        <>
+            <ProTable
+                rowKey="id"
+                key="${moduleName}TableList"
+                columns={columns}
+                request={(params) =>
+                    list${moduleName}({ ...params }).then((res) => {
+                        return {
+                            data: res.rows,
+                            total: res.total,
+                            success: true,
+                        }
+                    })
+                }
+                pagination={{
+                    ...pagination,
+                    showTotal: (total) => `总共 ${total} 条`,
+                }}
+                toolBarRender={() => [
+                    <Button
+                        type="primary"
+                        key="add"
+                        onClick={async () => {
+                            setCurrentRow(undefined)
+                            setModalVisible(true)
+                        }}
+                    >
+                        新建
+                    </Button>,
+                    <Button
+                        type="primary"
+                        key="remove"
+                        danger
+                        onClick={async () => {
+                            const success = await handleRemove(selectedRowsState)
+                            if (success) {
+                                setSelectedRows([])
+                                actionRef.current?.reload()()
+                            }
+                        }}
+                    >
+                        批量删除
+                    </Button>,
+                ]}
+                rowSelection={{
+                    onChange: (_, selectedRows) => {
+                        setSelectedRows(selectedRows)
+                    },
+                }}
+            />
+            <TableModal
+                onSubmit={(values) => {
+                    if (values.postId) {
+                        handleUpdate({ ...values })
+                    } else {
+                        handleAdd({ ...values })
+                    }
+                }}
+                onCancel={() => {
+                    setModalVisible(false)
+                    setCurrentRow(undefined)
+                }}
+                visible={modalVisible}
+                values={currentRow || {}}
+            />
+        </>
+    )
+}
+
+export default ${moduleName}TableList

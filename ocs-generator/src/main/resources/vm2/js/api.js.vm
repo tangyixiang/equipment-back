@@ -1,0 +1,32 @@
+import request from '@/utils/request'
+
+export function list${moduleName}(query) {
+    return request({
+        url: '${apiPath}/list',
+        method: 'get',
+        params: query,
+    })
+}
+
+export function add${moduleName}(data) {
+    return request({
+        url: '${apiPath}/add',
+        method: 'post',
+        data: data,
+    })
+}
+
+export function update${moduleName}(data) {
+    return request({
+        url: '${apiPath}/update',
+        method: 'post',
+        data: data,
+    })
+}
+
+export function del${moduleName}(dictId) {
+    return request({
+        url: '${apiPath}/del/' + dictId,
+        method: 'delete',
+    })
+}

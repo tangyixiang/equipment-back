@@ -1,12 +1,14 @@
 package com.ocs.generator.mapper;
 
 import com.ocs.generator.domain.GenTable;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * 业务 数据层
  */
+@Repository
 public interface GenTableMapper {
     /**
      * 查询业务列表

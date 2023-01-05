@@ -1,0 +1,69 @@
+package ${basePackage}.controller.${packageName};
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ocs.busi.domain.entity.${ClassName};
+import com.ocs.busi.service.${ClassName}Service;
+import com.ocs.common.constant.CommonConstants;
+import com.ocs.common.core.controller.BaseController;
+import com.ocs.common.core.domain.Result;
+import com.ocs.common.core.page.TableDataInfo;
+import com.ocs.common.helper.QueryHelper;
+import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+
+@RestController
+@RequestMapping("${apiPath}")
+public class ${ClassName}Controller extends BaseController {
+
+
+    @Autowired
+    private ${ClassName}Service ${simpleClassName}Service;
+
+
+    @GetMapping("/list")
+    public TableDataInfo list(${ClassName} ${simpleClassName}) {
+        startPage("create_time desc");
+        List<${ClassName}> list = companyContractService.list(${simpleClassName});
+        return getDataTable(list);
+    }
+
+
+    @PostMapping("/add")
+    public Result add(@RequestBody @Validated ${ClassName} ${simpleClassName}) {
+        ${simpleClassName}Service.save(${simpleClassName});
+
+        return Result.success();
+    }
+
+
+    @PostMapping("/update")
+    public Result update(@RequestBody @Validated ${ClassName} ${simpleClassName}) {
+        ${simpleClassName}Service.updateById(${simpleClassName});
+
+        return Result.success("更新成功");
+    }
+
+
+    @DeleteMapping("/del/{ids}")
+    @Transactional
+    public Result delete(@PathVariable String[] ids) {
+        for (String id : ids) {
+            LambdaUpdateWrapper<${ClassName}> wrapper = new LambdaUpdateWrapper<>();
+            wrapper.eq(${ClassName}::getId, id);
+            wrapper.set(${ClassName}::getDel, CommonConstants.STATUS_DEL);
+            ${simpleClassName}Service.update(null, wrapper);
+        }
+        return Result.success();
+    }
+
+
+}

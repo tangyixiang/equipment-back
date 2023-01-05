@@ -1,12 +1,14 @@
 package com.ocs.generator.mapper;
 
 import com.ocs.generator.domain.GenTableColumn;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * 业务字段 数据层
  */
+@Repository
 public interface GenTableColumnMapper {
     /**
      * 根据表名称查询列信息
