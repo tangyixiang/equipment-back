@@ -1,55 +1,32 @@
 package com.ocs;
 
-
-import cn.hutool.core.text.NamingCase;
-import cn.hutool.core.util.IdUtil;
-import com.alibaba.fastjson2.JSON;
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
-import com.ocs.busi.domain.entity.CompanyReceivables;
-import com.ocs.busi.domain.model.ReceivableBankFlowMapping;
-import com.ocs.busi.service.CompanyReceivablesService;
+import cn.hutool.core.map.BiMap;
+import cn.hutool.db.meta.MetaUtil;
+import cn.hutool.db.meta.Table;
+import cn.hutool.log.Log;
+import cn.hutool.log.LogFactory;
 import com.ocs.web.controller.task.TaskController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.sql.DataSource;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.text.MessageFormat;
+import java.util.HashMap;
 
 /**
  * @author tangyixiang
  * @Date 2022/10/13
  */
-@SpringBootTest
+// @SpringBootTest
 public class OfficeApplicationTest {
 
-    private String SQL = "SELECT COLUMN_NAME AS dataIndex ,COLUMN_COMMENT AS title FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '%s' ORDER BY ordinal_position";
+    private static final Log log = LogFactory.get();
 
     @Autowired
-    CompanyReceivablesService companyReceivablesService;
+    DataSource dataSource;
 
-    @Test
-    public void dbConvert() {
-        String tableName = "employee_salary";
-        String sql = String.format(SQL, tableName);
-        List<Map<String, Object>> maps = SqlRunner.db().selectList(sql);
-        List<Map<String, Object>> list = new ArrayList<>();
-        maps.forEach(map -> {
-            Set<String> strings = map.keySet();
-            HashMap<String, Object> hashMap = new HashMap<>();
-            for (String key : strings) {
-                hashMap.put(key, NamingCase.toCamelCase((String) map.get(key)));
-            }
-            hashMap.put("valueType", "text");
-            list.add(hashMap);
-        });
-
-        System.out.println("=============");
-        System.out.println(JSON.toJSONString(list));
-        System.out.println("=============");
-
-    }
 
     @Test
     void getParameterName() throws Exception {
@@ -61,25 +38,21 @@ public class OfficeApplicationTest {
         }
     }
 
-    // @Test
-    void doubleTest(){
+    @Test
+    void getDbTableInfo() {
+        Table table = MetaUtil.getTableMeta(dataSource, "apply_check");
+        log.info("{}", table);
+    }
 
-        CompanyReceivables companyReceivables = new CompanyReceivables();
-        String snowflakeNextIdStr = IdUtil.getSnowflakeNextIdStr();
-        companyReceivables.setId(snowflakeNextIdStr);
 
-        ReceivableBankFlowMapping receivableBankFlowMapping = new ReceivableBankFlowMapping();
-        receivableBankFlowMapping.setBankFlowId("1");
-        receivableBankFlowMapping.setUsePrice(4324322d);
-
-        companyReceivables.getRemark().add(receivableBankFlowMapping);
-
-        companyReceivablesService.save(companyReceivables);
-
-        CompanyReceivables receivables = companyReceivablesService.getById(snowflakeNextIdStr);
-        for (ReceivableBankFlowMapping bankFlowMapping : receivables.getRemark()) {
-            System.out.println(bankFlowMapping);
-        }
+    @Test
+    void hutoolDemo() {
+        BiMap<String, Object> map = new BiMap<>(new HashMap<>());
+        map.put("a", 1);
+        map.put("b", 2);
+        log.info("获取的值:{}", map.getKey(2));
+        String name = "张三";
+        log.info("{}", MessageFormat.format("你好{0}", name));
 
     }
 

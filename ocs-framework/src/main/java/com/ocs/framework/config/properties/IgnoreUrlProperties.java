@@ -16,6 +16,6 @@ public class IgnoreUrlProperties {
     }
 
     public String[] getUrls(){
-        return whiteUrl.toArray(new String[whiteUrl.size()]);
+        return whiteUrl.toArray(String[]::new);
     }
 }

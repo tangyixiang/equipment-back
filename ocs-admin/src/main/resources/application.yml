@@ -41,8 +41,8 @@ spring:
     # 国际化资源文件路径
     basename: i18n/messages
   profiles:
-#    active: dev
-      active: prod
+    active: dev
+#    active: prod
   # 文件上传
   servlet:
     multipart:
@@ -82,8 +82,6 @@ mybatis-plus:
   config-location: classpath:mybatis/mybatis-config.xml
   # 扫描实体类
   typeAliasesPackage: com.ocs.**.**
-  global-config:
-    enable-sql-runner: true
 
 # PageHelper分页插件
 pagehelper:
@@ -112,5 +110,4 @@ security:
     - /login
     - /register"
     - /captchaImage
-    - /front/column
     - /template/**
