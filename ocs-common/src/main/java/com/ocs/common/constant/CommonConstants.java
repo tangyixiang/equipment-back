@@ -26,6 +26,8 @@ public class CommonConstants {
     public static final String AUTO_RECONCILIATION = "1";
     // 手动对账
     public static final String MANUAL_RECONCILIATION = "2";
+    // 取消对账
+    public static final String CANCEL_RECONCILIATION = "3";
 
     // 借款
     public static final String BORROW = "1";

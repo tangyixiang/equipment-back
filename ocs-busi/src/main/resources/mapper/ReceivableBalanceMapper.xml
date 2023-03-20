@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ocs.busi.mapper.ReceivableBalanceMapper">
+
+    <resultMap id="BaseResultMap" type="com.ocs.busi.domain.entity.ReceivableBalance">
+            <result property="id" column="id" jdbcType="VARCHAR"/>
+            <result property="lastBalanceId" column="last_balance_id" jdbcType="VARCHAR"/>
+            <result property="clientOrgName" column="client_org_name" jdbcType="VARCHAR"/>
+            <result property="period" column="period" jdbcType="VARCHAR"/>
+            <result property="type" column="type" jdbcType="VARCHAR"/>
+            <result property="receivableAmount" column="receivable_amount" jdbcType="DOUBLE"/>
+            <result property="flowAmount" column="flow_amount" jdbcType="DOUBLE"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,client_org_name,period,
+        type,receivable_amount,flow_amount,
+        create_time,update_time
+    </sql>
+</mapper>

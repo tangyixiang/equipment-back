@@ -140,7 +140,7 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
 
             boolean timeCondition = tradeTime.isBefore(LocalDateTime.of(bankFlowUploadDto.getEndDate(), LocalTime.of(23, 59, 59)))
                     && tradeTime.isAfter(LocalDateTime.of(bankFlowUploadDto.getStartDate(), LocalTime.MIN));
-            logger.info("");
+
             if (selfAccount.equals(bankFlowUploadDto.getAccount()) && timeCondition) {
                 BankFlow bankFlow = new BankFlow();
                 bankFlow.setBankSiteCode(convertString(rowlist.get(0)));
@@ -160,6 +160,7 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
                 bankFlow.setOtherInfo(convertString(rowlist.get(12)));
                 bankFlow.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
                 bankFlow.setDel(CommonConstants.STATUS_NORMAL);
+                bankFlow.setPeriod(bankFlowUploadDto.getPeriod());
 
                 ValidateHelper.validData(bankFlow);
 

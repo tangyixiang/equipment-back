@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @TableName bank_flow
  */
 @Data
 @TableName(value = "bank_flow", autoResultMap = true)
@@ -111,6 +110,11 @@ public class BankFlow extends SimpleEntity {
     private String reconciliationModel;
 
     /**
+     * 会计期间
+     */
+    private String period;
+
+    /**
      * 关联对账ID
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
@@ -123,7 +127,5 @@ public class BankFlow extends SimpleEntity {
 
     @TableField(exist = false)
     private String associationIdStr;
-
-
 
 }

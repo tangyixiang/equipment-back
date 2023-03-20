@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ocs.busi.mapper.BankFlowLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.ocs.busi.domain.entity.BankFlowLog">
+            <id property="id" column="id" jdbcType="VARCHAR"/>
+            <result property="bankFlowId" column="bank_flow_id" jdbcType="VARCHAR"/>
+            <result property="receivableId" column="receivable_id" jdbcType="VARCHAR"/>
+            <result property="receivableType" column="receivable_type" jdbcType="VARCHAR"/>
+            <result property="amount" column="amount" jdbcType="DOUBLE"/>
+            <result property="type" column="type" jdbcType="VARCHAR"/>
+            <result property="period" column="period" jdbcType="VARCHAR"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,bank_flow_id,receivable_id,
+        receivable_type,amount,type,
+        period,create_by,create_time
+    </sql>
+</mapper>

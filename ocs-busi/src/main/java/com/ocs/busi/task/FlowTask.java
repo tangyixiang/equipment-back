@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyReceivables;
 import com.ocs.busi.domain.model.ReceivableBankFlowMapping;
+import com.ocs.busi.service.BankFlowLogService;
 import com.ocs.busi.service.BankFlowService;
 import com.ocs.busi.service.CompanyReceivablesService;
 import com.ocs.common.constant.CommonConstants;
@@ -32,6 +33,8 @@ public class FlowTask {
     private CompanyReceivablesService companyReceivablesService;
     @Autowired
     private BankFlowService bankFlowService;
+    @Autowired
+    private BankFlowLogService bankFlowLogService;
 
     List<String> notReconciled = List.of(CommonConstants.NOT_RECONCILED, CommonConstants.PART_RECONCILED);
 
@@ -82,6 +85,7 @@ public class FlowTask {
         Map<String, List<CompanyReceivables>> receivablesGroupMap = receivablesList.stream().collect(Collectors.groupingBy(CompanyReceivables::getClientOrgName));
         for (String clientOrgName : receivablesGroupMap.keySet()) {
             logger.info("客户:{},开始自动对账", clientOrgName);
+            //TODO 根据上期客户的结余优先进行匹配，
 
             LambdaQueryWrapper<BankFlow> bankFlowWrapper = new LambdaQueryWrapper<BankFlow>().in(BankFlow::getReconciliationFlag, notReconciled)
                     .eq(BankFlow::getAdversaryOrgName, clientOrgName).eq(BankFlow::getTradeType, CommonConstants.LOAN);
@@ -128,6 +132,9 @@ public class FlowTask {
                 companyReceivables.getRemark().add(new ReceivableBankFlowMapping(bankFlow.getId(), companyReceivables.getUnConfirmAmount()));
                 companyReceivables.setUnConfirmAmount(0d);
                 companyReceivables.getAssociationId().add(dzId);
+                // 添加日志
+                bankFlowLogService.addBankFlowUserLog(bankFlow, companyReceivables, companyReceivables.getUnConfirmAmount());
+
                 bankFlowService.updateById(bankFlow);
             }
         }
@@ -183,6 +190,8 @@ public class FlowTask {
                         bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() - useUnConfirmAmount);
                         bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + useUnConfirmAmount);
                         bankFlow.setReconciliationFlag(CommonConstants.PART_RECONCILED);
+                        // 添加日志
+                        bankFlowLogService.addBankFlowUserLog(bankFlow, companyReceivables, useUnConfirmAmount);
                         break;
                     } else if (diff == 0) {
                         // 如果差值相等，则用掉所有余额
@@ -190,11 +199,15 @@ public class FlowTask {
                         bankFlow.setUnConfirmPrice(0d);
                         bankFlow.setConfirmPrice(bankFlow.getPrice());
                         bankFlow.setReconciliationFlag(CommonConstants.RECONCILED);
+                        // 添加日志
+                        bankFlowLogService.addBankFlowUserLog(bankFlow, companyReceivables, bankFlow.getUnConfirmPrice());
                         break;
                     } else {
                         companyReceivables.getRemark().add(new ReceivableBankFlowMapping(bankFlow.getId(), bankFlow.getUnConfirmPrice()));
                         bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + bankFlow.getUnConfirmPrice());
                         bankFlow.setUnConfirmPrice(0d);
+                        // 添加日志
+                        bankFlowLogService.addBankFlowUserLog(bankFlow, companyReceivables, bankFlow.getUnConfirmPrice());
                     }
 
                 }

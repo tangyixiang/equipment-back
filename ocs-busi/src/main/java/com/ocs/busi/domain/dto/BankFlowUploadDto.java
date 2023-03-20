@@ -19,4 +19,6 @@ public class BankFlowUploadDto {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
+
+    private String period;
 }
