@@ -1,19 +1,19 @@
 package com.ocs.busi.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ocs.busi.domain.entity.FinancePeriod;
 import com.ocs.busi.domain.entity.InvoiceFinance;
 import com.ocs.busi.domain.entity.InvoiceOperating;
+import com.ocs.busi.service.FinancePeriodService;
 import com.ocs.busi.service.InvoiceFinanceService;
 import com.ocs.busi.service.InvoiceOperatingService;
 import com.ocs.busi.task.handle.InvoiceFinanceHandle;
 import com.ocs.busi.task.handle.InvoiceOperatingHandle;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.constant.TaskIDPrefixConstants;
-import com.ocs.common.core.domain.entity.SysDictData;
 import com.ocs.common.exception.ServiceException;
 import com.ocs.common.task.SysJobRuntime;
 import com.ocs.common.task.TaskContext;
-import com.ocs.system.service.ISysDictDataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author tangyixiang
@@ -41,28 +40,23 @@ public class InvoiceTask {
     @Autowired
     private InvoiceFinanceHandle invoiceFinanceHandle;
     @Autowired
-    private ISysDictDataService dictDataService;
+    private FinancePeriodService financePeriodService;
 
     /**
      * 分录
      *
-     * @param accountingPeriod 会计日期
+     * @param periodId 会计期间ID
      */
     @Transactional
-    public void splitTask(Integer accountingPeriod) {
+    public void splitTask(Integer periodId) {
         TaskContext.get().setTaskType(CommonConstants.TASK_SPLIT);
         logger.info("发票分录任务开始");
-        SysDictData dictData = new SysDictData();
-        dictData.setDictType("invoice_accounting_period");
-        List<SysDictData> sysDictDataList = dictDataService.selectDictDataList(dictData);
-
-        Optional<String> periodOptional = sysDictDataList.stream().filter(data -> data.getDictLabel().equals(accountingPeriod + "")).map(data -> data.getDictValue()).findFirst();
-        if (!periodOptional.isPresent()) {
-            throw new ServiceException("请配置会计期间,期间值" + accountingPeriod + ",不存在");
+        FinancePeriod financePeriod = financePeriodService.getById(periodId);
+        if (financePeriod == null) {
+            throw new ServiceException("会计期间不存在");
         }
-
-        Integer certificateId = splitOperatingInvoice(accountingPeriod + "", Integer.parseInt(periodOptional.get()));
-        splitFinanceInvoice(accountingPeriod + "", certificateId);
+        Integer certificateId = splitOperatingInvoice(financePeriod.getPeriod(), Integer.parseInt(financePeriod.getValue()));
+        splitFinanceInvoice(financePeriod.getPeriod() + "", certificateId);
         logger.info("发票分录任务完成");
     }
 

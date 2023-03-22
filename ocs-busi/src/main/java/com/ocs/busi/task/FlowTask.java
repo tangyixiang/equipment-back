@@ -4,11 +4,12 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyReceivables;
+import com.ocs.busi.domain.entity.FinancePeriod;
+import com.ocs.busi.domain.entity.ReceivableBalance;
 import com.ocs.busi.domain.model.ReceivableBankFlowMapping;
-import com.ocs.busi.service.BankFlowLogService;
-import com.ocs.busi.service.BankFlowService;
-import com.ocs.busi.service.CompanyReceivablesService;
+import com.ocs.busi.service.*;
 import com.ocs.common.constant.CommonConstants;
+import com.ocs.common.exception.ServiceException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -35,6 +36,10 @@ public class FlowTask {
     private BankFlowService bankFlowService;
     @Autowired
     private BankFlowLogService bankFlowLogService;
+    @Autowired
+    private FinancePeriodService financePeriodService;
+    @Autowired
+    private ReceivableBalanceService balanceService;
 
     List<String> notReconciled = List.of(CommonConstants.NOT_RECONCILED, CommonConstants.PART_RECONCILED);
 
@@ -57,8 +62,16 @@ public class FlowTask {
      * 对账任务运行
      */
     @Transactional
-    public void reconciliationTask() {
+    public void reconciliationTask(Integer periodId) {
         logger.info("对账任务开始运行");
+
+        FinancePeriod financePeriod = financePeriodService.getById(periodId);
+        if (financePeriod == null) {
+            throw new ServiceException("会计期间不存在");
+        }
+
+        String period = financePeriod.getPeriod();
+
 
         String today = DateUtil.format(new Date(), "yyyyMMdd");
         // 未对账的应收单
@@ -131,7 +144,7 @@ public class FlowTask {
                 // 记录使用了这笔银行流水的金额
                 companyReceivables.getRemark().add(new ReceivableBankFlowMapping(bankFlow.getId(), companyReceivables.getUnConfirmAmount()));
                 companyReceivables.setUnConfirmAmount(0d);
-                companyReceivables.getAssociationId().add(dzId);
+
                 // 添加日志
                 bankFlowLogService.addBankFlowUserLog(bankFlow, companyReceivables, companyReceivables.getUnConfirmAmount());
 
@@ -222,7 +235,6 @@ public class FlowTask {
                 }
                 companyReceivables.setReconciliationModel(reconciliationModel);
                 companyReceivables.setReconciliationFlag(diff > 0 ? CommonConstants.PART_RECONCILED : CommonConstants.RECONCILED);
-                companyReceivables.getAssociationId().add(dzId);
                 bankFlowService.updateBatchById(bankFlowList);
             }
             companyReceivablesService.updateBatchById(list);
@@ -248,6 +260,25 @@ public class FlowTask {
      */
     private List<BankFlow> filterBankFLow(List<BankFlow> list, String bankAccount) {
         return list.stream().filter(flow -> !flow.getReconciliationFlag().equals(CommonConstants.RECONCILED)).filter(flow -> flow.getSelfAccount().equals(bankAccount)).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据期间获取客户的结余
+     *
+     * @param period
+     * @param clientOrgName
+     * @return
+     */
+    private ReceivableBalance getPeriodBalance(String period, String clientOrgName) {
+        ReceivableBalance balance = balanceService.lambdaQuery().eq(ReceivableBalance::getClientOrgName, clientOrgName).eq(ReceivableBalance::getPeriod, period).one();
+        if (balance == null) {
+            List<ReceivableBalance> receivableBalanceList = balanceService.lambdaQuery().eq(ReceivableBalance::getClientOrgName, clientOrgName)
+                    .lt(ReceivableBalance::getPeriod, period).orderByDesc(ReceivableBalance::getPeriod).list();
+
+            Optional<ReceivableBalance> balanceOptional = receivableBalanceList.stream().findFirst();
+            return balanceOptional.isPresent() ? balanceOptional.get() : null;
+        }
+        return balance;
     }
 
 }

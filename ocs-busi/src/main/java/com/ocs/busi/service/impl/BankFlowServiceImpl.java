@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.dto.BankFlowUploadDto;
 import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyClientOrg;
-import com.ocs.busi.domain.entity.CompanyReceivables;
 import com.ocs.busi.helper.ExcelCellHelper;
 import com.ocs.busi.helper.SerialNumberHelper;
 import com.ocs.busi.helper.ValidateHelper;
@@ -90,17 +89,17 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
 
         List<String> receivablesIdList = new ArrayList<>();
 
-        for (BankFlow bankFlow : list) {
-            List<String> associationId = bankFlow.getAssociationId();
-            LambdaQueryWrapper<CompanyReceivables> queryWrapper = new LambdaQueryWrapper<CompanyReceivables>().like(CompanyReceivables::getAssociationId, associationId);
-            List<CompanyReceivables> companyReceivablesList = companyReceivablesService.list(queryWrapper);
-            List<String> ids = companyReceivablesList.stream().map(CompanyReceivables::getId).collect(Collectors.toList());
-            receivablesIdList.addAll(ids);
-        }
-        // 取消关联的应收单
-        if (receivablesIdList.size() > 0) {
-            companyReceivablesService.cancel(receivablesIdList);
-        }
+        //for (BankFlow bankFlow : list) {
+        //    List<String> associationId = bankFlow.getAssociationId();
+        //    LambdaQueryWrapper<CompanyReceivables> queryWrapper = new LambdaQueryWrapper<CompanyReceivables>().like(CompanyReceivables::getAssociationId, associationId);
+        //    List<CompanyReceivables> companyReceivablesList = companyReceivablesService.list(queryWrapper);
+        //    List<String> ids = companyReceivablesList.stream().map(CompanyReceivables::getId).collect(Collectors.toList());
+        //    receivablesIdList.addAll(ids);
+        //}
+        //// 取消关联的应收单
+        //if (receivablesIdList.size() > 0) {
+        //    companyReceivablesService.cancel(receivablesIdList);
+        //}
         // 删除旧的银行流水
         remove(wrapper);
 
@@ -108,10 +107,9 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
         BankFlow todayLastDataFlow = Optional.ofNullable(getBaseMapper().findByDateIn(LocalDate.now(), LocalDate.now().plusDays(1))).orElse(new BankFlow());
         SerialNumberHelper serialNumberHelper = new SerialNumberHelper(todayLastDataFlow.getId(), idPattern);
 
-        bankFlowList.forEach(bankFlow -> {
-            bankFlow.setId(serialNumberHelper.generateNextId(idPattern, 4));
-            save(bankFlow);
-        });
+        bankFlowList.forEach(bankFlow -> bankFlow.setId(serialNumberHelper.generateNextId(idPattern, 4)));
+
+        saveBatch(bankFlowList);
     }
 
     private List<BankFlow> convertExcelToFlow(InputStream inputStream, BankFlowUploadDto bankFlowUploadDto) {

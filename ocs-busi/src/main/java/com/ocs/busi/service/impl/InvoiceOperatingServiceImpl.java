@@ -4,18 +4,16 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.poi.excel.sax.Excel07SaxReader;
 import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.entity.CompanyReceivables;
 import com.ocs.busi.domain.entity.InvoiceOperating;
-import com.ocs.busi.domain.entity.InvoiceOperatingSplit;
 import com.ocs.busi.helper.ExcelCellHelper;
 import com.ocs.busi.helper.InvoiceHelper;
 import com.ocs.busi.helper.ValidateHelper;
 import com.ocs.busi.mapper.InvoiceOperatingMapper;
 import com.ocs.busi.service.CompanyReceivablesService;
 import com.ocs.busi.service.InvoiceOperatingService;
-import com.ocs.busi.service.InvoiceOperatingSplitService;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
 import org.apache.commons.lang3.StringUtils;
@@ -27,8 +25,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -45,8 +48,6 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
     private String bankAccount;
 
     @Autowired
-    private InvoiceOperatingSplitService invoiceOperatingSplitService;
-    @Autowired
     private InvoiceHelper invoiceHelper;
     @Autowired
     private CompanyReceivablesService receivablesService;
@@ -58,37 +59,28 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
         // 校验数据
         invoiceHelper.validateOperate(invoiceOperatingList);
 
-        invoiceOperatingList.forEach(invoice -> {
-            invoice.setId(IdUtil.getSnowflakeNextIdStr());
-            InvoiceOperating oldData = getBaseMapper().findByFlowId(invoice.getFlowId());
-            // 如果生成凭证,只保留最近3次的记录
-            if (oldData != null && oldData.getDataSplit() == Boolean.TRUE) {
-                // 保持原来的ID
-                invoice.setId(oldData.getId());
-                List<InvoiceOperatingSplit> invoiceOperatingSplitList = invoiceOperatingSplitService.list(new LambdaQueryWrapper<InvoiceOperatingSplit>()
-                        .eq(InvoiceOperatingSplit::getInvoiceOperatingId, oldData.getId()));
-                Map<String, List<InvoiceOperatingSplit>> taskIdGroupMap = invoiceOperatingSplitList.stream().collect(Collectors.groupingBy(InvoiceOperatingSplit::getTaskId));
-                if (taskIdGroupMap.keySet().size() > 3) {
-                    List<InvoiceOperatingSplit> taskFirstDataList = taskIdGroupMap.keySet().stream().map(k -> taskIdGroupMap.get(k).stream().findFirst().get()).collect(Collectors.toList());
-                    List<InvoiceOperatingSplit> taskDataOrderList = taskFirstDataList.stream().sorted(Comparator.comparing(InvoiceOperatingSplit::getCreateTime).reversed()).collect(Collectors.toList());
-                    for (int i = 3; i < taskDataOrderList.size(); i++) {
-                        LambdaQueryWrapper<InvoiceOperatingSplit> wrapper = new LambdaQueryWrapper<InvoiceOperatingSplit>().eq(InvoiceOperatingSplit::getInvoiceOperatingId, oldData.getId())
-                                .eq(InvoiceOperatingSplit::getTaskId, taskDataOrderList.get(i).getTaskId());
-                        invoiceOperatingSplitService.remove(wrapper);
-                    }
-                }
-            }
-        });
-        // 删除这个期间
-        remove(new LambdaQueryWrapper<InvoiceOperating>().eq(InvoiceOperating::getInvoicingPeriod, period));
-        // 再导入
-        saveOrUpdateBatch(invoiceOperatingList);
+        delRepeatData(invoiceOperatingList);
+
+        // 保存发票
+        saveBatch(invoiceOperatingList);
         saveReceivable(invoiceOperatingList, period);
     }
 
-
     private void saveReceivable(List<InvoiceOperating> invoiceOperatingList, String period) {
         List<CompanyReceivables> receivablesList = new ArrayList<>();
+        // 冲正的发票
+        List<String> redList = invoiceOperatingList.stream().filter(invoiceOperating -> invoiceOperating.getRedInvoice().trim().equals("红票"))
+                .map(invoiceOperating -> {
+                    String remark = invoiceOperating.getRemark();
+                    Pattern pattern = Pattern.compile("(?<=号码:)[0-9]+");
+                    Matcher matcher = pattern.matcher(remark);
+                    String number = "";
+                    while (matcher.find()) {
+                        number = matcher.group();
+                    }
+                    return number;
+                }).collect(Collectors.toList());
+
         for (InvoiceOperating invoice : invoiceOperatingList) {
             CompanyReceivables receivables = new CompanyReceivables();
             receivables.setId(invoice.getId());
@@ -100,14 +92,28 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
             receivables.setReceivableAmount(Double.parseDouble(invoice.getTotalPriceIncludingTax()));
             receivables.setUnConfirmAmount(Double.parseDouble(invoice.getTotalPriceIncludingTax()));
             receivables.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
+            receivables.setValid(invoice.getInvoiceState().trim().equals("开票完成") && !redList.contains(invoice.getInvoiceId()));
+            receivables.setInvoiceId(invoice.getInvoiceId());
+            receivables.setDirection(invoice.getRedInvoice().trim().equals("蓝票") ? CommonConstants.INVOICE_DIRECT_FORWARD : CommonConstants.INVOICE_DIRECT_REVERSE);
             receivablesList.add(receivables);
         }
-        // 删除之前的这个期间的数据
-        receivablesService.remove(new LambdaQueryWrapper<CompanyReceivables>()
-                .eq(CompanyReceivables::getPeriod, period).eq(CompanyReceivables::getSourceType,CommonConstants.RECEIVABLE_OPERATE));
+
         // 应收账单
         receivablesService.saveBatch(receivablesList);
+    }
 
+    private void delRepeatData(List<InvoiceOperating> invoiceOperatingList) {
+        for (InvoiceOperating invoice : invoiceOperatingList) {
+            LambdaQueryChainWrapper<InvoiceOperating> wrapper = lambdaQuery().eq(InvoiceOperating::getInvoiceId, invoice.getInvoiceId());
+            List<InvoiceOperating> list = list(wrapper);
+            if (list.size() > 0) {
+                logger.info("经营性发票重复导入,删除之前的,发票号码:{}", invoice.getInvoiceId());
+                //TODO 后续再完善删除逻辑
+                remove(wrapper);
+                // 删除应收账单
+                receivablesService.removeBatchByIds(list.stream().map(InvoiceOperating::getId).collect(Collectors.toList()));
+            }
+        }
     }
 
     private List<InvoiceOperating> convertExcelToInvoice(InputStream inputStream, String period) {
@@ -157,6 +163,8 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
             }
 
             InvoiceOperating invoiceOperating = new InvoiceOperating();
+
+            invoiceOperating.setId(IdUtil.getSnowflakeNextIdStr());
 
             invoiceOperating.setFlowId(convertString(rowlist.get(0)));
             invoiceOperating.setOrderId(convertString(rowlist.get(1)));

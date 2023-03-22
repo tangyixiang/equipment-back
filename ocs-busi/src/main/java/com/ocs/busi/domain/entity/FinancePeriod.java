@@ -7,6 +7,7 @@ import com.ocs.common.core.domain.SimpleEntity;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * @TableName finance_period
@@ -25,6 +26,13 @@ public class FinancePeriod extends SimpleEntity {
      */
     @NotBlank(message = "会计期间不能为空")
     private String period;
+
+
+    @NotNull(message = "凭证号起始值不能为空")
+    private String value;
+
+    @NotNull(message = "类型不能为空")
+    private String type;
 
     /**
      * 删除

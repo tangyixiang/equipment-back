@@ -1,6 +1,5 @@
 package com.ocs.busi.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ocs.common.core.domain.SimpleEntity;
 import lombok.Data;
@@ -15,8 +14,8 @@ import java.time.LocalDateTime;
  *
  * @TableName invoice_operating
  */
-@TableName(value = "invoice_operating")
 @Data
+@TableName(value = "invoice_operating")
 public class InvoiceOperating extends SimpleEntity {
 
 
@@ -31,7 +30,6 @@ public class InvoiceOperating extends SimpleEntity {
     /**
      * 流水号
      */
-    @TableId
     @NotBlank(message = "流水号不能为空")
     private String flowId;
 

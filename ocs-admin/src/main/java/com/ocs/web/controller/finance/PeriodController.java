@@ -7,6 +7,7 @@ import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.core.controller.BaseController;
 import com.ocs.common.core.domain.Result;
 import com.ocs.common.core.page.TableDataInfo;
+import com.ocs.common.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -31,7 +32,14 @@ public class PeriodController extends BaseController {
 
     @PostMapping("/add")
     public Result add(@RequestBody @Validated FinancePeriod financePeriod) {
-        financePeriodService.save(financePeriod);
+        FinancePeriod exist = financePeriodService.lambdaQuery().eq(FinancePeriod::getPeriod, financePeriod.getPeriod()).eq(FinancePeriod::getDel, CommonConstants.STATUS_NORMAL)
+                .eq(FinancePeriod::getType, financePeriod.getType()).one();
+
+        if (exist == null) {
+            financePeriodService.save(financePeriod);
+        } else {
+            throw new ServiceException("会计期间已存在");
+        }
         return Result.success();
     }
 

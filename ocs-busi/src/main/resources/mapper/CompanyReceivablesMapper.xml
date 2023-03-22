@@ -17,8 +17,9 @@
         <result property="reconciliationFlag" column="reconciliation_flag" jdbcType="VARCHAR"/>
         <result property="reconciliationModel" column="reconciliation_model" jdbcType="VARCHAR"/>
         <result property="bankAccount" column="bank_account" jdbcType="VARCHAR"/>
-        <result property="associationId" column="association_id"
-                typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result property="invoiceId" column="invoice_id" jdbcType="VARCHAR"/>
+        <result property="direction" column="direction" jdbcType="VARCHAR"/>
+        <result property="valid" column="valid" jdbcType="BOOLEAN"/>
         <result property="remark" column="remark" jdbcType="VARCHAR"
                 typeHandler="com.ocs.busi.config.GenericJacksonJsonTypeHandler"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>

@@ -48,6 +48,11 @@ public class CommonConstants {
     // 应收对账单类型-初始化财政发票类型
     public static final String RECEIVABLE_CUSTOM_OPERATE = "4";
 
+    // 发票的方向 正向
+    public static final String INVOICE_DIRECT_FORWARD = "1";
+    // 发票的方向 反向
+    public static final String INVOICE_DIRECT_REVERSE = "2";
+
     /**
      * 分录任务
      */

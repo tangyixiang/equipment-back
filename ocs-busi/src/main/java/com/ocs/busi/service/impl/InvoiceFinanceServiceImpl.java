@@ -4,11 +4,10 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.poi.excel.sax.Excel07SaxReader;
 import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.entity.CompanyReceivables;
 import com.ocs.busi.domain.entity.InvoiceFinance;
-import com.ocs.busi.domain.entity.InvoiceFinanceSplit;
 import com.ocs.busi.helper.InvoiceHelper;
 import com.ocs.busi.helper.ValidateHelper;
 import com.ocs.busi.mapper.InvoiceFinanceMapper;
@@ -27,7 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -58,38 +60,18 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
         // 数据校验
         invoiceHelper.validateFinance(invoiceFinanceList);
 
-        invoiceFinanceList.forEach(invoice -> {
-            invoice.setId(IdUtil.getSnowflakeNextIdStr());
-            InvoiceFinance oldData = getBaseMapper().findByInvoiceId(invoice.getInvoiceId());
-            // 如果生成凭证,只保留最近3次的记录
-            if (oldData != null && oldData.getDataSplit() == Boolean.TRUE) {
-                // 保持原来的ID
-                invoice.setId(oldData.getId());
-                // 执行了的任务次数
-                List<InvoiceFinanceSplit> invoiceFinanceSplitList = invoiceFinanceSplitService.list(new LambdaQueryWrapper<InvoiceFinanceSplit>()
-                        .eq(InvoiceFinanceSplit::getInvoiceFinanceId, oldData.getId()));
-                Map<String, List<InvoiceFinanceSplit>> taskIdGroupMap = invoiceFinanceSplitList.stream().collect(Collectors.groupingBy(InvoiceFinanceSplit::getTaskId));
+        delRepeatData(invoiceFinanceList);
 
-                if (taskIdGroupMap.keySet().size() > 3) {
-                    List<InvoiceFinanceSplit> taskFirstDataList = taskIdGroupMap.keySet().stream().map(k -> taskIdGroupMap.get(k).stream().findFirst().get()).collect(Collectors.toList());
-                    List<InvoiceFinanceSplit> taskDataOrderList = taskFirstDataList.stream().sorted(Comparator.comparing(InvoiceFinanceSplit::getCreateTime).reversed()).collect(Collectors.toList());
-                    for (int i = 3; i < taskDataOrderList.size(); i++) {
-                        LambdaQueryWrapper<InvoiceFinanceSplit> wrapper = new LambdaQueryWrapper<InvoiceFinanceSplit>().eq(InvoiceFinanceSplit::getInvoiceFinanceId, oldData.getId())
-                                .eq(InvoiceFinanceSplit::getTaskId, taskDataOrderList.get(i).getTaskId());
-                        invoiceFinanceSplitService.remove(wrapper);
-                    }
-                }
-            }
-        });
-
-        // 删除这个期间
-        remove(new LambdaQueryWrapper<InvoiceFinance>().eq(InvoiceFinance::getInvoicingPeriod, period));
+        // 保存发票
         saveBatch(invoiceFinanceList);
         saveReceivable(invoiceFinanceList, period);
     }
 
     private void saveReceivable(List<InvoiceFinance> invoiceFinanceList, String period) {
         List<CompanyReceivables> receivablesList = new ArrayList<>();
+        List<String> redList = invoiceFinanceList.stream().filter(invoiceFinance -> invoiceFinance.getElectronInvoiceNo() != null)
+                .map(invoiceFinance -> invoiceFinance.getElectronInvoiceNo().trim()).collect(Collectors.toList());
+
         for (InvoiceFinance invoice : invoiceFinanceList) {
             CompanyReceivables receivables = new CompanyReceivables();
             receivables.setId(invoice.getId());
@@ -101,15 +83,28 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
             receivables.setReceivableAmount(Double.parseDouble(invoice.getPrice()));
             receivables.setUnConfirmAmount(Double.parseDouble(invoice.getPrice()));
             receivables.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
+            receivables.setValid(!redList.contains(invoice.getInvoiceId()));
+            receivables.setInvoiceId(invoice.getInvoiceId());
+            receivables.setDirection(invoice.getElectronInvoiceNo() == null ? CommonConstants.INVOICE_DIRECT_FORWARD : CommonConstants.INVOICE_DIRECT_REVERSE);
             receivablesList.add(receivables);
         }
-        // 删除之前的这个期间的数据
-        receivablesService.remove(new LambdaQueryWrapper<CompanyReceivables>()
-                .eq(CompanyReceivables::getPeriod, period).eq(CompanyReceivables::getSourceType, CommonConstants.RECEIVABLE_FINANCE));
 
         // 应收账单
         receivablesService.saveBatch(receivablesList);
+    }
 
+    private void delRepeatData(List<InvoiceFinance> invoiceFinanceList) {
+        for (InvoiceFinance invoice : invoiceFinanceList) {
+            LambdaQueryChainWrapper<InvoiceFinance> wrapper = lambdaQuery().eq(InvoiceFinance::getInvoiceId, invoice.getInvoiceId());
+            List<InvoiceFinance> list = list(wrapper);
+            if (list.size() > 0) {
+                logger.info("财政性发票重复导入,删除之前的,发票号码:{}", invoice.getInvoiceId());
+                //TODO 后续再完善删除逻辑
+                remove(wrapper);
+                // 删除应收账单
+                receivablesService.removeBatchByIds(list.stream().map(InvoiceFinance::getId).collect(Collectors.toList()));
+            }
+        }
     }
 
     private List<InvoiceFinance> convertExcelToInvoice(InputStream inputStream, String month) {
@@ -156,6 +151,7 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
 
             InvoiceFinance invoiceFinance = new InvoiceFinance();
 
+            invoiceFinance.setId(IdUtil.getSnowflakeNextIdStr());
             invoiceFinance.setInvoicingPeriod(month);
             invoiceFinance.setInvoicingDate(convertString(rowlist.get(0)));
             invoiceFinance.setOrgName(convertString(rowlist.get(1)));

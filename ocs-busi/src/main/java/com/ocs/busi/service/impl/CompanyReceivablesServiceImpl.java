@@ -88,7 +88,6 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
                     bankFlow.setReconciliationFlag(bankFlow.getConfirmPrice() == 0 ? CommonConstants.NOT_RECONCILED : CommonConstants.PART_RECONCILED);
                 }
 
-                companyReceivables.setAssociationId(Collections.emptyList());
                 companyReceivables.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
                 companyReceivables.setReconciliationModel("");
                 companyReceivables.setConfirmAmount(0d);
