@@ -95,10 +95,12 @@ public class InvoiceOperatingHandle {
             int increment = atomicInteger.incrementAndGet();
             List<InvoiceOperatingSplit> splitList = new ArrayList<>();
 
-            InvoiceOperatingSplit temp1 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount().toString(), "0", "100203", bankFlowLog.getReceivableId())
-            InvoiceOperatingSplit temp2 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), "0", bankFlowLog.getAmount().toString(), "12129902", bankFlowLog.getReceivableId());
-            InvoiceOperatingSplit temp3 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount().toString(), "0", "800102", bankFlowLog.getReceivableId());
-            InvoiceOperatingSplit temp4 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), "0", bankFlowLog.getAmount().toString(), "6401", bankFlowLog.getReceivableId());
+            int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? -1 : 1;
+
+            InvoiceOperatingSplit temp1 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount() * i, 0d, "100203", bankFlowLog.getReceivableId());
+            InvoiceOperatingSplit temp2 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), 0d, bankFlowLog.getAmount() * i, "12129902", bankFlowLog.getReceivableId());
+            InvoiceOperatingSplit temp3 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount() * i, 0d, "800102", bankFlowLog.getReceivableId());
+            InvoiceOperatingSplit temp4 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), 0d, bankFlowLog.getAmount() * i, "6401", bankFlowLog.getReceivableId());
 
             temp2.setDivergenceCode("0");
             temp4.setDivergenceCode("0");
@@ -189,7 +191,7 @@ public class InvoiceOperatingHandle {
      *
      * @return
      */
-    private InvoiceOperatingSplit recRecord(Integer id, LocalDate invoiceDate, String buyerName, String borrow, String loan, String subjectCode, String operatingId) {
+    private InvoiceOperatingSplit recRecord(Integer id, LocalDate invoiceDate, String buyerName, Double borrow, Double loan, String subjectCode, String operatingId) {
         InvoiceOperatingSplit split = new InvoiceOperatingSplit();
         split.setId(IdUtil.objectId());
         split.setDate(LocalDateTimeUtil.format(invoiceDate, "yyyy-MM-dd"));
@@ -197,8 +199,8 @@ public class InvoiceOperatingHandle {
         split.setCertificateId(id);
         split.setSubjectCode(subjectCode);
         split.setSummary(buyerName);
-        split.setBorrow(borrow);
-        split.setLoan(loan);
+        split.setBorrow(borrow.toString());
+        split.setLoan(loan.toString());
         split.setAttachmentNum("0");
         split.setUseFor(buyerName);
         split.setDivergenceCode("0");
