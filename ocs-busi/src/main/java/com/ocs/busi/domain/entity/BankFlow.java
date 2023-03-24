@@ -114,17 +114,18 @@ public class BankFlow extends SimpleEntity {
      */
     private String period;
 
+    private String del;
+
     /**
      * 关联对账ID
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> associationId = new ArrayList<>();
 
-    private String del;
-
     @TableField(exist = false)
     private List<LocalDate> tradeTimeArray;
 
+    // 前端查询用
     @TableField(exist = false)
     private String associationIdStr;
 

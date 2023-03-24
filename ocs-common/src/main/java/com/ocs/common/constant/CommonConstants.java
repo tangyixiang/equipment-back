@@ -39,10 +39,10 @@ public class CommonConstants {
     // 导出
     public static final String DATA_LOG_EXPORT = "2";
 
-    // 应收对账单类型-财政发票类型
-    public static final String RECEIVABLE_FINANCE = "1";
     // 应收对账单类型-经营发票类型
-    public static final String RECEIVABLE_OPERATE = "2";
+    public static final String RECEIVABLE_OPERATE = "1";
+    // 应收对账单类型-财政发票类型
+    public static final String RECEIVABLE_FINANCE = "2";
     // 应收对账单类型-初始化经营发票类型
     public static final String RECEIVABLE_CUSTOM_FINANCE = "3";
     // 应收对账单类型-初始化财政发票类型

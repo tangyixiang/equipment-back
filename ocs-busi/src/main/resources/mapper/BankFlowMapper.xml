@@ -95,4 +95,9 @@
     </select>
 
 
+    <select id="countPriceBeforePeriod" resultType="com.ocs.busi.domain.entity.BankFlow">
+        SELECT adversary_org_name ,SUM(price) AS price FROM bank_flow WHERE trade_type = '2' and period &lt; #{period} GROUP BY adversary_org_name
+    </select>
+
+
 </mapper>

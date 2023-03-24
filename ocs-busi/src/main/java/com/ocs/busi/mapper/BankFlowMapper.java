@@ -19,6 +19,8 @@ public interface BankFlowMapper extends BaseMapper<BankFlow> {
     List<BankFlow> findAllInByBankSiteCode(@Param("bankSiteCodeStr") String bankSiteCodeStr);
 
     List<BankFlow> findByCondition(BankFlowDto bankFlowDto);
+
+    List<BankFlow> countPriceBeforePeriod(@Param("period") String period);
 }
 
 

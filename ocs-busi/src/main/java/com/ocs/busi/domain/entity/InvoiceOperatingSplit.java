@@ -1,5 +1,6 @@
 package com.ocs.busi.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @Data
 public class InvoiceOperatingSplit extends InvoiceDataSplit {
 
-    @TableId
+    @TableId(type = IdType.ASSIGN_ID)
     private String id;
 
     /**
@@ -31,7 +32,7 @@ public class InvoiceOperatingSplit extends InvoiceDataSplit {
     /**
      * 会计期间
      */
-    private String accountingPeriod;
+    private String period;
 
     /**
      * 同一会计期间运行了几次

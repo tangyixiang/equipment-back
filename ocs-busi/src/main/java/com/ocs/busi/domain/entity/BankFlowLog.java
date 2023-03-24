@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -30,6 +31,16 @@ public class BankFlowLog {
     private String receivableId;
 
     /**
+     * 开票日期
+     */
+    private LocalDate invoiceDate;
+
+    /**
+     * 客户名称
+     */
+    private String clientOrgName;
+
+    /**
      * 账款类型 1 经营发票  2 财政发票
      */
     private String receivableType;
@@ -45,7 +56,17 @@ public class BankFlowLog {
     private String type;
 
     /**
-     * 会计期间
+     * 应收会计期
+     */
+    private String receivablePeriod;
+
+    /**
+     * 银行会计期间
+     */
+    private String bankPeriod;
+
+    /**
+     * 对账运行期间
      */
     private String period;
 

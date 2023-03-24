@@ -19,6 +19,15 @@ public interface BankFlowLogService extends IService<BankFlowLog> {
      * @param companyReceivables 应收单
      * @param userAmount         金额
      */
-    void addBankFlowUserLog(BankFlow bankFlow, CompanyReceivables companyReceivables, Double userAmount);
+    void addBankFlowUseLog(BankFlow bankFlow, CompanyReceivables companyReceivables, Double userAmount, String period);
 
+
+    /**
+     * 新增银行流水日志
+     *
+     * @param bankFlow           银行流水
+     * @param companyReceivables 应收单
+     * @param cancelAmount         金额
+     */
+    void addBankFlowCancelLog(BankFlow bankFlow, CompanyReceivables companyReceivables, Double cancelAmount, String period);
 }

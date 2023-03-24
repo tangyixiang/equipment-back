@@ -64,7 +64,7 @@ public class InvoiceDataSplit {
      * 附件张数
      */
     @Excel(name = "附件张数")
-    protected String attachmentNum;
+    protected String attachmentNum ="0";
 
     /**
      * 辅助用途

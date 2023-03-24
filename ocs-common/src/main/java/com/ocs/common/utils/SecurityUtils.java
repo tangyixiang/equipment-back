@@ -1,8 +1,7 @@
 package com.ocs.common.utils;
 
-import com.ocs.common.constant.HttpStatus;
 import com.ocs.common.core.domain.model.LoginUser;
-import com.ocs.common.exception.ServiceException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,49 +9,39 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 /**
  * 安全服务工具类
  */
+@Slf4j
 public class SecurityUtils {
     /**
      * 用户ID
      **/
     public static Long getUserId() {
-        try {
-            return getLoginUser().getUserId();
-        } catch (Exception e) {
-            throw new ServiceException("获取用户ID异常", HttpStatus.UNAUTHORIZED);
-        }
+        return getLoginUser() != null ? getLoginUser().getUserId() : null;
     }
 
     /**
      * 获取部门ID
      **/
     public static Long getDeptId() {
-        try {
-            return getLoginUser().getDeptId();
-        } catch (Exception e) {
-            throw new ServiceException("获取部门ID异常", HttpStatus.UNAUTHORIZED);
-        }
+        return getLoginUser() != null ? getLoginUser().getDeptId() : null;
     }
 
     /**
      * 获取用户账户
      **/
     public static String getUsername() {
-        try {
-            return getLoginUser().getUsername();
-        } catch (Exception e) {
-            throw new ServiceException("获取用户账户异常", HttpStatus.UNAUTHORIZED);
-        }
+        return getLoginUser() != null ? getLoginUser().getUsername() : null;
     }
 
     /**
      * 获取用户
      **/
     public static LoginUser getLoginUser() {
-        try {
-            return (LoginUser) getAuthentication().getPrincipal();
-        } catch (Exception e) {
-            throw new ServiceException("获取用户信息异常", HttpStatus.UNAUTHORIZED);
+        Object principal = getAuthentication().getPrincipal();
+
+        if (principal == null) {
+            log.error("获取用户信息为NULL");
         }
+        return (LoginUser) principal;
     }
 
     /**

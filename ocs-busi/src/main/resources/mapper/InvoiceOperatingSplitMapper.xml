@@ -23,7 +23,7 @@
         <result property="fundsCode" column="funds_code" jdbcType="VARCHAR"/>
         <result property="taskId" column="task_id" jdbcType="VARCHAR"/>
         <result property="invoiceOperatingId" column="invoice_operating_id" jdbcType="VARCHAR"/>
-        <result property="accountingPeriod" column="accounting_period" jdbcType="VARCHAR"/>
+        <result property="period" column="period" jdbcType="VARCHAR"/>
         <result property="periodNum" column="period_num" jdbcType="INTEGER"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>

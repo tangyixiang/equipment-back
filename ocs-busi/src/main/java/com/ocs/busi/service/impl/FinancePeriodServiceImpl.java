@@ -15,6 +15,10 @@ import org.springframework.stereotype.Service;
 public class FinancePeriodServiceImpl extends ServiceImpl<FinancePeriodMapper, FinancePeriod>
     implements FinancePeriodService{
 
+    @Override
+    public FinancePeriod getOpen() {
+        return lambdaQuery().eq(FinancePeriod::isOpen, true).one();
+    }
 }
 
 

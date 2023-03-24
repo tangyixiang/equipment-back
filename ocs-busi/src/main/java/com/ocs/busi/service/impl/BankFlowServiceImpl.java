@@ -3,7 +3,6 @@ package com.ocs.busi.service.impl;
 import cn.hutool.poi.excel.sax.Excel07SaxReader;
 import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.dto.BankFlowUploadDto;
 import com.ocs.busi.domain.entity.BankFlow;
@@ -81,35 +80,16 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
     public synchronized void importBankFlow(InputStream inputStream, BankFlowUploadDto bankFlowUploadDto) {
         List<BankFlow> bankFlowList = convertExcelToFlow(inputStream, bankFlowUploadDto);
 
-        LambdaQueryWrapper<BankFlow> wrapper = new LambdaQueryWrapper<BankFlow>().eq(BankFlow::getSelfAccount, bankFlowUploadDto.getAccount())
-                .ge(BankFlow::getTradeTime, LocalDateTime.of(bankFlowUploadDto.getStartDate(), LocalTime.MIN))
-                .le(BankFlow::getTradeTime, LocalDateTime.of(bankFlowUploadDto.getEndDate(), LocalTime.of(23, 59, 59)));
-
-        List<BankFlow> list = list(wrapper);
-
-        List<String> receivablesIdList = new ArrayList<>();
-
-        //for (BankFlow bankFlow : list) {
-        //    List<String> associationId = bankFlow.getAssociationId();
-        //    LambdaQueryWrapper<CompanyReceivables> queryWrapper = new LambdaQueryWrapper<CompanyReceivables>().like(CompanyReceivables::getAssociationId, associationId);
-        //    List<CompanyReceivables> companyReceivablesList = companyReceivablesService.list(queryWrapper);
-        //    List<String> ids = companyReceivablesList.stream().map(CompanyReceivables::getId).collect(Collectors.toList());
-        //    receivablesIdList.addAll(ids);
-        //}
-        //// 取消关联的应收单
-        //if (receivablesIdList.size() > 0) {
-        //    companyReceivablesService.cancel(receivablesIdList);
-        //}
-        // 删除旧的银行流水
-        remove(wrapper);
-
         String idPattern = "YHSL" + DateUtils.dateTimeNow("yyyyMMdd");
         BankFlow todayLastDataFlow = Optional.ofNullable(getBaseMapper().findByDateIn(LocalDate.now(), LocalDate.now().plusDays(1))).orElse(new BankFlow());
         SerialNumberHelper serialNumberHelper = new SerialNumberHelper(todayLastDataFlow.getId(), idPattern);
-
         bankFlowList.forEach(bankFlow -> bankFlow.setId(serialNumberHelper.generateNextId(idPattern, 4)));
-
         saveBatch(bankFlowList);
+    }
+
+    @Override
+    public List<BankFlow> countPriceBeforePeriod(String period) {
+        return this.getBaseMapper().countPriceBeforePeriod(period);
     }
 
     private List<BankFlow> convertExcelToFlow(InputStream inputStream, BankFlowUploadDto bankFlowUploadDto) {

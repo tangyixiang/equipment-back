@@ -9,12 +9,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyClientOrg;
 import com.ocs.busi.domain.entity.CompanyReceivables;
+import com.ocs.busi.domain.entity.FinancePeriod;
 import com.ocs.busi.domain.model.ReceivableBankFlowMapping;
 import com.ocs.busi.helper.ValidateHelper;
 import com.ocs.busi.mapper.CompanyReceivablesMapper;
-import com.ocs.busi.service.BankFlowService;
-import com.ocs.busi.service.CompanyClientOrgService;
-import com.ocs.busi.service.CompanyReceivablesService;
+import com.ocs.busi.service.*;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -49,9 +47,13 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
     private String operateBankAccount;
 
     @Autowired
+    private BankFlowService bankFlowService;
+    @Autowired
     private CompanyClientOrgService clientOrgService;
     @Autowired
-    private BankFlowService bankFlowService;
+    private BankFlowLogService bankFlowLogService;
+    @Autowired
+    private FinancePeriodService financePeriodService;
 
 
     @Override
@@ -69,8 +71,14 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
     }
 
     @Override
+    @Transactional
     public void cancel(List<String> receivablesIds) {
         List<CompanyReceivables> receivablesList = listByIds(receivablesIds);
+
+        FinancePeriod financePeriod = financePeriodService.getOpen();
+        if (financePeriod == null) {
+            throw new ServiceException("没有打开的会计期间");
+        }
 
         for (CompanyReceivables companyReceivables : receivablesList) {
             if (!companyReceivables.getReconciliationFlag().equals(CommonConstants.NOT_RECONCILED)) {
@@ -81,11 +89,11 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
                 List<BankFlow> bankFlows = bankFlowService.listByIds(bankFlowIds);
                 for (BankFlow bankFlow : bankFlows) {
                     Double usePrice = map.get(bankFlow.getId());
-                    bankFlow.setAssociationId(Collections.emptyList());
                     bankFlow.setReconciliationModel("");
                     bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() + usePrice);
                     bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() - usePrice);
                     bankFlow.setReconciliationFlag(bankFlow.getConfirmPrice() == 0 ? CommonConstants.NOT_RECONCILED : CommonConstants.PART_RECONCILED);
+                    bankFlowLogService.addBankFlowCancelLog(bankFlow, companyReceivables, usePrice, financePeriod.getPeriod());
                 }
 
                 companyReceivables.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
