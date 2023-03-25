@@ -51,9 +51,15 @@ public class BankFlowLog {
     private Double amount;
 
     /**
+     * 剩余银行金额
+     */
+    private Double unConfirmBankAmount;
+
+    /**
      * 对账类型  1 自动对账  2 手动对账  3 取消对账
      */
     private String type;
+
 
     /**
      * 应收会计期

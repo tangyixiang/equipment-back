@@ -12,6 +12,7 @@ import com.ocs.common.utils.SecurityUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author tangyx
@@ -31,6 +32,7 @@ public class BankFlowLogServiceImpl extends ServiceImpl<BankFlowLogMapper, BankF
         bankFlowLog.setClientOrgName(companyReceivables.getClientOrgName());
         bankFlowLog.setReceivableType(companyReceivables.getSourceType());
         bankFlowLog.setAmount(userAmount);
+        bankFlowLog.setUnConfirmBankAmount(bankFlow.getUnConfirmPrice());
         bankFlowLog.setReceivablePeriod(companyReceivables.getPeriod());
         bankFlowLog.setBankPeriod(bankFlow.getPeriod());
         bankFlowLog.setPeriod(period);
@@ -50,6 +52,7 @@ public class BankFlowLogServiceImpl extends ServiceImpl<BankFlowLogMapper, BankF
         bankFlowLog.setClientOrgName(companyReceivables.getClientOrgName());
         bankFlowLog.setReceivableType(companyReceivables.getSourceType());
         bankFlowLog.setAmount(cancelAmount);
+        bankFlowLog.setUnConfirmBankAmount(bankFlow.getUnConfirmPrice());
         bankFlowLog.setType(CommonConstants.CANCEL_RECONCILIATION);
         bankFlowLog.setReceivablePeriod(companyReceivables.getPeriod());
         bankFlowLog.setBankPeriod(bankFlow.getPeriod());
@@ -58,6 +61,11 @@ public class BankFlowLogServiceImpl extends ServiceImpl<BankFlowLogMapper, BankF
         bankFlowLog.setCreateTime(LocalDateTime.now());
 
         save(bankFlowLog);
+    }
+
+    @Override
+    public List<BankFlowLog> findByPeriod(String period, String receivableType, String type) {
+        return this.getBaseMapper().findByPeriod(period, receivableType, type);
     }
 }
 

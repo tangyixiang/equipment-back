@@ -4,6 +4,9 @@ import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.BankFlowLog;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ocs.busi.domain.entity.CompanyReceivables;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author tangyx
@@ -27,7 +30,9 @@ public interface BankFlowLogService extends IService<BankFlowLog> {
      *
      * @param bankFlow           银行流水
      * @param companyReceivables 应收单
-     * @param cancelAmount         金额
+     * @param cancelAmount       金额
      */
     void addBankFlowCancelLog(BankFlow bankFlow, CompanyReceivables companyReceivables, Double cancelAmount, String period);
+
+    List<BankFlowLog> findByPeriod(String period, String receivableType, String type);
 }

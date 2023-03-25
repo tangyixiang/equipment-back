@@ -6,7 +6,6 @@ import com.ocs.busi.domain.entity.*;
 import com.ocs.busi.service.*;
 import com.ocs.common.constant.CommonConstants;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,39 +86,66 @@ public class InvoiceOperatingHandle {
             splitList.addAll(incomeList);
             saveSplit(splitList, taskId, period);
         }
+        // 当前流水对账
+        List<BankFlowLog> currentBankFlowList = bankFlowLogService.findByPeriod(period, CommonConstants.RECEIVABLE_OPERATE, "eq");
+        // 往期流水对账
+        List<BankFlowLog> pastBankFlowList = bankFlowLogService.findByPeriod(period, CommonConstants.RECEIVABLE_OPERATE, "lt");
 
-        List<BankFlowLog> bankFlowLogList = bankFlowLogService.lambdaQuery()
-                .eq(BankFlowLog::getPeriod, period).eq(BankFlowLog::getReceivableType, CommonConstants.RECEIVABLE_OPERATE).list();
-
-        for (BankFlowLog bankFlowLog : bankFlowLogList) {
+        for (BankFlowLog bankFlowLog : currentBankFlowList) {
             int increment = atomicInteger.incrementAndGet();
-            List<InvoiceOperatingSplit> splitList = new ArrayList<>();
-
             int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? -1 : 1;
-
             InvoiceOperatingSplit temp1 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount() * i, 0d, "100203", bankFlowLog.getReceivableId());
             InvoiceOperatingSplit temp2 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), 0d, bankFlowLog.getAmount() * i, "12129902", bankFlowLog.getReceivableId());
             InvoiceOperatingSplit temp3 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount() * i, 0d, "800102", bankFlowLog.getReceivableId());
             InvoiceOperatingSplit temp4 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), 0d, bankFlowLog.getAmount() * i, "6401", bankFlowLog.getReceivableId());
-
             temp2.setDivergenceCode("0");
             temp4.setDivergenceCode("0");
             temp4.setFuncClassificCode("2013850");
             temp4.setFundsCode("34");
-            splitList.addAll(List.of(temp1, temp2, temp3, temp4));
-
+            List<InvoiceOperatingSplit> splitList = List.of(temp1, temp2, temp3, temp4);
             saveSplit(splitList, taskId, period);
         }
 
-
-        //TODO 对账前，先计算出之前的结余，然后再计算本期的对账
-        List<BankFlow> bankFlowList = bankFlowService.countPriceBeforePeriod(period);
-        if (ObjectUtils.isNotEmpty(bankFlowList)) {
-
+        List<BankFlowLog> allBankFlowList = new ArrayList<>(currentBankFlowList);
+        allBankFlowList.addAll(pastBankFlowList);
+        // 经营预收回款
+        for (BankFlowLog bankFlowLog : allBankFlowList) {
+            // 只有剩余未对账金额时生成
+            if (bankFlowLog.getUnConfirmBankAmount() > 0) {
+                int increment = atomicInteger.incrementAndGet();
+                int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? 1 : -1;
+                InvoiceOperatingSplit temp1 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount() * i, 0d, "100203", bankFlowLog.getReceivableId());
+                InvoiceOperatingSplit temp2 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), 0d, bankFlowLog.getAmount() * i, "2305010202", bankFlowLog.getReceivableId());
+                List<InvoiceOperatingSplit> splitList = List.of(temp1, temp2);
+                saveSplit(splitList, taskId, period);
+            }
         }
 
-        //
+        Map<String, List<BankFlowLog>> map = pastBankFlowList.stream().collect(Collectors.groupingBy(BankFlowLog::getBankFlowId));
+        // 往期对账未取消对账
+        List<BankFlowLog> pastBankUnCancelList = new ArrayList<>();
+        for (String bankFlowId : map.keySet()) {
+            List<BankFlowLog> bankFlowLogs = map.get(bankFlowId);
+            boolean match = bankFlowLogs.stream().allMatch(bankFlowLog -> !bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION));
+            if (match) {
+                pastBankUnCancelList.addAll(bankFlowLogs);
+            }
+        }
 
+        for (BankFlowLog bankFlowLog : pastBankUnCancelList) {
+            int increment = atomicInteger.incrementAndGet();
+
+            InvoiceOperatingSplit temp1 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount(), 0d, "2305010202", bankFlowLog.getReceivableId());
+            InvoiceOperatingSplit temp2 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), 0d, bankFlowLog.getAmount(), "12129902", bankFlowLog.getReceivableId());
+            InvoiceOperatingSplit temp3 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount(), 0d, "800102", bankFlowLog.getReceivableId());
+            InvoiceOperatingSplit temp4 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), 0d, bankFlowLog.getAmount(), "6401", bankFlowLog.getReceivableId());
+            temp2.setDivergenceCode("0");
+            temp4.setDivergenceCode("0");
+            temp4.setFuncClassificCode("2013850");
+            temp4.setFundsCode("34");
+            List<InvoiceOperatingSplit> splitList = List.of(temp1, temp2, temp3, temp4);
+            saveSplit(splitList, taskId, period);
+        }
 
         return atomicInteger.get();
     }

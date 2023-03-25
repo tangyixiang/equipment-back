@@ -22,4 +22,19 @@
         receivable_type,amount,`type`,past_rec,
         `period`,create_by,create_time
     </sql>
+
+    <select id="findByPeriod" resultType="com.ocs.busi.domain.entity.BankFlowLog">
+        select * from bank_flow_log
+        <where>
+            period = #{period} and receivable_type = #{receivableType}
+            <if test="type == 'eq'">
+                and bank_period = #{period}
+            </if>
+            <if test="type == 'lt'">
+                and bank_period &lt; #{period}
+            </if>
+        </where>
+
+
+    </select>
 </mapper>
