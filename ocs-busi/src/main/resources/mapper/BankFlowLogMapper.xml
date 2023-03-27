@@ -11,7 +11,6 @@
             <result property="receivableType" column="receivable_type" jdbcType="VARCHAR"/>
             <result property="amount" column="amount" jdbcType="DOUBLE"/>
             <result property="type" column="type" jdbcType="VARCHAR"/>
-            <result property="pastRec" column="past_rec" jdbcType="Boolean"/>
             <result property="period" column="period" jdbcType="VARCHAR"/>
             <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>

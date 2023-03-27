@@ -8,6 +8,8 @@
             <id property="id" column="id" jdbcType="INTEGER"/>
             <result property="period" column="period" jdbcType="VARCHAR"/>
             <result property="value" column="value" jdbcType="VARCHAR"/>
+            <result property="type" column="type" jdbcType="VARCHAR"/>
+            <result property="open" column="open" jdbcType="BOOLEAN"/>
             <result property="del" column="del" jdbcType="VARCHAR"/>
             <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
             <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
@@ -15,8 +17,5 @@
             <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <sql id="Base_Column_List">
-        id,period,create_by,
-        update_by,create_time,update_time
-    </sql>
+
 </mapper>
