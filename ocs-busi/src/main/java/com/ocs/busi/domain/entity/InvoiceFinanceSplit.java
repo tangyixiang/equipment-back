@@ -31,12 +31,8 @@ public class InvoiceFinanceSplit extends InvoiceDataSplit {
     /**
      * 会计期间
      */
-    private String accountingPeriod;
+    private String period;
 
-    /**
-     * 会计期间运行次数
-     */
-    private Integer periodNum;
 
     private LocalDateTime createTime;
 

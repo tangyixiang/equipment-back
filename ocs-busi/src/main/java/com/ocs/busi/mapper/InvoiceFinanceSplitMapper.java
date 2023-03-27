@@ -11,8 +11,6 @@ import com.ocs.busi.domain.entity.InvoiceFinanceSplit;
  */
 public interface InvoiceFinanceSplitMapper extends BaseMapper<InvoiceFinanceSplit> {
 
-    Integer findPeriodNumMax(String accountingPeriod);
-
 }
 
 

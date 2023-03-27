@@ -15,11 +15,6 @@ import org.springframework.stereotype.Service;
 public class InvoiceFinanceSplitServiceImpl extends ServiceImpl<InvoiceFinanceSplitMapper, InvoiceFinanceSplit>
         implements InvoiceFinanceSplitService {
 
-    @Override
-    public Integer findPeriodNumMax(String accountingPeriod) {
-        return getBaseMapper().findPeriodNumMax(accountingPeriod);
-    }
-
 }
 
 

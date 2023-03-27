@@ -1,9 +1,7 @@
 package com.ocs.busi.task;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ocs.busi.domain.entity.CompanyReceivables;
 import com.ocs.busi.domain.entity.FinancePeriod;
-import com.ocs.busi.domain.entity.InvoiceFinance;
 import com.ocs.busi.service.CompanyReceivablesService;
 import com.ocs.busi.service.FinancePeriodService;
 import com.ocs.busi.service.InvoiceFinanceService;
@@ -87,10 +85,13 @@ public class InvoiceTask {
         SysJobRuntime runtime = TaskContext.get();
         String taskId = TaskIDPrefixConstants.FINANCE_TASK + runtime.getTaskId();
         log.info("财政性发票,分录任务开始执行,分配的任务ID:{}", taskId);
-        LambdaQueryWrapper<InvoiceFinance> wrapper = new LambdaQueryWrapper<InvoiceFinance>().eq(InvoiceFinance::getDataSplit, false);
-        List<InvoiceFinance> list = invoiceFinanceService.list(wrapper);
 
-        return invoiceFinanceHandle.dataSplit(certificateId, list, period, taskId);
+        List<CompanyReceivables> financeReceivableList = receivablesService.lambdaQuery()
+                .in(CompanyReceivables::getSourceType, List.of(CommonConstants.RECEIVABLE_FINANCE, CommonConstants.RECEIVABLE_CUSTOM_OPERATE))
+                .eq(CompanyReceivables::getPeriod, period)
+                .orderByAsc(CompanyReceivables::getInvoicingDate).list();
+
+        return invoiceFinanceHandle.dataSplit(certificateId, financeReceivableList, period, taskId);
     }
 
 }

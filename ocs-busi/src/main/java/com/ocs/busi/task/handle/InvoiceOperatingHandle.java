@@ -34,10 +34,6 @@ public class InvoiceOperatingHandle {
     private InvoiceOperatingService invoiceOperatingService;
     @Autowired
     private BankFlowLogService bankFlowLogService;
-    @Autowired
-    private BankFlowService bankFlowService;
-    @Autowired
-    private CompanyReceivablesService receivablesService;
 
     /**
      * 发票拆分
@@ -52,10 +48,6 @@ public class InvoiceOperatingHandle {
     public Integer dataSplit(Integer startCertificateId, List<CompanyReceivables> receivablesList, String period, String taskId) {
         // 初始化凭照号码起始值
         AtomicInteger atomicInteger = new AtomicInteger(startCertificateId);
-
-        // 会计期间运行次数
-        Integer periodNumMax = invoiceOperatingSplitService.findPeriodNumMax(period);
-        final Integer periodNum = periodNumMax == null ? 1 : periodNumMax + 1;
 
         Map<String, List<CompanyReceivables>> collect = receivablesList.stream().collect(Collectors.groupingBy(CompanyReceivables::getInvoiceId));
 
@@ -94,10 +86,12 @@ public class InvoiceOperatingHandle {
         for (BankFlowLog bankFlowLog : currentBankFlowList) {
             int increment = atomicInteger.incrementAndGet();
             int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? -1 : 1;
-            InvoiceOperatingSplit temp1 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount() * i, 0d, "100203", bankFlowLog.getReceivableId());
-            InvoiceOperatingSplit temp2 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), 0d, bankFlowLog.getAmount() * i, "12129902", bankFlowLog.getReceivableId());
-            InvoiceOperatingSplit temp3 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount() * i, 0d, "800102", bankFlowLog.getReceivableId());
-            InvoiceOperatingSplit temp4 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), 0d, bankFlowLog.getAmount() * i, "6401", bankFlowLog.getReceivableId());
+            LocalDate date = getSplitDate(bankFlowLog);
+
+            InvoiceOperatingSplit temp1 = recRecord(increment, date, bankFlowLog, bankFlowLog.getAmount() * i, 0d, "100203");
+            InvoiceOperatingSplit temp2 = recRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount() * i, "12129902");
+            InvoiceOperatingSplit temp3 = recRecord(increment, date, bankFlowLog, bankFlowLog.getAmount() * i, 0d, "800102");
+            InvoiceOperatingSplit temp4 = recRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount() * i, "6401");
             temp2.setDivergenceCode("0");
             temp4.setDivergenceCode("0");
             temp4.setFuncClassificCode("2013850");
@@ -114,8 +108,9 @@ public class InvoiceOperatingHandle {
             if (bankFlowLog.getUnConfirmBankAmount() > 0) {
                 int increment = atomicInteger.incrementAndGet();
                 int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? 1 : -1;
-                InvoiceOperatingSplit temp1 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount() * i, 0d, "100203", bankFlowLog.getReceivableId());
-                InvoiceOperatingSplit temp2 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), 0d, bankFlowLog.getAmount() * i, "2305010202", bankFlowLog.getReceivableId());
+                LocalDate date = getSplitDate(bankFlowLog);
+                InvoiceOperatingSplit temp1 = recRecord(increment, date, bankFlowLog, bankFlowLog.getAmount() * i, 0d, "100203");
+                InvoiceOperatingSplit temp2 = recRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount() * i, "2305010202");
                 List<InvoiceOperatingSplit> splitList = List.of(temp1, temp2);
                 saveSplit(splitList, taskId, period);
             }
@@ -134,11 +129,11 @@ public class InvoiceOperatingHandle {
 
         for (BankFlowLog bankFlowLog : pastBankUnCancelList) {
             int increment = atomicInteger.incrementAndGet();
-
-            InvoiceOperatingSplit temp1 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount(), 0d, "2305010202", bankFlowLog.getReceivableId());
-            InvoiceOperatingSplit temp2 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), 0d, bankFlowLog.getAmount(), "12129902", bankFlowLog.getReceivableId());
-            InvoiceOperatingSplit temp3 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), bankFlowLog.getAmount(), 0d, "800102", bankFlowLog.getReceivableId());
-            InvoiceOperatingSplit temp4 = recRecord(increment, bankFlowLog.getInvoiceDate(), bankFlowLog.getClientOrgName(), 0d, bankFlowLog.getAmount(), "6401", bankFlowLog.getReceivableId());
+            LocalDate date = getSplitDate(bankFlowLog);
+            InvoiceOperatingSplit temp1 = recRecord(increment, date, bankFlowLog, bankFlowLog.getAmount(), 0d, "2305010202");
+            InvoiceOperatingSplit temp2 = recRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount(), "12129902");
+            InvoiceOperatingSplit temp3 = recRecord(increment, date, bankFlowLog, bankFlowLog.getAmount(), 0d, "800102");
+            InvoiceOperatingSplit temp4 = recRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount(), "6401");
             temp2.setDivergenceCode("0");
             temp4.setDivergenceCode("0");
             temp4.setFuncClassificCode("2013850");
@@ -148,6 +143,22 @@ public class InvoiceOperatingHandle {
         }
 
         return atomicInteger.get();
+    }
+
+    private LocalDate getSplitDate(BankFlowLog bankFlowLog) {
+        LocalDate date = null;
+        // 对账日期，如果在本月就取对账日期，发生在次月，就取发票会计期的最后一天
+        String receivablePeriod = bankFlowLog.getReceivablePeriod();
+        if (receivablePeriod.equals(bankFlowLog.getPeriod())) {
+            date = bankFlowLog.getCreateTime().toLocalDate();
+        } else {
+            Integer year = Integer.parseInt(receivablePeriod.substring(4));
+            Integer month = Integer.parseInt(receivablePeriod.substring(4, 6));
+            LocalDate localDate = LocalDate.of(year, month, 1);
+            // 最后一天
+            date = localDate.withDayOfMonth(localDate.lengthOfMonth());
+        }
+        return date;
     }
 
     private void saveSplit(List<InvoiceOperatingSplit> splitList, String taskId, String period) {
@@ -217,20 +228,20 @@ public class InvoiceOperatingHandle {
      *
      * @return
      */
-    private InvoiceOperatingSplit recRecord(Integer id, LocalDate invoiceDate, String buyerName, Double borrow, Double loan, String subjectCode, String operatingId) {
+    private InvoiceOperatingSplit recRecord(Integer id, LocalDate invoiceDate, BankFlowLog bankFlowLog, Double borrow, Double loan, String subjectCode) {
         InvoiceOperatingSplit split = new InvoiceOperatingSplit();
         split.setId(IdUtil.objectId());
         split.setDate(LocalDateTimeUtil.format(invoiceDate, "yyyy-MM-dd"));
         split.setCertificateType("记账");
         split.setCertificateId(id);
         split.setSubjectCode(subjectCode);
-        split.setSummary(buyerName);
+        split.setSummary(bankFlowLog.getClientOrgName());
         split.setBorrow(borrow.toString());
         split.setLoan(loan.toString());
         split.setAttachmentNum("0");
-        split.setUseFor(buyerName);
+        split.setUseFor(bankFlowLog.getClientOrgName());
         split.setDivergenceCode("0");
-        split.setInvoiceOperatingId(operatingId);
+        split.setInvoiceOperatingId(bankFlowLog.getReceivableId());
         split.setCreateTime(LocalDateTime.now());
 
         return split;

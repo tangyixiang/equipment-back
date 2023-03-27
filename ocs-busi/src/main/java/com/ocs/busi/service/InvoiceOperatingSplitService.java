@@ -10,6 +10,4 @@ import com.ocs.busi.domain.entity.InvoiceOperatingSplit;
  */
 public interface InvoiceOperatingSplitService extends IService<InvoiceOperatingSplit> {
 
-    Integer findPeriodNumMax(String accountingPeriod);
-
 }

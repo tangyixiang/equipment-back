@@ -23,17 +23,9 @@
         <result property="fundsCode" column="funds_code" jdbcType="VARCHAR"/>
         <result property="taskId" column="task_id" jdbcType="VARCHAR"/>
         <result property="invoiceFinanceId" column="invoice_finance_id" jdbcType="VARCHAR"/>
-        <result property="accountingPeriod" column="accounting_period" jdbcType="VARCHAR"/>
-        <result property="periodNum" column="period_num" jdbcType="INTEGER"/>
+        <result property="period" column="period" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <select id="findPeriodNumMax" resultType="java.lang.Integer">
-        select period_num
-        from invoice_finance_split
-        where accounting_period = #{period}
-        group by period_num
-        order by period_num desc limit 1
-    </select>
 
 </mapper>

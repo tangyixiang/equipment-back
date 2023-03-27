@@ -34,10 +34,6 @@ public class InvoiceOperatingSplit extends InvoiceDataSplit {
      */
     private String period;
 
-    /**
-     * 同一会计期间运行了几次
-     */
-    private Integer periodNum;
 
     private LocalDateTime createTime;
 
