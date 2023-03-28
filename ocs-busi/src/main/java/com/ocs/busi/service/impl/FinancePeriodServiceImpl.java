@@ -17,7 +17,7 @@ public class FinancePeriodServiceImpl extends ServiceImpl<FinancePeriodMapper, F
 
     @Override
     public FinancePeriod getOpen() {
-        return lambdaQuery().eq(FinancePeriod::isOpen, true).one();
+        return lambdaQuery().eq(FinancePeriod::getOpen, true).one();
     }
 }
 

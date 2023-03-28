@@ -31,11 +31,7 @@ public class FinancePeriod extends SimpleEntity {
     @NotNull(message = "凭证号起始值不能为空")
     private String value;
 
-    // 1 经营 2 财务
-    @NotNull(message = "类型不能为空")
-    private String type;
-
-    private boolean open;
+    private Boolean open;
 
     /**
      * 删除
