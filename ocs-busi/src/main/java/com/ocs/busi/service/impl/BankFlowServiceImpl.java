@@ -17,9 +17,8 @@ import com.ocs.busi.service.CompanyReceivablesService;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
 import com.ocs.common.utils.DateUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,14 +32,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
- * @author tangyx
- * @description 针对表【bank_flow】的数据库操作Service实现
- * @createDate 2022-11-01 15:42:04
+ * 银行流水service
  */
+@Slf4j
 @Service
 public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> implements BankFlowService {
-
-    private static final Logger logger = LoggerFactory.getLogger(BankFlowServiceImpl.class);
 
     @Autowired
     private CompanyClientOrgService companyClientOrgService;
@@ -52,7 +48,7 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
         List<BankFlow> bankFlowList = convertExcelToFlow(inputStream, bankFlowUploadDto);
         // 所有的客户信息
         List<CompanyClientOrg> allCompanyOrg = companyClientOrgService.findAllCompanyOrg();
-        logger.info("客户数量:{}", allCompanyOrg.size());
+        log.info("客户数量:{}", allCompanyOrg.size());
         Set<String> allCompanyOrgNameSet = allCompanyOrg.stream().map(CompanyClientOrg::getName).collect(Collectors.toSet());
         List<String> bankSiteCodeList = new ArrayList<>();
         // 根据BankSiteCode来查询
@@ -61,11 +57,11 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
 
         bankFlows.forEach(flow -> bankSiteCodeList.add(flow.getBankSiteCode()));
 
-        bankFlowList.forEach(flow -> {
+        /*bankFlowList.forEach(flow -> {
             if (!allCompanyOrgNameSet.contains(flow.getAdversaryOrgName())) {
                 throw new ServiceException("客户基础资料中不存在," + flow.getAdversaryOrgName());
             }
-        });
+        });*/
 
         Map<String, Object> result = new HashMap<>();
         result.put("validate", bankFlows.size() == 0);
@@ -98,8 +94,8 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
         try {
             reader.read(inputStream, "0");
         } catch (POIException | IllegalArgumentException e) {
-            logger.error("银行流水导入失败:{}", e);
-            throw new ServiceException("模板数据异常,请上传正确的导入模板");
+            log.error("银行流水导入失败:{}", e);
+            throw new ServiceException("模板数据异常,请上传正确的导入模板," + e.getMessage());
         }
         return bankFlowList;
     }

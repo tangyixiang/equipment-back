@@ -114,7 +114,7 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
             reader.read(inputStream, "0");
         } catch (POIException | IllegalArgumentException e) {
             logger.error("财政发票导入失败:{}", e);
-            throw new ServiceException("模板数据异常,请上传正确的导入模板");
+            throw new ServiceException("模板数据异常,请上传正确的导入模板," + e.getMessage());
         }
         return invoiceFinanceList;
     }
