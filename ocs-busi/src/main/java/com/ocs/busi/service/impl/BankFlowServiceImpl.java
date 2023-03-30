@@ -3,7 +3,8 @@ package com.ocs.busi.service.impl;
 import cn.hutool.poi.excel.sax.Excel07SaxReader;
 import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.dto.BankFlowUploadDto;
 import com.ocs.busi.domain.entity.BankFlow;
@@ -51,7 +52,7 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
     @Transactional
     public synchronized void importBankFlow(InputStream inputStream, BankFlowUploadDto uploadDto) {
         List<BankFlow> bankFlowList = convertExcelToFlow(inputStream, uploadDto);
-        LambdaQueryChainWrapper<BankFlow> wrapper = lambdaQuery().eq(BankFlow::getPeriod, uploadDto.getPeriod()).eq(BankFlow::getSelfAccount, uploadDto.getAccount())
+        Wrapper<BankFlow> wrapper = new LambdaQueryWrapper<BankFlow>().eq(BankFlow::getPeriod, uploadDto.getPeriod()).eq(BankFlow::getSelfAccount, uploadDto.getAccount())
                 .lt(BankFlow::getTradeTime, LocalDateTime.of(uploadDto.getEndDate().plusDays(1), LocalTime.MIN))
                 .ge(BankFlow::getTradeTime, LocalDateTime.of(uploadDto.getStartDate(), LocalTime.MIN))
                 .in(BankFlow::getReconciliationFlag, List.of(CommonConstants.PART_RECONCILED, CommonConstants.RECONCILED));
