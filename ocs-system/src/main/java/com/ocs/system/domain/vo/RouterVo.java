@@ -55,6 +55,11 @@ public class RouterVo {
     private MetaVo meta;
 
     /**
+     * 菜单类型
+     */
+    private String menuType;
+
+    /**
      * 子路由
      */
     private List<RouterVo> children;
@@ -129,6 +134,14 @@ public class RouterVo {
 
     public void setMeta(MetaVo meta) {
         this.meta = meta;
+    }
+
+    public String getMenuType() {
+        return menuType;
+    }
+
+    public void setMenuType(String menuType) {
+        this.menuType = menuType;
     }
 
     public List<RouterVo> getChildren() {
