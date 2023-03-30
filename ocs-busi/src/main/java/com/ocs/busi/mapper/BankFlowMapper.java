@@ -14,8 +14,6 @@ public interface BankFlowMapper extends BaseMapper<BankFlow> {
 
     BankFlow findByDateIn(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-    BankFlow findByBankSiteCode(@Param("bankSiteCode") String bankSiteCode);
-
     List<BankFlow> findAllInByBankSiteCode(@Param("bankSiteCodeStr") String bankSiteCodeStr);
 
     List<BankFlow> findByCondition(BankFlowDto bankFlowDto);

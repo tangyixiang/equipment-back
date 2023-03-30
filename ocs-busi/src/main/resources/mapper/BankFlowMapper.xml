@@ -40,11 +40,6 @@
         order by id desc limit 1
     </select>
 
-    <select id="findByBankSiteCode" resultMap="BaseResultMap">
-        select *
-        from bank_flow
-        where bank_site_code = #{bankSiteCode}
-    </select>
 
     <select id="findAllInByBankSiteCode" resultMap="BaseResultMap">
         select bank_site_code
@@ -75,6 +70,9 @@
             </if>
             <if test="comment != null and comment != ''">
                 AND comment like concat('%', #{comment}, '%')
+            </if>
+            <if test="period != null and period != ''">
+                AND period = #{period}
             </if>
             <if test="adversaryOrgName != null and adversaryOrgName != ''">
                 AND adversary_org_name like concat('%', #{adversaryOrgName}, '%')

@@ -6,7 +6,6 @@ import cn.hutool.poi.exceptions.POIException;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.dto.BankFlowUploadDto;
 import com.ocs.busi.domain.entity.BankFlow;
-import com.ocs.busi.domain.entity.CompanyClientOrg;
 import com.ocs.busi.helper.ExcelCellHelper;
 import com.ocs.busi.helper.SerialNumberHelper;
 import com.ocs.busi.helper.ValidateHelper;
@@ -29,7 +28,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * 银行流水service
@@ -44,28 +42,15 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
     private CompanyReceivablesService companyReceivablesService;
 
     @Override
-    public Map<String, Object> uploadValidate(InputStream inputStream, BankFlowUploadDto bankFlowUploadDto) {
-        List<BankFlow> bankFlowList = convertExcelToFlow(inputStream, bankFlowUploadDto);
-        // 所有的客户信息
-        List<CompanyClientOrg> allCompanyOrg = companyClientOrgService.findAllCompanyOrg();
-        log.info("客户数量:{}", allCompanyOrg.size());
-        Set<String> allCompanyOrgNameSet = allCompanyOrg.stream().map(CompanyClientOrg::getName).collect(Collectors.toSet());
-        List<String> bankSiteCodeList = new ArrayList<>();
-        // 根据BankSiteCode来查询
-        String bankSiteCodeStr = bankFlowList.stream().map(flow -> flow.getBankSiteCode()).collect(Collectors.joining(","));
-        List<BankFlow> bankFlows = getBaseMapper().findAllInByBankSiteCode(bankSiteCodeStr);
-
-        bankFlows.forEach(flow -> bankSiteCodeList.add(flow.getBankSiteCode()));
-
-        /*bankFlowList.forEach(flow -> {
-            if (!allCompanyOrgNameSet.contains(flow.getAdversaryOrgName())) {
-                throw new ServiceException("客户基础资料中不存在," + flow.getAdversaryOrgName());
-            }
-        });*/
+    public Map<String, Object> uploadValidate(InputStream inputStream, BankFlowUploadDto uploadDto) {
+        // 尝试转换数据
+        convertExcelToFlow(inputStream, uploadDto);
+        // 按会计期+账号+时间段导入银行流水。
+        Long count = lambdaQuery().eq(BankFlow::getPeriod, uploadDto.getPeriod()).eq(BankFlow::getSelfAccount, uploadDto.getAccount())
+                .le(BankFlow::getTradeTime, uploadDto.getEndDate()).ge(BankFlow::getTradeTime, uploadDto.getStartDate()).count();
 
         Map<String, Object> result = new HashMap<>();
-        result.put("validate", bankFlows.size() == 0);
-        result.put("message", bankSiteCodeList.toString());
+        result.put("validate", count == 0);
 
         return result;
 
@@ -73,9 +58,16 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
 
     @Override
     @Transactional
-    public synchronized void importBankFlow(InputStream inputStream, BankFlowUploadDto bankFlowUploadDto) {
-        List<BankFlow> bankFlowList = convertExcelToFlow(inputStream, bankFlowUploadDto);
+    public synchronized void importBankFlow(InputStream inputStream, BankFlowUploadDto uploadDto) {
+        List<BankFlow> bankFlowList = convertExcelToFlow(inputStream, uploadDto);
 
+        Long count = lambdaQuery().eq(BankFlow::getPeriod, uploadDto.getPeriod()).eq(BankFlow::getSelfAccount, uploadDto.getAccount())
+                .le(BankFlow::getTradeTime, uploadDto.getEndDate()).ge(BankFlow::getTradeTime, uploadDto.getStartDate())
+                .in(BankFlow::getReconciliationFlag, List.of(CommonConstants.PART_RECONCILED, CommonConstants.RECONCILED)).count();
+
+        if (count > 0) {
+            throw new ServiceException("部分银行流水已对账回款,请先取消");
+        }
         String idPattern = "YHSL" + DateUtils.dateTimeNow("yyyyMMdd");
         BankFlow todayLastDataFlow = Optional.ofNullable(getBaseMapper().findByDateIn(LocalDate.now(), LocalDate.now().plusDays(1))).orElse(new BankFlow());
         SerialNumberHelper serialNumberHelper = new SerialNumberHelper(todayLastDataFlow.getId(), idPattern);
@@ -157,6 +149,7 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
     public String convertString(Object value) {
         return value == null ? null : String.valueOf(value);
     }
+
 }
 
 

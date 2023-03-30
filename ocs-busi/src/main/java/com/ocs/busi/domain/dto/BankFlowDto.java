@@ -70,6 +70,11 @@ public class BankFlowDto {
      */
     private String reconciliationModel;
 
+    /**
+     * 会计期间
+     */
+    private String period;
+
 
     @TableField(exist = false)
     private List<LocalDate> tradeTimeArray;

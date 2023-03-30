@@ -35,10 +35,18 @@ public class PeriodController extends BaseController {
 
     @GetMapping("/listOpen")
     public TableDataInfo listOpen() {
-        startPage("create_time desc");
         List<FinancePeriod> list = financePeriodService.listByMap(Map.of("del", CommonConstants.STATUS_NORMAL, "open", true));
         return getDataTable(list);
     }
+
+
+    @GetMapping("/all")
+    public Result listAll() {
+        List<FinancePeriod> list = financePeriodService.lambdaQuery().eq(FinancePeriod::getDel, CommonConstants.STATUS_NORMAL)
+                .orderByDesc(FinancePeriod::getCreateTime).list();
+        return Result.success(list);
+    }
+
 
     @PostMapping("/add")
     public Result add(@RequestBody @Validated FinancePeriod financePeriod) {
