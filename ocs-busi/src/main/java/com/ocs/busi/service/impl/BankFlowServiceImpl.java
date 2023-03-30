@@ -3,6 +3,7 @@ package com.ocs.busi.service.impl;
 import cn.hutool.poi.excel.sax.Excel07SaxReader;
 import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.dto.BankFlowUploadDto;
 import com.ocs.busi.domain.entity.BankFlow;
@@ -11,14 +12,11 @@ import com.ocs.busi.helper.SerialNumberHelper;
 import com.ocs.busi.helper.ValidateHelper;
 import com.ocs.busi.mapper.BankFlowMapper;
 import com.ocs.busi.service.BankFlowService;
-import com.ocs.busi.service.CompanyClientOrgService;
-import com.ocs.busi.service.CompanyReceivablesService;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
 import com.ocs.common.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,11 +34,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> implements BankFlowService {
 
-    @Autowired
-    private CompanyClientOrgService companyClientOrgService;
-    @Autowired
-    private CompanyReceivablesService companyReceivablesService;
-
     @Override
     public Map<String, Object> uploadValidate(InputStream inputStream, BankFlowUploadDto uploadDto) {
         // 尝试转换数据
@@ -51,23 +44,24 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
 
         Map<String, Object> result = new HashMap<>();
         result.put("validate", count == 0);
-
         return result;
-
     }
 
     @Override
     @Transactional
     public synchronized void importBankFlow(InputStream inputStream, BankFlowUploadDto uploadDto) {
         List<BankFlow> bankFlowList = convertExcelToFlow(inputStream, uploadDto);
+        LambdaQueryChainWrapper<BankFlow> wrapper = lambdaQuery().eq(BankFlow::getPeriod, uploadDto.getPeriod()).eq(BankFlow::getSelfAccount, uploadDto.getAccount())
+                .lt(BankFlow::getTradeTime, LocalDateTime.of(uploadDto.getEndDate().plusDays(1), LocalTime.MIN))
+                .ge(BankFlow::getTradeTime, LocalDateTime.of(uploadDto.getStartDate(), LocalTime.MIN))
+                .in(BankFlow::getReconciliationFlag, List.of(CommonConstants.PART_RECONCILED, CommonConstants.RECONCILED));
 
-        Long count = lambdaQuery().eq(BankFlow::getPeriod, uploadDto.getPeriod()).eq(BankFlow::getSelfAccount, uploadDto.getAccount())
-                .le(BankFlow::getTradeTime, uploadDto.getEndDate()).ge(BankFlow::getTradeTime, uploadDto.getStartDate())
-                .in(BankFlow::getReconciliationFlag, List.of(CommonConstants.PART_RECONCILED, CommonConstants.RECONCILED)).count();
-
+        long count = count(wrapper);
         if (count > 0) {
             throw new ServiceException("部分银行流水已对账回款,请先取消");
         }
+        remove(wrapper);
+        log.info("会计期间:{},银行流水删除", uploadDto.getPeriod());
         String idPattern = "YHSL" + DateUtils.dateTimeNow("yyyyMMdd");
         BankFlow todayLastDataFlow = Optional.ofNullable(getBaseMapper().findByDateIn(LocalDate.now(), LocalDate.now().plusDays(1))).orElse(new BankFlow());
         SerialNumberHelper serialNumberHelper = new SerialNumberHelper(todayLastDataFlow.getId(), idPattern);
