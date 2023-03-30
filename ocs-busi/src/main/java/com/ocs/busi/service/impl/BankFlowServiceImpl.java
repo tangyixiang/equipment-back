@@ -3,7 +3,6 @@ package com.ocs.busi.service.impl;
 import cn.hutool.poi.excel.sax.Excel07SaxReader;
 import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.dto.BankFlowUploadDto;
@@ -52,17 +51,19 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
     @Transactional
     public synchronized void importBankFlow(InputStream inputStream, BankFlowUploadDto uploadDto) {
         List<BankFlow> bankFlowList = convertExcelToFlow(inputStream, uploadDto);
-        Wrapper<BankFlow> wrapper = new LambdaQueryWrapper<BankFlow>().eq(BankFlow::getPeriod, uploadDto.getPeriod()).eq(BankFlow::getSelfAccount, uploadDto.getAccount())
+        LambdaQueryWrapper<BankFlow> listWrapper = new LambdaQueryWrapper<BankFlow>().eq(BankFlow::getPeriod, uploadDto.getPeriod()).eq(BankFlow::getSelfAccount, uploadDto.getAccount())
                 .lt(BankFlow::getTradeTime, LocalDateTime.of(uploadDto.getEndDate().plusDays(1), LocalTime.MIN))
-                .ge(BankFlow::getTradeTime, LocalDateTime.of(uploadDto.getStartDate(), LocalTime.MIN))
-                .in(BankFlow::getReconciliationFlag, List.of(CommonConstants.PART_RECONCILED, CommonConstants.RECONCILED));
+                .ge(BankFlow::getTradeTime, LocalDateTime.of(uploadDto.getStartDate(), LocalTime.MIN));
+        LambdaQueryWrapper<BankFlow> countWrapper = new LambdaQueryWrapper<BankFlow>().eq(BankFlow::getPeriod, uploadDto.getPeriod()).eq(BankFlow::getSelfAccount, uploadDto.getAccount())
+                .lt(BankFlow::getTradeTime, LocalDateTime.of(uploadDto.getEndDate().plusDays(1), LocalTime.MIN))
+                .ge(BankFlow::getTradeTime, LocalDateTime.of(uploadDto.getStartDate(), LocalTime.MIN)).in(BankFlow::getReconciliationFlag, List.of(CommonConstants.PART_RECONCILED, CommonConstants.RECONCILED));
 
-        long count = count(wrapper);
+        long count = count(countWrapper);
         if (count > 0) {
             throw new ServiceException("部分银行流水已对账回款,请先取消");
         }
-        remove(wrapper);
-        log.info("会计期间:{},银行流水删除", uploadDto.getPeriod());
+        boolean del = remove(listWrapper);
+        log.info("会计期间:{},银行流水删除:{}", uploadDto.getPeriod(), del);
         String idPattern = "YHSL" + DateUtils.dateTimeNow("yyyyMMdd");
         BankFlow todayLastDataFlow = Optional.ofNullable(getBaseMapper().findByDateIn(LocalDate.now(), LocalDate.now().plusDays(1))).orElse(new BankFlow());
         SerialNumberHelper serialNumberHelper = new SerialNumberHelper(todayLastDataFlow.getId(), idPattern);
