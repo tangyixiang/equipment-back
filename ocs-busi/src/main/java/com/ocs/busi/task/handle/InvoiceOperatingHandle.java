@@ -52,6 +52,7 @@ public class InvoiceOperatingHandle {
         Map<String, List<CompanyReceivables>> collect = receivablesList.stream().collect(Collectors.groupingBy(CompanyReceivables::getInvoiceId));
 
         for (String invoiceId : collect.keySet()) {
+            log.info("开始处理发票ID:{}", invoiceId);
             List<CompanyReceivables> list = collect.get(invoiceId);
             List<String> idList = list.stream().map(CompanyReceivables::getId).collect(Collectors.toList());
             List<InvoiceOperating> invoiceOperatingList = invoiceOperatingService.listByIds(idList);
@@ -84,6 +85,7 @@ public class InvoiceOperatingHandle {
         List<BankFlowLog> pastBankFlowList = bankFlowLogService.findByPeriod(period, CommonConstants.RECEIVABLE_OPERATE, "lt");
 
         for (BankFlowLog bankFlowLog : currentBankFlowList) {
+            log.info("处理当前流水对账分录");
             int increment = atomicInteger.incrementAndGet();
             int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? -1 : 1;
             LocalDate date = getSplitDate(bankFlowLog);
@@ -106,6 +108,7 @@ public class InvoiceOperatingHandle {
         for (BankFlowLog bankFlowLog : allBankFlowList) {
             // 只有剩余未对账金额时生成
             if (bankFlowLog.getUnConfirmBankAmount() > 0) {
+                log.info("处理流水对账未完全分录");
                 int increment = atomicInteger.incrementAndGet();
                 int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? 1 : -1;
                 LocalDate date = getSplitDate(bankFlowLog);

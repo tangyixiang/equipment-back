@@ -9,6 +9,7 @@ import com.ocs.busi.mapper.CompanyEmployeeMapper;
 import com.ocs.busi.service.CompanyClientOrgService;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
+import com.ocs.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -57,6 +58,10 @@ public class InvoiceHelper {
             String payer = invoiceFinance.getPayer();
             String socialCreditCode = invoiceFinance.getSocialCreditCode();
             String creator = invoiceFinance.getCreator();
+
+            if (StringUtils.isEmpty(socialCreditCode)) {
+                continue;
+            }
 
             List<CompanyClientOrg> clientOrgList = clientOrgService.list(new LambdaQueryWrapper<CompanyClientOrg>().eq(CompanyClientOrg::getName, payer)
                     .eq(CompanyClientOrg::getDel, CommonConstants.STATUS_NORMAL));

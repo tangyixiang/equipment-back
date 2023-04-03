@@ -101,7 +101,7 @@ public class TaskController extends BaseController {
         SysJob sysJob = sysJobService.selectJobById(taskRunDto.getJobId());
         // 只有初始化配置时,给了参数配置才起作用
         if (StringUtils.isNotEmpty(sysJob.getParam())) {
-            sysJob.setParam(taskRunDto.getParams());
+            sysJob.setParam("'" + taskRunDto.getParams() + "'");
         }
         CompletableFuture.runAsync(() -> {
             try {

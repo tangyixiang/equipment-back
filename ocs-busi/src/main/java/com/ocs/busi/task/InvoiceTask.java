@@ -41,13 +41,13 @@ public class InvoiceTask {
     /**
      * 分录
      *
-     * @param periodId 会计期间ID
+     * @param period 会计期间
      */
     @Transactional
-    public void splitTask(Integer periodId) {
+    public void splitTask(String period) {
         TaskContext.get().setTaskType(CommonConstants.TASK_SPLIT);
         log.info("发票分录任务开始");
-        FinancePeriod financePeriod = financePeriodService.getById(periodId);
+        FinancePeriod financePeriod = financePeriodService.lambdaQuery().eq(FinancePeriod::getPeriod, period).one();
         if (financePeriod == null) {
             throw new ServiceException("会计期间不存在");
         }

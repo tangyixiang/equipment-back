@@ -59,14 +59,14 @@ public class FlowTask {
      * 对账任务运行
      */
     @Transactional
-    public void reconciliationTask(Integer periodId) {
+    public void reconciliationTask(String period) {
         logger.info("对账任务开始运行");
 
-        FinancePeriod financePeriod = financePeriodService.getById(periodId);
+        FinancePeriod financePeriod = financePeriodService.lambdaQuery().eq(FinancePeriod::getPeriod, period).one();
         if (financePeriod == null) {
             throw new ServiceException("会计期间不存在");
         }
-        period = financePeriod.getPeriod();
+        this.period = financePeriod.getPeriod();
         logger.info("对账账期:{}", period);
 
         String today = DateUtil.format(new Date(), "yyyyMMdd");
