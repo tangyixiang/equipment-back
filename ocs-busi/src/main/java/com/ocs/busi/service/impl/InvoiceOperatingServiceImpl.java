@@ -4,7 +4,8 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.poi.excel.sax.Excel07SaxReader;
 import cn.hutool.poi.excel.sax.handler.RowHandler;
 import cn.hutool.poi.exceptions.POIException;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ocs.busi.domain.entity.CompanyReceivables;
 import com.ocs.busi.domain.entity.InvoiceOperating;
@@ -104,7 +105,7 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
 
     private void delRepeatData(List<InvoiceOperating> invoiceOperatingList) {
         for (InvoiceOperating invoice : invoiceOperatingList) {
-            LambdaQueryChainWrapper<InvoiceOperating> wrapper = lambdaQuery().eq(InvoiceOperating::getInvoiceId, invoice.getInvoiceId());
+            Wrapper<InvoiceOperating> wrapper = new LambdaQueryWrapper<InvoiceOperating>().eq(InvoiceOperating::getInvoiceId, invoice.getInvoiceId());
             List<InvoiceOperating> list = list(wrapper);
             if (list.size() > 0) {
                 logger.info("经营性发票重复导入,删除之前的,发票号码:{}", invoice.getInvoiceId());
@@ -236,7 +237,7 @@ public class InvoiceOperatingServiceImpl extends ServiceImpl<InvoiceOperatingMap
     }*/
 
     public String convertString(Object value) {
-        return value == null ? null : String.valueOf(value);
+        return value == null ? null : String.valueOf(value).trim();
     }
 
 }
