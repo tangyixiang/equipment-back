@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author tangyx
@@ -36,10 +37,12 @@ public class AccountingSubjectServiceImpl extends ServiceImpl<AccountingSubjectM
         SysDictData sysDictData = new SysDictData();
         sysDictData.setDictLabel(itemName);
         List<SysDictData> sysDictDataList = dictDataService.selectDictDataList(sysDictData);
-        SysDictData dictData = sysDictDataList.stream().filter(data -> dictTypeService.selectDictTypeByType(data.getDictType()).getGroup().equals(CommonConstants.DICT_FINANCE_GROUP))
-                .findFirst().get();
-
-        LambdaQueryWrapper<AccountingSubject> wrapper = new LambdaQueryWrapper<AccountingSubject>().eq(AccountingSubject::getItemId, dictData.getDictValue());
+        Optional<SysDictData> dictDataOptional = sysDictDataList.stream().filter(data -> dictTypeService.selectDictTypeByType(data.getDictType()).getGroup().equals(CommonConstants.DICT_FINANCE_GROUP))
+                .findFirst();
+        if (!dictDataOptional.isPresent()) {
+            return null;
+        }
+        LambdaQueryWrapper<AccountingSubject> wrapper = new LambdaQueryWrapper<AccountingSubject>().eq(AccountingSubject::getItemId, dictDataOptional.get().getDictValue());
         AccountingSubject subject = getOne(wrapper);
         return subject;
     }

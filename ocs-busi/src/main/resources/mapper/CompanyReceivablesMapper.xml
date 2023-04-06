@@ -53,7 +53,7 @@
                 AND receivable_amount &lt;= #{amountEnd}
             </if>
             <if test="clientOrgName != null and clientOrgName != ''">
-                AND client_org_name = #{clientOrgName}
+                AND client_org_name like CONCAT('%',#{clientOrgName},'%')
             </if>
             <if test="reconciliationFlag != null and reconciliationFlag != ''">
                 AND reconciliation_flag = #{reconciliationFlag}
@@ -63,6 +63,12 @@
             </if>
             <if test="associationIdStr != null and associationIdStr != ''">
                 AND association_id like concat('%', #{associationIdStr}, '%')
+            </if>
+            <if test="direction != null and direction != ''">
+                AND direction = #{direction}
+            </if>
+            <if test="valid != null ">
+                AND valid = #{valid}
             </if>
 
         </where>

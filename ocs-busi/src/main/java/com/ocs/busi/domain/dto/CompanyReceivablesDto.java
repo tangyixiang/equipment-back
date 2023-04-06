@@ -44,4 +44,10 @@ public class CompanyReceivablesDto {
 
     private String associationIdStr;
 
+    // 方向
+    private String direction;
+
+    // 有效
+    private Boolean valid;
+
 }
