@@ -50,6 +50,11 @@ public class BankFlowDto {
     private String comment;
 
     /**
+     * 摘要
+     */
+    private String summary;
+
+    /**
      * 对方单位名称
      */
     private String adversaryOrgName;

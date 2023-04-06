@@ -71,6 +71,9 @@
             <if test="comment != null and comment != ''">
                 AND comment like concat('%', #{comment}, '%')
             </if>
+            <if test="summary != null and summary != ''">
+                AND summary like concat('%', #{summary}, '%')
+            </if>
             <if test="otherInfo != null and otherInfo != ''">
                 AND other_info like concat('%', #{otherInfo}, '%')
             </if>
