@@ -77,6 +77,7 @@ public class InvoiceOperatingHandle {
             }
             splitList.addAll(taxList);
             splitList.addAll(incomeList);
+            splitList.forEach(split -> split.setName("开票分录"));
             saveSplit(splitList, taskId, period);
         }
         // 当前流水对账
@@ -99,6 +100,7 @@ public class InvoiceOperatingHandle {
             temp4.setFuncClassificCode("2013850");
             temp4.setFundsCode("34");
             List<InvoiceOperatingSplit> splitList = List.of(temp1, temp2, temp3, temp4);
+            splitList.forEach(split -> split.setName("回款对账分录"));
             saveSplit(splitList, taskId, period);
         }
 
@@ -115,6 +117,7 @@ public class InvoiceOperatingHandle {
                 InvoiceOperatingSplit temp1 = recRecord(increment, date, bankFlowLog, bankFlowLog.getAmount() * i, 0d, "100203");
                 InvoiceOperatingSplit temp2 = recRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount() * i, "2305010202");
                 List<InvoiceOperatingSplit> splitList = List.of(temp1, temp2);
+                splitList.forEach(split -> split.setName("回款预收分录"));
                 saveSplit(splitList, taskId, period);
             }
         }
@@ -142,6 +145,7 @@ public class InvoiceOperatingHandle {
             temp4.setFuncClassificCode("2013850");
             temp4.setFundsCode("34");
             List<InvoiceOperatingSplit> splitList = List.of(temp1, temp2, temp3, temp4);
+            splitList.forEach(split -> split.setName("预收冲应收分录"));
             saveSplit(splitList, taskId, period);
         }
 

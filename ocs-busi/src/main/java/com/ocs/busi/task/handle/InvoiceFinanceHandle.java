@@ -74,6 +74,7 @@ public class InvoiceFinanceHandle {
                 }
                 splitList.add(financeRecord(increment, invoiceFinance, financeItemValue.getValue()));
             }
+            splitList.forEach(split -> split.setName("开票分录"));
             saveSplit(splitList, taskId, period);
         }
 
@@ -89,7 +90,9 @@ public class InvoiceFinanceHandle {
             LocalDate date = getSplitDate(bankFlowLog);
             InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlowLog.getAmount() * i, 0d, "100204");
             InvoiceFinanceSplit temp2 = bankFlowRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount() * i, "12129901");
-            saveSplit(List.of(temp1, temp2), taskId, period);
+            List<InvoiceFinanceSplit> splitList = List.of(temp1, temp2);
+            splitList.forEach(split -> split.setName("回款对账分录"));
+            saveSplit(splitList, taskId, period);
         }
 
         List<BankFlowLog> allBankFlowList = new ArrayList<>(currentBankFlowList);
@@ -104,7 +107,9 @@ public class InvoiceFinanceHandle {
                 LocalDate date = getSplitDate(bankFlowLog);
                 InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlowLog.getAmount() * i, 0d, "100204");
                 InvoiceFinanceSplit temp2 = bankFlowRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount() * i, "21030118");
-                saveSplit(List.of(temp1, temp2), taskId, period);
+                List<InvoiceFinanceSplit> splitList = List.of(temp1, temp2);
+                splitList.forEach(split -> split.setName("回款预收分录"));
+                saveSplit(splitList, taskId, period);
             }
         }
 
@@ -124,7 +129,9 @@ public class InvoiceFinanceHandle {
             LocalDate date = getSplitDate(bankFlowLog);
             InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlowLog.getAmount(), 0d, "21030118");
             InvoiceFinanceSplit temp2 = bankFlowRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount(), "12129901");
-            saveSplit(List.of(temp1, temp2), taskId, period);
+            List<InvoiceFinanceSplit> splitList = List.of(temp1, temp2);
+            splitList.forEach(split -> split.setName("预收冲应收分录"));
+            saveSplit(splitList, taskId, period);
         }
 
         return atomicInteger.get();

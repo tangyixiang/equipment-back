@@ -18,6 +18,8 @@ public class InvoiceDataSplit {
     @TableField(exist = false)
     protected String splitType;
 
+    private String name;
+
     /**
      * 日期
      */
