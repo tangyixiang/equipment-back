@@ -89,6 +89,7 @@ public class CompanyReceivablesServiceImpl extends ServiceImpl<CompanyReceivable
                 List<BankFlow> bankFlows = bankFlowService.listByIds(bankFlowIds);
                 for (BankFlow bankFlow : bankFlows) {
                     Double usePrice = map.get(bankFlow.getId());
+                    bankFlow.setAssociationId(new ArrayList<>());
                     bankFlow.setReconciliationModel("");
                     bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() + usePrice);
                     bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() - usePrice);
