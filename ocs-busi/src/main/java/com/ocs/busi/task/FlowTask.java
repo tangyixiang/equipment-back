@@ -124,6 +124,7 @@ public class FlowTask {
 
                 BankFlow bankFlow = bankFlowOptional.get();
                 // 已对账金额
+                Double useAmount = companyReceivables.getUnConfirmAmount();
                 bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + companyReceivables.getUnConfirmAmount());
                 bankFlow.setUnConfirmPrice(bankFlow.getUnConfirmPrice() - companyReceivables.getUnConfirmAmount());
                 // 已对账
@@ -140,7 +141,7 @@ public class FlowTask {
                 companyReceivables.setUnConfirmAmount(0d);
 
                 // 添加日志
-                bankFlowLogService.addBankFlowUseLog(bankFlow, companyReceivables, companyReceivables.getUnConfirmAmount(), period);
+                bankFlowLogService.addBankFlowUseLog(bankFlow, companyReceivables, useAmount, period);
 
                 bankFlowService.updateById(bankFlow);
             }
