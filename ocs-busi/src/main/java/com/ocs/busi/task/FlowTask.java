@@ -37,8 +37,6 @@ public class FlowTask {
     private BankFlowLogService bankFlowLogService;
     @Autowired
     private FinancePeriodService financePeriodService;
-    // 账期
-    private String period;
 
     List<String> notReconciled = List.of(CommonConstants.NOT_RECONCILED, CommonConstants.PART_RECONCILED);
 
@@ -66,7 +64,7 @@ public class FlowTask {
         if (financePeriod == null) {
             throw new ServiceException("会计期间不存在");
         }
-        this.period = financePeriod.getPeriod();
+
         logger.info("对账账期:{}", period);
 
         String today = DateUtil.format(new Date(), "yyyyMMdd");
@@ -77,22 +75,22 @@ public class FlowTask {
 
         // 精准对账
         logger.info("银行流水金额 == 应收单金额对账开始");
-        oneBankFlowMatch(today, receivablesList, "equal");
+        oneBankFlowMatch(today, receivablesList, "equal", period);
         logger.info("银行流水金额 == 应收单金额对账结束");
         logger.info("==================================================");
         logger.info("银行流水金额 > 应收单金额对账开始");
-        oneBankFlowMatch(today, receivablesList, "gt");
+        oneBankFlowMatch(today, receivablesList, "gt", period);
         logger.info("银行流水金额 > 应收单金额对账结束");
         logger.info("==================================================");
         logger.info("银行流水金额 < 应收单金额对账开始");
-        multiBankFlowMatch(today, CommonConstants.AUTO_RECONCILIATION, receivablesList, null);
+        multiBankFlowMatch(today, CommonConstants.AUTO_RECONCILIATION, receivablesList, null, period);
         logger.info("银行流水金额 < 应收单金额对账结束");
     }
 
     /**
      * 单笔银行流水能覆盖单笔应收账单
      */
-    public void oneBankFlowMatch(String today, List<CompanyReceivables> receivablesList, String type) {
+    public void oneBankFlowMatch(String today, List<CompanyReceivables> receivablesList, String type, String period) {
         Map<String, List<CompanyReceivables>> receivablesGroupMap = receivablesList.stream().collect(Collectors.groupingBy(CompanyReceivables::getClientOrgName));
         for (String clientOrgName : receivablesGroupMap.keySet()) {
             logger.info("客户:{},开始自动对账", clientOrgName);
@@ -103,12 +101,12 @@ public class FlowTask {
             List<CompanyReceivables> companyReceivablesList = receivablesGroupMap.get(clientOrgName);
             companyReceivablesList.stream().sorted(Comparator.comparing(CompanyReceivables::getInvoicingDate));
 
-            bankFlowMatch(today, CommonConstants.AUTO_RECONCILIATION, bankFlowList, companyReceivablesList, type);
+            bankFlowMatch(today, CommonConstants.AUTO_RECONCILIATION, bankFlowList, companyReceivablesList, type, period);
         }
     }
 
 
-    public void bankFlowMatch(String today, String reconciliationModel, List<BankFlow> bankFlowList, List<CompanyReceivables> companyReceivablesList, String type) {
+    public void bankFlowMatch(String today, String reconciliationModel, List<BankFlow> bankFlowList, List<CompanyReceivables> companyReceivablesList, String type, String period) {
         // 过滤已经对账的数据
         List<CompanyReceivables> filterReceivables = filterReceivables(companyReceivablesList);
         for (CompanyReceivables companyReceivables : filterReceivables) {
@@ -153,7 +151,7 @@ public class FlowTask {
     /**
      * 多笔银行流水覆盖一笔应收账单
      */
-    public void multiBankFlowMatch(String today, String reconciliationModel, List<CompanyReceivables> receivablesList, List<BankFlow> bankFlowList) {
+    public void multiBankFlowMatch(String today, String reconciliationModel, List<CompanyReceivables> receivablesList, List<BankFlow> bankFlowList, String period) {
         List<CompanyReceivables> filterReceivables = filterReceivables(receivablesList);
         Map<String, List<CompanyReceivables>> receivablesGroupMap = filterReceivables.stream().collect(Collectors.groupingBy(CompanyReceivables::getClientOrgName));
 

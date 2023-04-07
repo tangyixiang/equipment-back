@@ -1,31 +1,35 @@
 package com.ocs;
 
-import cn.hutool.core.map.BiMap;
 import cn.hutool.db.meta.MetaUtil;
 import cn.hutool.db.meta.Table;
-import cn.hutool.log.Log;
-import cn.hutool.log.LogFactory;
+import com.ocs.busi.domain.entity.BankFlowLog;
+import com.ocs.busi.service.BankFlowLogService;
+import com.ocs.common.constant.CommonConstants;
 import com.ocs.web.controller.task.TaskController;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.text.MessageFormat;
-import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author tangyixiang
  * @Date 2022/10/13
  */
-// @SpringBootTest
+@Slf4j
+@SpringBootTest
 public class OfficeApplicationTest {
-
-    private static final Log log = LogFactory.get();
 
     @Autowired
     DataSource dataSource;
+
+    @Autowired
+    BankFlowLogService bankFlowLogService;
+
 
 
     @Test
@@ -44,16 +48,12 @@ public class OfficeApplicationTest {
         log.info("{}", table);
     }
 
-
     @Test
-    void hutoolDemo() {
-        BiMap<String, Object> map = new BiMap<>(new HashMap<>());
-        map.put("a", 1);
-        map.put("b", 2);
-        log.info("获取的值:{}", map.getKey(2));
-        String name = "张三";
-        log.info("{}", MessageFormat.format("你好{0}", name));
-
+    void aaaa() {
+        List<BankFlowLog> bankFlowLogs = bankFlowLogService.findByPeriod("202301", CommonConstants.RECEIVABLE_OPERATE, "eq");
+        log.info(bankFlowLogs.toString());
     }
+
+
 
 }

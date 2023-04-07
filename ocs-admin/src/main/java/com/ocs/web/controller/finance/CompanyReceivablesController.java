@@ -4,9 +4,11 @@ import cn.hutool.core.date.DateUtil;
 import com.ocs.busi.domain.dto.CompanyReceivablesDto;
 import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyReceivables;
+import com.ocs.busi.domain.entity.FinancePeriod;
 import com.ocs.busi.mapper.CompanyReceivablesMapper;
 import com.ocs.busi.service.BankFlowService;
 import com.ocs.busi.service.CompanyReceivablesService;
+import com.ocs.busi.service.FinancePeriodService;
 import com.ocs.busi.task.FlowTask;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.core.controller.BaseController;
@@ -41,6 +43,8 @@ public class CompanyReceivablesController extends BaseController {
     private BankFlowService bankFlowService;
     @Autowired
     private FlowTask flowTask;
+    @Autowired
+    private FinancePeriodService financePeriodService;
 
 
     @RequestMapping("/template/download")
@@ -76,27 +80,22 @@ public class CompanyReceivablesController extends BaseController {
         }
 
         List<BankFlow> bankFlowList = bankFlowService.listByIds(bankFlowIds);
-        // Map<String, List<CompanyReceivables>> receivablesGroupMap = companyReceivablesList.stream().collect(Collectors.groupingBy(CompanyReceivables::getClientOrgName));
-        // if (receivablesGroupMap.keySet().size() > 1) {
-        //     throw new ServiceException("应收单选择了不同名称的客户");
-        // }
 
-        /*Map<String, List<BankFlow>> bankFlowGroupMap = bankFlowList.stream().collect(Collectors.groupingBy(BankFlow::getAdversaryOrgName));
-        if (bankFlowGroupMap.keySet().size() > 1) {
-            throw new ServiceException("银行流水选择了不同名称的客户");
-        }
-
-        if (!receivablesGroupMap.keySet().containsAll(bankFlowGroupMap.keySet())) {
-            throw new ServiceException("应收单客户与银行流水客户不一致");
-        }*/
 
         String oldState = receivablesList.stream().map(CompanyReceivables::getReconciliationFlag).collect(Collectors.joining(","));
 
+        FinancePeriod financePeriod = financePeriodService.lambdaQuery().eq(FinancePeriod::getOpen, true).one();
+        if (financePeriod == null) {
+            throw new ServiceException("会计期间不存在");
+        }
+
+        String period = financePeriod.getPeriod();
+
         String today = DateUtil.format(new Date(), "yyyyMMdd");
         logger.info("开始手动对账");
-        flowTask.bankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, bankFlowList, receivablesList, "equal");
-        flowTask.bankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, bankFlowList, receivablesList, "gt");
-        flowTask.multiBankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, receivablesList, bankFlowList);
+        flowTask.bankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, bankFlowList, receivablesList, "equal", period);
+        flowTask.bankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, bankFlowList, receivablesList, "gt", period);
+        flowTask.multiBankFlowMatch(today, CommonConstants.MANUAL_RECONCILIATION, receivablesList, bankFlowList, period);
 
         List<CompanyReceivables> newReceivablesList = companyReceivablesService.listByIds(receivablesIds);
         String newState = newReceivablesList.stream().map(CompanyReceivables::getReconciliationFlag).collect(Collectors.joining(","));
