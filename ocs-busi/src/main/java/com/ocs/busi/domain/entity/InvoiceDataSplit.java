@@ -18,6 +18,7 @@ public class InvoiceDataSplit {
     @TableField(exist = false)
     protected String splitType;
 
+    @Excel(name = "分录名称")
     private String name;
 
     /**
