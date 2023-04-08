@@ -2,10 +2,7 @@ package com.ocs.busi.task.handle;
 
 import cn.hutool.core.util.IdUtil;
 import com.ocs.busi.domain.entity.*;
-import com.ocs.busi.service.AccountingSubjectService;
-import com.ocs.busi.service.BankFlowLogService;
-import com.ocs.busi.service.InvoiceFinanceService;
-import com.ocs.busi.service.InvoiceFinanceSplitService;
+import com.ocs.busi.service.*;
 import com.ocs.common.constant.CommonConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +34,8 @@ public class InvoiceFinanceHandle {
     private InvoiceFinanceService invoiceFinanceService;
     @Autowired
     private BankFlowLogService bankFlowLogService;
+    @Autowired
+    private BankFlowService bankFlowService;
 
     /**
      * 发票拆分
@@ -111,6 +110,23 @@ public class InvoiceFinanceHandle {
                 splitList.forEach(split -> split.setName("回款预收分录"));
                 saveSplit(splitList, taskId, period);
             }
+        }
+
+        List<String> bankFlowIds = currentBankFlowList.stream().map(BankFlowLog::getBankFlowId).collect(Collectors.toList());
+        // 本期没有对账的银行流水
+        List<BankFlow> bankFlowList = bankFlowService.lambdaQuery().eq(BankFlow::getPeriod, period).eq(BankFlow::getSelfAccount, "9558852102002052299").notIn(BankFlow::getId, bankFlowIds).list();
+        for (BankFlow bankFlow : bankFlowList) {
+            // 只有剩余未对账金额时生成
+            log.info("处理流水没有对账分录");
+            int increment = atomicInteger.incrementAndGet();
+            LocalDate date = LocalDate.now();
+            BankFlowLog bankFlowLog = new BankFlowLog();
+            bankFlowLog.setClientOrgName(bankFlow.getAdversaryOrgName());
+            InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlow.getUnConfirmPrice(), 0d, "100204");
+            InvoiceFinanceSplit temp2 = bankFlowRecord(increment, date, bankFlowLog, 0d, bankFlow.getUnConfirmPrice(), "21030118");
+            List<InvoiceFinanceSplit> splitList = List.of(temp1, temp2);
+            splitList.forEach(split -> split.setName("回款预收分录"));
+            saveSplit(splitList, taskId, period);
         }
 
         Map<String, List<BankFlowLog>> map = pastBankFlowList.stream().collect(Collectors.groupingBy(BankFlowLog::getBankFlowId));
