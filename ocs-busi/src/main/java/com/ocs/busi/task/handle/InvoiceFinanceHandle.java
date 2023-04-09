@@ -114,7 +114,8 @@ public class InvoiceFinanceHandle {
 
         List<String> bankFlowIds = currentBankFlowList.stream().map(BankFlowLog::getBankFlowId).collect(Collectors.toList());
         // 本期没有对账的银行流水
-        List<BankFlow> bankFlowList = bankFlowService.lambdaQuery().eq(BankFlow::getPeriod, period).eq(BankFlow::getSelfAccount, "9558852102002052299").notIn(BankFlow::getId, bankFlowIds).list();
+        List<BankFlow> bankFlowList = bankFlowService.lambdaQuery().eq(BankFlow::getPeriod, period).eq(BankFlow::getSelfAccount, "9558852102002052299")
+                .notIn(bankFlowIds.size() > 0, BankFlow::getId, bankFlowIds).list();
         for (BankFlow bankFlow : bankFlowList) {
             // 只有剩余未对账金额时生成
             log.info("处理流水没有对账分录");
