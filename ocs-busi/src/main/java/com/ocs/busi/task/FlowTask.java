@@ -139,6 +139,7 @@ public class FlowTask {
                 // 记录使用了这笔银行流水的金额
                 companyReceivables.getRemark().add(new ReceivableBankFlowMapping(bankFlow.getId(), companyReceivables.getUnConfirmAmount()));
                 companyReceivables.setUnConfirmAmount(0d);
+                companyReceivables.getAssociationId().add(dzId);
 
                 // 添加日志
                 bankFlowLogService.addBankFlowUseLog(bankFlow, companyReceivables, useAmount, period);
@@ -231,6 +232,7 @@ public class FlowTask {
                 }
                 companyReceivables.setReconciliationModel(reconciliationModel);
                 companyReceivables.setReconciliationFlag(diff > 0 ? CommonConstants.PART_RECONCILED : CommonConstants.RECONCILED);
+                companyReceivables.getAssociationId().add(dzId);
                 bankFlowService.updateBatchById(bankFlowList);
             }
             companyReceivablesService.updateBatchById(list);

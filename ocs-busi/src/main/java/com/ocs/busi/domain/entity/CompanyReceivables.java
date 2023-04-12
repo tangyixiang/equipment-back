@@ -3,6 +3,7 @@ package com.ocs.busi.domain.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.ocs.busi.config.GenericJacksonJsonTypeHandler;
 import com.ocs.busi.domain.model.ReceivableBankFlowMapping;
 import com.ocs.common.core.domain.SimpleEntity;
@@ -97,6 +98,12 @@ public class CompanyReceivables extends SimpleEntity {
      * 有效
      */
     private Boolean valid;
+
+    /**
+     * 应收对账ID
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> associationId = new ArrayList<>();
 
     /**
      * 备注
