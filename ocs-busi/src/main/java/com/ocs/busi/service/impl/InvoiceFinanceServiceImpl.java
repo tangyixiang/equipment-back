@@ -70,7 +70,7 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
 
     private void saveReceivable(List<InvoiceFinance> invoiceFinanceList, String period) {
         List<CompanyReceivables> receivablesList = new ArrayList<>();
-        List<String> redList = invoiceFinanceList.stream().filter(invoiceFinance -> invoiceFinance.getElectronInvoiceNo() != null)
+        List<String> redList = invoiceFinanceList.stream().filter(invoiceFinance -> StringUtils.isNotEmpty(invoiceFinance.getElectronInvoiceNo()))
                 .map(invoiceFinance -> invoiceFinance.getElectronInvoiceNo().trim()).collect(Collectors.toList());
 
         for (InvoiceFinance invoice : invoiceFinanceList) {
@@ -86,7 +86,7 @@ public class InvoiceFinanceServiceImpl extends ServiceImpl<InvoiceFinanceMapper,
             receivables.setReconciliationFlag(CommonConstants.NOT_RECONCILED);
             receivables.setValid(!redList.contains(invoice.getInvoiceId()));
             receivables.setInvoiceId(invoice.getInvoiceId());
-            receivables.setDirection(invoice.getElectronInvoiceNo() == null ? CommonConstants.INVOICE_DIRECT_FORWARD : CommonConstants.INVOICE_DIRECT_REVERSE);
+            receivables.setDirection(StringUtils.isEmpty(invoice.getElectronInvoiceNo()) ? CommonConstants.INVOICE_DIRECT_FORWARD : CommonConstants.INVOICE_DIRECT_REVERSE);
             receivablesList.add(receivables);
         }
 
