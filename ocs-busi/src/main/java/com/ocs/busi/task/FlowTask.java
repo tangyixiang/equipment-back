@@ -204,18 +204,20 @@ public class FlowTask {
                     } else if (diff == 0) {
                         // 如果差值相等，则用掉所有余额
                         companyReceivables.getRemark().add(new ReceivableBankFlowMapping(bankFlow.getId(), bankFlow.getUnConfirmPrice()));
-                        bankFlow.setUnConfirmPrice(0d);
+                        Double useAmount = bankFlow.getUnConfirmPrice();
                         bankFlow.setConfirmPrice(bankFlow.getPrice());
+                        bankFlow.setUnConfirmPrice(0d);
                         bankFlow.setReconciliationFlag(CommonConstants.RECONCILED);
-                        // 添加日志
-                        bankFlowLogService.addBankFlowUseLog(bankFlow, companyReceivables, bankFlow.getUnConfirmPrice(), period);
+                        // 添加日志,日志计算需要银行流水准确的未对账金额
+                        bankFlowLogService.addBankFlowUseLog(bankFlow, companyReceivables, useAmount, period);
                         break;
                     } else {
                         companyReceivables.getRemark().add(new ReceivableBankFlowMapping(bankFlow.getId(), bankFlow.getUnConfirmPrice()));
+                        Double useAmount = bankFlow.getUnConfirmPrice();
                         bankFlow.setConfirmPrice(bankFlow.getConfirmPrice() + bankFlow.getUnConfirmPrice());
                         bankFlow.setUnConfirmPrice(0d);
-                        // 添加日志
-                        bankFlowLogService.addBankFlowUseLog(bankFlow, companyReceivables, bankFlow.getUnConfirmPrice(), period);
+                        // 添加日志,日志计算需要银行流水准确的未对账金额
+                        bankFlowLogService.addBankFlowUseLog(bankFlow, companyReceivables, useAmount, period);
                     }
                 }
                 logger.info("多笔银行流水金额匹配结束");

@@ -36,7 +36,7 @@ public class SecurityUtils {
      * 获取用户
      **/
     public static LoginUser getLoginUser() {
-        Object principal = getAuthentication().getPrincipal();
+        Object principal = getAuthentication() != null ? getAuthentication().getPrincipal() : null;
 
         if (principal == null) {
             log.error("获取用户信息为NULL");

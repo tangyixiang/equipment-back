@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -88,7 +89,7 @@ public class InvoiceOperatingHandle {
         List<BankFlowLog> pastBankFlowList = bankFlowLogService.findByPeriod(period, CommonConstants.RECEIVABLE_OPERATE, "lt");
 
         for (BankFlowLog bankFlowLog : currentBankFlowList) {
-            log.info("处理当前流水对账分录");
+            log.info("处理当前流水对账的分录");
             int increment = atomicInteger.incrementAndGet();
             int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? -1 : 1;
             LocalDate date = getSplitDate(bankFlowLog);
@@ -112,9 +113,9 @@ public class InvoiceOperatingHandle {
         for (BankFlowLog bankFlowLog : allBankFlowList) {
             // 只有剩余未对账金额时生成
             if (bankFlowLog.getUnConfirmBankAmount() > 0) {
-                log.info("处理流水对账未完全分录");
+                log.info("处理流水对账未完全的分录");
                 int increment = atomicInteger.incrementAndGet();
-                int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? 1 : -1;
+                int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? -1 : 1;
                 LocalDate date = getSplitDate(bankFlowLog);
                 InvoiceOperatingSplit temp1 = recRecord(increment, date, bankFlowLog, bankFlowLog.getAmount() * i, 0d, "100203");
                 InvoiceOperatingSplit temp2 = recRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount() * i, "2305010202");
@@ -124,12 +125,12 @@ public class InvoiceOperatingHandle {
             }
         }
 
-        List<String> bankFlowIds = currentBankFlowList.stream().map(BankFlowLog::getBankFlowId).collect(Collectors.toList());
+        Set<String> bankFlowIds = currentBankFlowList.stream().map(BankFlowLog::getBankFlowId).collect(Collectors.toSet());
         // 本期没有对账的银行流水
-        List<BankFlow> bankFlowList = bankFlowService.lambdaQuery().eq(BankFlow::getPeriod, period).eq(BankFlow::getSelfAccount, "2103215119300148266")
+        List<BankFlow> bankFlowList = bankFlowService.lambdaQuery().eq(BankFlow::getPeriod, period).eq(BankFlow::getSelfAccount, "2103215119300148266").ne(BankFlow::getReconciliationFlag, CommonConstants.NOT_RECONCILED)
                 .notIn(bankFlowIds.size() > 0, BankFlow::getId, bankFlowIds).list();
         for (BankFlow bankFlow : bankFlowList) {
-            log.info("处理流水没有对账分录");
+            log.info("处理流水没有对账的分录");
             int increment = atomicInteger.incrementAndGet();
             LocalDate date = LocalDate.now();
             BankFlowLog bankFlowLog = new BankFlowLog();
@@ -154,6 +155,7 @@ public class InvoiceOperatingHandle {
         }
 
         for (BankFlowLog bankFlowLog : pastBankUnCancelList) {
+            log.info("处理预收冲应收的分录");
             int increment = atomicInteger.incrementAndGet();
             LocalDate date = getSplitDate(bankFlowLog);
             InvoiceOperatingSplit temp1 = recRecord(increment, date, bankFlowLog, bankFlowLog.getAmount(), 0d, "2305010202");
