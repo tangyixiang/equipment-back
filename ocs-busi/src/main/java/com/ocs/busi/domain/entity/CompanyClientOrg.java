@@ -29,7 +29,7 @@ public class CompanyClientOrg extends SimpleEntity {
     /**
      * 统一社会信用码
      */
-    @NotBlank(message = "统一社会信用码不能为空")
+    //@NotBlank(message = "统一社会信用码不能为空")
     private String socialCreditCode;
 
     /**
