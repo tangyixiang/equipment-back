@@ -104,8 +104,8 @@ public class InvoiceFinanceHandle {
                 int increment = atomicInteger.incrementAndGet();
                 int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? -1 : 1;
                 LocalDate date = getSplitDate(bankFlowLog);
-                InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlowLog.getAmount() * i, 0d, "100204");
-                InvoiceFinanceSplit temp2 = bankFlowRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount() * i, "21030118");
+                InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlowLog.getUnConfirmBankAmount() * i, 0d, "100204");
+                InvoiceFinanceSplit temp2 = bankFlowRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getUnConfirmBankAmount() * i, "21030118");
                 List<InvoiceFinanceSplit> splitList = List.of(temp1, temp2);
                 splitList.forEach(split -> split.setName("回款预收分录"));
                 saveSplit(splitList, taskId, period);
@@ -114,7 +114,7 @@ public class InvoiceFinanceHandle {
 
         List<String> bankFlowIds = currentBankFlowList.stream().map(BankFlowLog::getBankFlowId).collect(Collectors.toList());
         // 本期没有对账的银行流水
-        List<BankFlow> bankFlowList = bankFlowService.lambdaQuery().eq(BankFlow::getPeriod, period).eq(BankFlow::getSelfAccount, "9558852102002052299").ne(BankFlow::getReconciliationFlag, CommonConstants.NOT_RECONCILED)
+        List<BankFlow> bankFlowList = bankFlowService.lambdaQuery().eq(BankFlow::getPeriod, period).eq(BankFlow::getSelfAccount, "9558852102002052299").eq(BankFlow::getReconciliationFlag, CommonConstants.NOT_RECONCILED)
                 .notIn(bankFlowIds.size() > 0, BankFlow::getId, bankFlowIds).list();
         for (BankFlow bankFlow : bankFlowList) {
             // 只有剩余未对账金额时生成

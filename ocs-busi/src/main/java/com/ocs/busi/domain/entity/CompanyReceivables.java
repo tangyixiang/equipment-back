@@ -1,5 +1,6 @@
 package com.ocs.busi.domain.entity;
 
+import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -112,4 +113,15 @@ public class CompanyReceivables extends SimpleEntity {
     private List<ReceivableBankFlowMapping> remark = new ArrayList<>();
 
 
+    public void setReceivableAmount(Double receivableAmount) {
+        this.receivableAmount = NumberUtil.round(receivableAmount, 2).doubleValue();
+    }
+
+    public void setConfirmAmount(Double confirmAmount) {
+        this.confirmAmount = NumberUtil.round(confirmAmount, 2).doubleValue();
+    }
+
+    public void setUnConfirmAmount(Double unConfirmAmount) {
+        this.unConfirmAmount = NumberUtil.round(unConfirmAmount, 2).doubleValue();
+    }
 }

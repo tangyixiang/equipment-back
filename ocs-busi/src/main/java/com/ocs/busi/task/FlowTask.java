@@ -1,12 +1,16 @@
 package com.ocs.busi.task;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ocs.busi.domain.entity.BankFlow;
 import com.ocs.busi.domain.entity.CompanyReceivables;
 import com.ocs.busi.domain.entity.FinancePeriod;
 import com.ocs.busi.domain.model.ReceivableBankFlowMapping;
-import com.ocs.busi.service.*;
+import com.ocs.busi.service.BankFlowLogService;
+import com.ocs.busi.service.BankFlowService;
+import com.ocs.busi.service.CompanyReceivablesService;
+import com.ocs.busi.service.FinancePeriodService;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
 import org.apache.commons.lang3.ObjectUtils;
@@ -258,6 +262,10 @@ public class FlowTask {
      */
     private List<BankFlow> filterBankFLow(List<BankFlow> list, String bankAccount) {
         return list.stream().filter(flow -> !flow.getReconciliationFlag().equals(CommonConstants.RECONCILED)).filter(flow -> flow.getSelfAccount().equals(bankAccount)).collect(Collectors.toList());
+    }
+
+    private Double preciseCompute(Double value){
+        return NumberUtil.round(value, 2).doubleValue();
     }
 
 }

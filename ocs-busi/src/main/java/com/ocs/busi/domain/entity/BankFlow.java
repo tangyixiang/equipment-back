@@ -1,5 +1,6 @@
 package com.ocs.busi.domain.entity;
 
+import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
  */
 @Data
 @TableName(value = "bank_flow", autoResultMap = true)
@@ -129,4 +131,16 @@ public class BankFlow extends SimpleEntity {
     @TableField(exist = false)
     private String associationIdStr;
 
+
+    public void setPrice(Double price) {
+        this.price = NumberUtil.round(price, 2).doubleValue();
+    }
+
+    public void setConfirmPrice(Double confirmPrice) {
+        this.confirmPrice = NumberUtil.round(confirmPrice, 2).doubleValue();
+    }
+
+    public void setUnConfirmPrice(Double unConfirmPrice) {
+        this.unConfirmPrice = NumberUtil.round(unConfirmPrice, 2).doubleValue();
+    }
 }
