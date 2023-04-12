@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -78,11 +79,11 @@ public class InvoiceFinanceHandle {
         }
 
         // 当前流水对账
-        List<BankFlowLog> currentBankFlowList = bankFlowLogService.findByPeriod(period, CommonConstants.RECEIVABLE_FINANCE, "eq");
+        List<BankFlowLog> currentBankFlowLogList = bankFlowLogService.findByPeriod(period, CommonConstants.RECEIVABLE_FINANCE, "eq");
         // 往期流水对账
-        List<BankFlowLog> pastBankFlowList = bankFlowLogService.findByPeriod(period, CommonConstants.RECEIVABLE_FINANCE, "lt");
+        List<BankFlowLog> pastBankFlowLogList = bankFlowLogService.findByPeriod(period, CommonConstants.RECEIVABLE_FINANCE, "lt");
 
-        for (BankFlowLog bankFlowLog : currentBankFlowList) {
+        for (BankFlowLog bankFlowLog : currentBankFlowLogList) {
             log.info("处理当前流水对账分录");
             int increment = atomicInteger.incrementAndGet();
             int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? -1 : 1;
@@ -94,25 +95,25 @@ public class InvoiceFinanceHandle {
             saveSplit(splitList, taskId, period);
         }
 
-        List<BankFlowLog> allBankFlowList = new ArrayList<>(currentBankFlowList);
-        allBankFlowList.addAll(pastBankFlowList);
-        // 财政
-        for (BankFlowLog bankFlowLog : allBankFlowList) {
+        // 本期进行了对账的银行流水
+        Set<String> bankFlowIds = currentBankFlowLogList.stream().map(BankFlowLog::getBankFlowId).collect(Collectors.toSet());
+        List<BankFlow> currentBankFlow = bankFlowService.listByIds(bankFlowIds);
+
+        for (BankFlow bankFlow : currentBankFlow) {
             // 只有剩余未对账金额时生成
-            if (bankFlowLog.getUnConfirmBankAmount() > 0) {
-                log.info("处理流水对账未完全分录");
+            if (bankFlow.getUnConfirmPrice() > 0) {
+                log.info("处理流水对账未完全的分录");
                 int increment = atomicInteger.incrementAndGet();
-                int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? -1 : 1;
+                BankFlowLog bankFlowLog = currentBankFlowLogList.stream().filter(log -> log.getBankFlowId().equals(bankFlow.getId())).findAny().get();
                 LocalDate date = getSplitDate(bankFlowLog);
-                InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlowLog.getUnConfirmBankAmount() * i, 0d, "100204");
-                InvoiceFinanceSplit temp2 = bankFlowRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getUnConfirmBankAmount() * i, "21030118");
+                InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlow.getUnConfirmPrice(), 0d, "100204");
+                InvoiceFinanceSplit temp2 = bankFlowRecord(increment, date, bankFlowLog, 0d, bankFlow.getUnConfirmPrice(), "21030118");
                 List<InvoiceFinanceSplit> splitList = List.of(temp1, temp2);
                 splitList.forEach(split -> split.setName("回款预收分录"));
                 saveSplit(splitList, taskId, period);
             }
         }
 
-        List<String> bankFlowIds = currentBankFlowList.stream().map(BankFlowLog::getBankFlowId).collect(Collectors.toList());
         // 本期没有对账的银行流水
         List<BankFlow> bankFlowList = bankFlowService.lambdaQuery().eq(BankFlow::getPeriod, period).eq(BankFlow::getSelfAccount, "9558852102002052299").eq(BankFlow::getReconciliationFlag, CommonConstants.NOT_RECONCILED)
                 .notIn(bankFlowIds.size() > 0, BankFlow::getId, bankFlowIds).list();
@@ -130,7 +131,7 @@ public class InvoiceFinanceHandle {
             saveSplit(splitList, taskId, period);
         }
 
-        Map<String, List<BankFlowLog>> map = pastBankFlowList.stream().collect(Collectors.groupingBy(BankFlowLog::getBankFlowId));
+        Map<String, List<BankFlowLog>> map = pastBankFlowLogList.stream().collect(Collectors.groupingBy(BankFlowLog::getBankFlowId));
         // 往期对账未取消对账
         List<BankFlowLog> pastBankUnCancelList = new ArrayList<>();
         for (String bankFlowId : map.keySet()) {
