@@ -97,20 +97,21 @@ public class InvoiceFinanceHandle {
 
         // 本期进行了对账的银行流水
         Set<String> bankFlowIds = currentBankFlowLogList.stream().map(BankFlowLog::getBankFlowId).collect(Collectors.toSet());
-        List<BankFlow> currentBankFlow = bankFlowService.lambdaQuery().in(bankFlowIds.size() > 0, BankFlow::getId, bankFlowIds).list();
-
-        for (BankFlow bankFlow : currentBankFlow) {
-            // 只有剩余未对账金额时生成
-            if (bankFlow.getUnConfirmPrice() > 0) {
-                log.info("处理流水对账未完全的分录");
-                int increment = atomicInteger.incrementAndGet();
-                BankFlowLog bankFlowLog = currentBankFlowLogList.stream().filter(log -> log.getBankFlowId().equals(bankFlow.getId())).findAny().get();
-                LocalDate date = getSplitDate(bankFlowLog);
-                InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlow.getUnConfirmPrice(), 0d, "100204");
-                InvoiceFinanceSplit temp2 = bankFlowRecord(increment, date, bankFlowLog, 0d, bankFlow.getUnConfirmPrice(), "21030118");
-                List<InvoiceFinanceSplit> splitList = List.of(temp1, temp2);
-                splitList.forEach(split -> split.setName("回款预收分录"));
-                saveSplit(splitList, taskId, period);
+        if (bankFlowIds.size() > 0) {
+            List<BankFlow> currentBankFlow = bankFlowService.listByIds(bankFlowIds);
+            for (BankFlow bankFlow : currentBankFlow) {
+                // 只有剩余未对账金额时生成
+                if (bankFlow.getUnConfirmPrice() > 0) {
+                    log.info("处理流水对账未完全的分录");
+                    int increment = atomicInteger.incrementAndGet();
+                    BankFlowLog bankFlowLog = currentBankFlowLogList.stream().filter(log -> log.getBankFlowId().equals(bankFlow.getId())).findAny().get();
+                    LocalDate date = getSplitDate(bankFlowLog);
+                    InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlow.getUnConfirmPrice(), 0d, "100204");
+                    InvoiceFinanceSplit temp2 = bankFlowRecord(increment, date, bankFlowLog, 0d, bankFlow.getUnConfirmPrice(), "21030118");
+                    List<InvoiceFinanceSplit> splitList = List.of(temp1, temp2);
+                    splitList.forEach(split -> split.setName("回款预收分录"));
+                    saveSplit(splitList, taskId, period);
+                }
             }
         }
 
