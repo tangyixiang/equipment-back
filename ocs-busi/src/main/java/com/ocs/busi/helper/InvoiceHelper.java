@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class InvoiceHelper {
@@ -68,10 +67,10 @@ public class InvoiceHelper {
             if (clientOrgList.size() == 0) {
                 throw new ServiceException("缴款人:" + payer + ",不存在");
             }
-            Optional<CompanyClientOrg> clientOrg = clientOrgList.stream().filter(org -> org.getSocialCreditCode().equals(socialCreditCode)).findAny();
+            /*Optional<CompanyClientOrg> clientOrg = clientOrgList.stream().filter(org -> org.getSocialCreditCode().equals(socialCreditCode)).findAny();
             if (!clientOrg.isPresent()) {
                 throw new ServiceException("缴款人:" + payer + ",社会信用统一代码与系统录入的不匹配");
-            }
+            }*/
 
             validateEmployee(creator);
         }
