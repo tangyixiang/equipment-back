@@ -1,6 +1,5 @@
 package com.ocs.web.controller.task;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ocs.busi.domain.dto.TaskDto;
 import com.ocs.busi.domain.dto.TaskRunDto;
 import com.ocs.busi.domain.entity.InvoiceDataSplit;
@@ -69,11 +68,11 @@ public class TaskController extends BaseController {
         SysJobLog sysJobLog = sysJobLogService.selectJobLogById(jobLogId);
         String taskId = sysJobLog.getTaskId();
         if (StringUtils.isNotEmpty(taskId)) {
-            LambdaQueryWrapper<InvoiceOperatingSplit> wrapper1 = new LambdaQueryWrapper<InvoiceOperatingSplit>().eq(InvoiceOperatingSplit::getTaskId, TaskIDPrefixConstants.OPERATE_TASK + taskId);
-            List<InvoiceOperatingSplit> invoiceOperatingSplits = invoiceOperatingSplitService.list(wrapper1);
+            List<InvoiceOperatingSplit> invoiceOperatingSplits = invoiceOperatingSplitService.lambdaQuery().eq(InvoiceOperatingSplit::getTaskId, TaskIDPrefixConstants.OPERATE_TASK + taskId)
+                    .orderByAsc(InvoiceOperatingSplit::getCertificateId).list();
 
-            LambdaQueryWrapper<InvoiceFinanceSplit> wrapper2 = new LambdaQueryWrapper<InvoiceFinanceSplit>().eq(InvoiceFinanceSplit::getTaskId, TaskIDPrefixConstants.FINANCE_TASK + taskId);
-            List<InvoiceFinanceSplit> invoiceFinanceSplits = invoiceFinanceSplitService.list(wrapper2);
+            List<InvoiceFinanceSplit> invoiceFinanceSplits = invoiceFinanceSplitService.lambdaQuery().eq(InvoiceFinanceSplit::getTaskId, TaskIDPrefixConstants.FINANCE_TASK + taskId)
+                    .orderByAsc(InvoiceFinanceSplit::getCertificateId).list();
 
             List<InvoiceDataSplit> list = new ArrayList<>();
             invoiceOperatingSplits.forEach(op -> {
