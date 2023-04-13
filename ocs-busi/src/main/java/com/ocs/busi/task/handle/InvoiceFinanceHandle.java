@@ -97,7 +97,7 @@ public class InvoiceFinanceHandle {
 
         // 本期进行了对账的银行流水
         Set<String> bankFlowIds = currentBankFlowLogList.stream().map(BankFlowLog::getBankFlowId).collect(Collectors.toSet());
-        List<BankFlow> currentBankFlow = bankFlowService.listByIds(bankFlowIds);
+        List<BankFlow> currentBankFlow = bankFlowService.lambdaQuery().in(bankFlowIds.size() > 0, BankFlow::getId, bankFlowIds).list();
 
         for (BankFlow bankFlow : currentBankFlow) {
             // 只有剩余未对账金额时生成
