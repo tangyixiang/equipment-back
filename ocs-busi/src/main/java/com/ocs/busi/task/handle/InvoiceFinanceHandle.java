@@ -72,7 +72,7 @@ public class InvoiceFinanceHandle {
                 if (financeItemValue == null) {
                     log.error("未找到科目编码,科目名称:{}", itemName);
                 }
-                splitList.add(financeRecord(increment, invoiceFinance, financeItemValue.getValue()));
+                splitList.add(financeRecord(increment, invoiceFinance, financeItemValue == null ? "" : financeItemValue.getValue()));
             }
             splitList.forEach(split -> split.setName("开票分录"));
             saveSplit(splitList, taskId, period);
