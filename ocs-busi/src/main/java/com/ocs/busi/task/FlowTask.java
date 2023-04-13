@@ -13,7 +13,6 @@ import com.ocs.busi.service.CompanyReceivablesService;
 import com.ocs.busi.service.FinancePeriodService;
 import com.ocs.common.constant.CommonConstants;
 import com.ocs.common.exception.ServiceException;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,12 +162,13 @@ public class FlowTask {
 
         for (String clientOrgName : receivablesGroupMap.keySet()) {
             logger.info("客户:{},开始对账-多笔流水", clientOrgName);
-
-            if (ObjectUtils.isEmpty(bankFlowList)) {
+            // 自动对账
+            if (CommonConstants.AUTO_RECONCILIATION.equals(reconciliationModel)) {
                 LambdaQueryWrapper<BankFlow> bankFlowWrapper = new LambdaQueryWrapper<BankFlow>().in(BankFlow::getReconciliationFlag, notReconciled)
                         .eq(BankFlow::getAdversaryOrgName, clientOrgName).eq(BankFlow::getTradeType, CommonConstants.LOAN);
                 bankFlowList = bankFlowService.list(bankFlowWrapper);
             }
+
             List<CompanyReceivables> list = receivablesGroupMap.get(clientOrgName);
             list.stream().sorted(Comparator.comparing(CompanyReceivables::getInvoicingDate));
 
@@ -264,7 +264,7 @@ public class FlowTask {
         return list.stream().filter(flow -> !flow.getReconciliationFlag().equals(CommonConstants.RECONCILED)).filter(flow -> flow.getSelfAccount().equals(bankAccount)).collect(Collectors.toList());
     }
 
-    private Double preciseCompute(Double value){
+    private Double preciseCompute(Double value) {
         return NumberUtil.round(value, 2).doubleValue();
     }
 

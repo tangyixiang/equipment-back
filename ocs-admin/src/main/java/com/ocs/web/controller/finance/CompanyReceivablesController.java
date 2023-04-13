@@ -81,7 +81,6 @@ public class CompanyReceivablesController extends BaseController {
 
         List<BankFlow> bankFlowList = bankFlowService.listByIds(bankFlowIds);
 
-
         String oldState = receivablesList.stream().map(CompanyReceivables::getReconciliationFlag).collect(Collectors.joining(","));
 
         FinancePeriod financePeriod = financePeriodService.lambdaQuery().eq(FinancePeriod::getOpen, true).one();
