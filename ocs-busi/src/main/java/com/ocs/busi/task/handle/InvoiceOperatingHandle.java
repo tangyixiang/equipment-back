@@ -3,6 +3,7 @@ package com.ocs.busi.task.handle;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.IdUtil;
 import com.ocs.busi.domain.entity.*;
+import com.ocs.busi.helper.InvoiceHelper;
 import com.ocs.busi.service.*;
 import com.ocs.common.constant.CommonConstants;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,8 @@ public class InvoiceOperatingHandle {
     @Autowired
     private InvoiceOperatingService invoiceOperatingService;
     @Autowired
+    private InvoiceHelper invoiceHelper;
+    @Autowired
     private BankFlowLogService bankFlowLogService;
     @Autowired
     private BankFlowService bankFlowService;
@@ -62,7 +65,12 @@ public class InvoiceOperatingHandle {
             List<Double> priceList = computeTotalPrice(invoiceOperatingList);
             int increment = atomicInteger.incrementAndGet();
             InvoiceOperating firstInvoice = invoiceOperatingList.get(0);
-            String date = LocalDateTimeUtil.format(firstInvoice.getInvoicingTime().toLocalDate(), "yyyy-MM-dd");
+            // 发票时间
+            LocalDate invoiceDate = firstInvoice.getInvoicingTime().toLocalDate();
+            // 会计最后一天
+            LocalDate periodDate = invoiceHelper.getPeriodLastDate(firstInvoice.getInvoicingPeriod());
+            LocalDate actualDate = invoiceDate.isBefore(periodDate) ? invoiceDate : periodDate;
+            String date = LocalDateTimeUtil.format(actualDate, "yyyy-MM-dd");
 
             List<InvoiceOperatingSplit> splitList = new ArrayList<>();
             // 汇总
@@ -75,8 +83,8 @@ public class InvoiceOperatingHandle {
                 String itemName = getItemName(invoiceOperating);
                 // 科目编号
                 Map<String, String> nameValueMap = accountingSubjectService.findOperatingData(itemName);
-                taxList.add(taxRecord(increment, invoiceOperating, itemName, nameValueMap.get("经营核算税科目映射关系")));
-                incomeList.add(incomeRecord(increment, invoiceOperating, itemName, nameValueMap.get("经营核算收入科目映射关系")));
+                taxList.add(taxRecord(increment, invoiceOperating, itemName, nameValueMap.get("经营核算税科目映射关系"), date));
+                incomeList.add(incomeRecord(increment, invoiceOperating, itemName, nameValueMap.get("经营核算收入科目映射关系"), date));
             }
             splitList.addAll(taxList);
             splitList.addAll(incomeList);
@@ -92,7 +100,8 @@ public class InvoiceOperatingHandle {
             log.info("处理当前流水对账的分录");
             int increment = atomicInteger.incrementAndGet();
             int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? -1 : 1;
-            LocalDate date = getSplitDate(bankFlowLog);
+            LocalDate periodLastDate = invoiceHelper.getPeriodLastDate(bankFlowLog.getPeriod());
+            LocalDate date = bankFlowLog.getCreateTime().toLocalDate().isBefore(periodLastDate) ? bankFlowLog.getCreateTime().toLocalDate() : periodLastDate;
 
             InvoiceOperatingSplit temp1 = recRecord(increment, date, bankFlowLog, bankFlowLog.getAmount() * i, 0d, "100203");
             InvoiceOperatingSplit temp2 = recRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount() * i, "12129902");
@@ -116,7 +125,7 @@ public class InvoiceOperatingHandle {
                     log.info("处理流水对账未完全的分录");
                     int increment = atomicInteger.incrementAndGet();
                     BankFlowLog bankFlowLog = currentBankFlowLogList.stream().filter(log -> log.getBankFlowId().equals(bankFlow.getId())).findAny().get();
-                    LocalDate date = getSplitDate(bankFlowLog);
+                    LocalDate date = invoiceHelper.getPeriodLastDate(bankFlowLog.getPeriod());
                     InvoiceOperatingSplit temp1 = recRecord(increment, date, bankFlowLog, bankFlow.getUnConfirmPrice(), 0d, "100203");
                     InvoiceOperatingSplit temp2 = recRecord(increment, date, bankFlowLog, 0d, bankFlow.getUnConfirmPrice(), "2305010202");
                     List<InvoiceOperatingSplit> splitList = List.of(temp1, temp2);
@@ -126,14 +135,13 @@ public class InvoiceOperatingHandle {
             }
         }
 
-
         // 本期没有对账的银行流水
         List<BankFlow> bankFlowList = bankFlowService.lambdaQuery().eq(BankFlow::getPeriod, period).eq(BankFlow::getSelfAccount, "2103215119300148266").eq(BankFlow::getReconciliationFlag, CommonConstants.NOT_RECONCILED)
                 .notIn(bankFlowIds.size() > 0, BankFlow::getId, bankFlowIds).list();
         for (BankFlow bankFlow : bankFlowList) {
             log.info("处理流水没有对账的分录");
             int increment = atomicInteger.incrementAndGet();
-            LocalDate date = LocalDate.now();
+            LocalDate date = invoiceHelper.getPeriodLastDate(bankFlow.getPeriod());
             BankFlowLog bankFlowLog = new BankFlowLog();
             bankFlowLog.setClientOrgName(bankFlow.getAdversaryOrgName());
             InvoiceOperatingSplit temp1 = recRecord(increment, date, bankFlowLog, bankFlow.getUnConfirmPrice(), 0d, "100203");
@@ -158,7 +166,9 @@ public class InvoiceOperatingHandle {
         for (BankFlowLog bankFlowLog : pastBankUnCancelList) {
             log.info("处理预收冲应收的分录");
             int increment = atomicInteger.incrementAndGet();
-            LocalDate date = getSplitDate(bankFlowLog);
+            LocalDate periodLastDate = invoiceHelper.getPeriodLastDate(bankFlowLog.getPeriod());
+            LocalDate date = bankFlowLog.getCreateTime().toLocalDate().isBefore(periodLastDate) ? bankFlowLog.getCreateTime().toLocalDate() : periodLastDate;
+
             InvoiceOperatingSplit temp1 = recRecord(increment, date, bankFlowLog, bankFlowLog.getAmount(), 0d, "2305010202");
             InvoiceOperatingSplit temp2 = recRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount(), "12129902");
             InvoiceOperatingSplit temp3 = recRecord(increment, date, bankFlowLog, bankFlowLog.getAmount(), 0d, "800102");
@@ -175,21 +185,6 @@ public class InvoiceOperatingHandle {
         return atomicInteger.get();
     }
 
-    private LocalDate getSplitDate(BankFlowLog bankFlowLog) {
-        LocalDate date = null;
-        // 对账日期，如果在本月就取对账日期，发生在次月，就取发票会计期的最后一天
-        String receivablePeriod = bankFlowLog.getReceivablePeriod();
-        if (receivablePeriod.equals(bankFlowLog.getPeriod())) {
-            date = bankFlowLog.getCreateTime().toLocalDate();
-        } else {
-            Integer year = Integer.parseInt(receivablePeriod.substring(4));
-            Integer month = Integer.parseInt(receivablePeriod.substring(4, 6));
-            LocalDate localDate = LocalDate.of(year, month, 1);
-            // 最后一天
-            date = localDate.withDayOfMonth(localDate.lengthOfMonth());
-        }
-        return date;
-    }
 
     private void saveSplit(List<InvoiceOperatingSplit> splitList, String taskId, String period) {
         for (InvoiceOperatingSplit s : splitList) {
@@ -214,10 +209,10 @@ public class InvoiceOperatingHandle {
         return split;
     }
 
-    private InvoiceOperatingSplit incomeRecord(Integer id, InvoiceOperating invoiceOperating, String itemName, String subjectCode) {
+    private InvoiceOperatingSplit incomeRecord(Integer id, InvoiceOperating invoiceOperating, String itemName, String subjectCode, String invoiceDate) {
         // 经营核算收入科目映射关系
         InvoiceOperatingSplit split = new InvoiceOperatingSplit();
-        split.setDate(LocalDateTimeUtil.format(invoiceOperating.getInvoicingTime().toLocalDate(), "yyyy-MM-dd"));
+        split.setDate(invoiceDate);
         split.setCertificateType("记账");
         split.setCertificateId(id);
         split.setSubjectCode(subjectCode);
@@ -234,10 +229,10 @@ public class InvoiceOperatingHandle {
         return split;
     }
 
-    private InvoiceOperatingSplit taxRecord(Integer id, InvoiceOperating invoiceOperating, String itemName, String subjectCode) {
+    private InvoiceOperatingSplit taxRecord(Integer id, InvoiceOperating invoiceOperating, String itemName, String subjectCode, String invoiceDate) {
         InvoiceOperatingSplit split = new InvoiceOperatingSplit();
         split.setId(IdUtil.objectId());
-        split.setDate(LocalDateTimeUtil.format(invoiceOperating.getInvoicingTime().toLocalDate(), "yyyy-MM-dd"));
+        split.setDate(invoiceDate);
         split.setCertificateType("记账");
         split.setCertificateId(id);
         split.setSubjectCode(subjectCode);

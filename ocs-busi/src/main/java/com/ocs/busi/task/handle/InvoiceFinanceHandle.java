@@ -1,7 +1,9 @@
 package com.ocs.busi.task.handle;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.IdUtil;
 import com.ocs.busi.domain.entity.*;
+import com.ocs.busi.helper.InvoiceHelper;
 import com.ocs.busi.service.*;
 import com.ocs.common.constant.CommonConstants;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,8 @@ public class InvoiceFinanceHandle {
     @Autowired
     private InvoiceFinanceService invoiceFinanceService;
     @Autowired
+    private InvoiceHelper invoiceHelper;
+    @Autowired
     private BankFlowLogService bankFlowLogService;
     @Autowired
     private BankFlowService bankFlowService;
@@ -62,9 +66,16 @@ public class InvoiceFinanceHandle {
             int increment = atomicInteger.incrementAndGet();
             // 开票日期
             InvoiceFinance fristInvoice = invoiceFinanceList.get(0);
+            // 发票时间
+            LocalDate invoiceDate = LocalDate.parse(fristInvoice.getInvoicingDate());
+            // 会计最后一天
+            LocalDate periodDate = invoiceHelper.getPeriodLastDate(fristInvoice.getInvoicingPeriod());
+            LocalDate actualDate = invoiceDate.isBefore(periodDate) ? invoiceDate : periodDate;
+            String date = LocalDateTimeUtil.format(actualDate, "yyyy-MM-dd");
+
             // 汇总
             double totalPrice = invoiceFinanceList.stream().mapToDouble(finance -> Double.parseDouble(finance.getPrice())).sum();
-            splitList.add(bankRecord(increment, fristInvoice, totalPrice + ""));
+            splitList.add(bankRecord(increment, date, fristInvoice, totalPrice + ""));
 
             for (InvoiceFinance invoiceFinance : invoiceFinanceList) {
                 String itemName = invoiceFinance.getItemName();
@@ -72,7 +83,7 @@ public class InvoiceFinanceHandle {
                 if (financeItemValue == null) {
                     log.error("未找到科目编码,科目名称:{}", itemName);
                 }
-                splitList.add(financeRecord(increment, invoiceFinance, financeItemValue == null ? "" : financeItemValue.getValue()));
+                splitList.add(financeRecord(increment, date, invoiceFinance, financeItemValue == null ? "" : financeItemValue.getValue()));
             }
             splitList.forEach(split -> split.setName("开票分录"));
             saveSplit(splitList, taskId, period);
@@ -87,7 +98,8 @@ public class InvoiceFinanceHandle {
             log.info("处理当前流水对账分录");
             int increment = atomicInteger.incrementAndGet();
             int i = bankFlowLog.getType().equals(CommonConstants.CANCEL_RECONCILIATION) ? -1 : 1;
-            LocalDate date = getSplitDate(bankFlowLog);
+            LocalDate periodLastDate = invoiceHelper.getPeriodLastDate(bankFlowLog.getPeriod());
+            LocalDate date = bankFlowLog.getCreateTime().toLocalDate().isBefore(periodLastDate) ? bankFlowLog.getCreateTime().toLocalDate() : periodLastDate;
             InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlowLog.getAmount() * i, 0d, "100204");
             InvoiceFinanceSplit temp2 = bankFlowRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount() * i, "12129901");
             List<InvoiceFinanceSplit> splitList = List.of(temp1, temp2);
@@ -105,7 +117,7 @@ public class InvoiceFinanceHandle {
                     log.info("处理流水对账未完全的分录");
                     int increment = atomicInteger.incrementAndGet();
                     BankFlowLog bankFlowLog = currentBankFlowLogList.stream().filter(log -> log.getBankFlowId().equals(bankFlow.getId())).findAny().get();
-                    LocalDate date = getSplitDate(bankFlowLog);
+                    LocalDate date = invoiceHelper.getPeriodLastDate(bankFlow.getPeriod());
                     InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlow.getUnConfirmPrice(), 0d, "100204");
                     InvoiceFinanceSplit temp2 = bankFlowRecord(increment, date, bankFlowLog, 0d, bankFlow.getUnConfirmPrice(), "21030118");
                     List<InvoiceFinanceSplit> splitList = List.of(temp1, temp2);
@@ -122,7 +134,7 @@ public class InvoiceFinanceHandle {
             // 只有剩余未对账金额时生成
             log.info("处理流水没有对账分录");
             int increment = atomicInteger.incrementAndGet();
-            LocalDate date = LocalDate.now();
+            LocalDate date = invoiceHelper.getPeriodLastDate(bankFlow.getPeriod());
             BankFlowLog bankFlowLog = new BankFlowLog();
             bankFlowLog.setClientOrgName(bankFlow.getAdversaryOrgName());
             InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlow.getUnConfirmPrice(), 0d, "100204");
@@ -145,7 +157,9 @@ public class InvoiceFinanceHandle {
 
         for (BankFlowLog bankFlowLog : pastBankUnCancelList) {
             int increment = atomicInteger.incrementAndGet();
-            LocalDate date = getSplitDate(bankFlowLog);
+            LocalDate periodLastDate = invoiceHelper.getPeriodLastDate(bankFlowLog.getPeriod());
+            LocalDate date = bankFlowLog.getCreateTime().toLocalDate().isBefore(periodLastDate) ? bankFlowLog.getCreateTime().toLocalDate() : periodLastDate;
+
             InvoiceFinanceSplit temp1 = bankFlowRecord(increment, date, bankFlowLog, bankFlowLog.getAmount(), 0d, "21030118");
             InvoiceFinanceSplit temp2 = bankFlowRecord(increment, date, bankFlowLog, 0d, bankFlowLog.getAmount(), "12129901");
             List<InvoiceFinanceSplit> splitList = List.of(temp1, temp2);
@@ -164,10 +178,10 @@ public class InvoiceFinanceHandle {
         invoiceFinanceSplitService.saveBatch(splitList);
     }
 
-    public InvoiceFinanceSplit bankRecord(Integer id, InvoiceFinance invoiceFinance, String totalPrice) {
+    public InvoiceFinanceSplit bankRecord(Integer id, String date, InvoiceFinance invoiceFinance, String totalPrice) {
         InvoiceFinanceSplit split = new InvoiceFinanceSplit();
         split.setId(IdUtil.objectId());
-        split.setDate(invoiceFinance.getInvoicingDate());
+        split.setDate(date);
         split.setCertificateType("记账");
         split.setCertificateId(id);
         split.setSubjectCode("12129901");
@@ -182,10 +196,10 @@ public class InvoiceFinanceHandle {
         return split;
     }
 
-    public InvoiceFinanceSplit financeRecord(Integer id, InvoiceFinance invoiceFinance, String subjectCode) {
+    public InvoiceFinanceSplit financeRecord(Integer id, String date, InvoiceFinance invoiceFinance, String subjectCode) {
         InvoiceFinanceSplit split = new InvoiceFinanceSplit();
         split.setId(IdUtil.objectId());
-        split.setDate(invoiceFinance.getInvoicingDate());
+        split.setDate(date);
         split.setCertificateType("记账");
         split.setCertificateId(id);
         split.setSubjectCode(subjectCode);

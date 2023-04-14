@@ -13,6 +13,7 @@ import com.ocs.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -83,6 +84,14 @@ public class InvoiceHelper {
         }
         // 如果没找到启用的，则报错
         employeeList.stream().filter(employee -> employee.getStatus().equals("0")).findAny().orElseThrow(() -> new ServiceException("职员:" + name + ", 被禁用"));
+    }
+
+    public LocalDate getPeriodLastDate(String period){
+        Integer year = Integer.parseInt(period.substring(4));
+        Integer month = Integer.parseInt(period.substring(4, 6));
+        LocalDate localDate = LocalDate.of(year, month, 1);
+        // 最后一天
+        return localDate.withDayOfMonth(localDate.lengthOfMonth());
     }
 
 
